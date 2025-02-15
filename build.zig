@@ -263,6 +263,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates various flags used during and after window creation",
         },
         .{
+            .name = "raymarching",
+            .path = "examples/shaders/raymarching.zig",
+            .desc = "Uses a raymarching in a shader to render shapes",
+        },
+        .{
             .name = "texture_outline",
             .path = "examples/shaders/texture_outline.zig",
             .desc = "Uses a shader to create an outline around a sprite",
