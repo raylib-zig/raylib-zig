@@ -574,8 +574,18 @@ pub fn guiSetTooltip(tooltip: [*:0]const u8) void {
 }
 
 /// Get text with icon id prepended (if supported)
-pub fn guiIconText(iconId: i32, text: [*:0]const u8) [*:0]const u8 {
-    return std.mem.span(cdef.GuiIconText(@as(c_int, iconId), @as([*c]const u8, @ptrCast(text))));
+pub fn guiIconText(comptime iconId: anytype, text: [*:0]const u8) [*:0]const u8 {
+    comptime var icon: c_int = undefined;
+
+    comptime {
+        if (@TypeOf(iconId) == GuiIconName) {
+            icon = @intCast(@intFromEnum(iconId));
+        } else {
+            icon = @intCast(iconId);
+        }
+    }
+
+    return std.mem.span(cdef.GuiIconText(icon, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Set default icon drawing size
