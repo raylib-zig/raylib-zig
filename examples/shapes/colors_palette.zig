@@ -43,7 +43,7 @@ pub fn main() anyerror!void {
         rl.Color.beige,
     };
 
-    const colorNames = [maxColorCount][*:0]const u8{
+    const colorNames = [maxColorCount][:0]const u8{
         "DARKGRAY",
         "MAROON",
         "ORANGE",
