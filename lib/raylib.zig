@@ -2211,6 +2211,13 @@ pub fn loadRenderTexture(width: i32, height: i32) RaylibError!RenderTexture2D {
     return if (isValid) render_texture else RaylibError.LoadRenderTexture;
 }
 
+pub fn colorToInt(color: Color) i32 {
+    return if (@inComptime())
+        (@as(i32, color.r) << 24) | (@as(i32, color.g) << 16) | (@as(i32, color.b) << 8) | @as(i32, color.a)
+    else
+        @as(i32, cdef.ColorToInt(color));
+}
+
 /// Get the default Font
 pub fn getFontDefault() RaylibError!Font {
     // TODO: GetFontDefault requires SUPPORT_DEFAULT_FONT. Error out if unset.
@@ -4216,11 +4223,6 @@ pub fn colorIsEqual(col1: Color, col2: Color) bool {
 /// Get color with alpha applied, alpha goes from 0.0f to 1.0f
 pub fn fade(color: Color, alpha: f32) Color {
     return cdef.Fade(color, alpha);
-}
-
-/// Get hexadecimal value for a Color (0xRRGGBBAA)
-pub fn colorToInt(color: Color) i32 {
-    return @as(i32, cdef.ColorToInt(color));
 }
 
 /// Get Color normalized as float [0..1]
