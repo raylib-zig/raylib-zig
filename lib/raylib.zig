@@ -2513,7 +2513,7 @@ pub fn drawTextCodepoints(font: Font, codepoints: []const c_int, position: Vecto
 }
 
 /// Load UTF-8 text encoded from codepoints array
-pub fn loadUTF8(codepoints: []const c_int) [*:0]u8 {
+pub fn loadUTF8(codepoints: []const c_int) [:0]u8 {
     return std.mem.span(cdef.LoadUTF8(@as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, @intCast(codepoints.len))));
 }
 

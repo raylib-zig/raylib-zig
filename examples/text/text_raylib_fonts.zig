@@ -32,7 +32,7 @@ pub fn main() !void {
         rl.unloadFont(font);
     };
 
-    const messages = [MAX_FONTS][*:0]const u8{
+    const messages = [MAX_FONTS][:0]const u8{
         "ALAGARD FONT designed by Hewett Tsoi",
         "PIXELPLAY FONT designed by Aleksander Shevchuk",
         "MECHA FONT designed by Captain Falcon",
