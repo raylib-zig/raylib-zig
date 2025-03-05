@@ -4,7 +4,7 @@
 
 Manually tweaked, auto-generated [raylib](https://github.com/raysan5/raylib) bindings for zig.
 
-Bindings tested on raylib version 5.6-dev and Zig 0.14.0-dev.2802+257054a14
+Bindings tested on raylib version 5.6-dev and Zig 0.14.0
 
 Thanks to all the [contributors](https://github.com/Not-Nik/raylib-zig/graphs/contributors) for their help with this
 binding.
