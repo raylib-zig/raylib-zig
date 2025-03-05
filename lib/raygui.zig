@@ -550,7 +550,7 @@ pub fn guiGetFont() Font {
 }
 
 /// Load style file over global style variable (.rgs)
-pub fn guiLoadStyle(fileName: [*:0]const u8) void {
+pub fn guiLoadStyle(fileName: [:0]const u8) void {
     cdef.GuiLoadStyle(@as([*c]const u8, @ptrCast(fileName)));
 }
 
@@ -570,12 +570,12 @@ pub fn guiDisableTooltip() void {
 }
 
 /// Set tooltip string
-pub fn guiSetTooltip(tooltip: [*:0]const u8) void {
+pub fn guiSetTooltip(tooltip: [:0]const u8) void {
     cdef.GuiSetTooltip(@as([*c]const u8, @ptrCast(tooltip)));
 }
 
 /// Get text with icon id prepended (if supported)
-pub fn guiIconText(iconId: i32, text: [*:0]const u8) [*:0]const u8 {
+pub fn guiIconText(iconId: i32, text: [:0]const u8) [:0]const u8 {
     return std.mem.span(cdef.GuiIconText(@as(c_int, iconId), @as([*c]const u8, @ptrCast(text))));
 }
 
@@ -590,156 +590,156 @@ pub fn guiDrawIcon(iconId: i32, posX: i32, posY: i32, pixelSize: i32, color: Col
 }
 
 /// Window Box control, shows a window that can be closed
-pub fn guiWindowBox(bounds: Rectangle, title: [*:0]const u8) i32 {
+pub fn guiWindowBox(bounds: Rectangle, title: [:0]const u8) i32 {
     return @as(i32, cdef.GuiWindowBox(bounds, @as([*c]const u8, @ptrCast(title))));
 }
 
 /// Group Box control with text name
-pub fn guiGroupBox(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiGroupBox(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiGroupBox(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Line separator control, could contain text
-pub fn guiLine(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiLine(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiLine(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Label control
-pub fn guiLabel(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiLabel(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiLabel(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Button control, returns true when clicked
-pub fn guiButton(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiButton(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiButton(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Label button control, returns true when clicked
-pub fn guiLabelButton(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiLabelButton(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiLabelButton(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Toggle Button control
-pub fn guiToggle(bounds: Rectangle, text: [*:0]const u8, active: *bool) i32 {
+pub fn guiToggle(bounds: Rectangle, text: [:0]const u8, active: *bool) i32 {
     return @as(i32, cdef.GuiToggle(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]bool, @ptrCast(active))));
 }
 
 /// Toggle Group control
-pub fn guiToggleGroup(bounds: Rectangle, text: [*:0]const u8, active: *i32) i32 {
+pub fn guiToggleGroup(bounds: Rectangle, text: [:0]const u8, active: *i32) i32 {
     return @as(i32, cdef.GuiToggleGroup(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// Toggle Slider control
-pub fn guiToggleSlider(bounds: Rectangle, text: [*:0]const u8, active: *i32) i32 {
+pub fn guiToggleSlider(bounds: Rectangle, text: [:0]const u8, active: *i32) i32 {
     return @as(i32, cdef.GuiToggleSlider(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// Check Box control, returns true when active
-pub fn guiCheckBox(bounds: Rectangle, text: [*:0]const u8, checked: *bool) i32 {
+pub fn guiCheckBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) i32 {
     return @as(i32, cdef.GuiCheckBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]bool, @ptrCast(checked))));
 }
 
 /// Combo Box control
-pub fn guiComboBox(bounds: Rectangle, text: [*:0]const u8, active: *i32) i32 {
+pub fn guiComboBox(bounds: Rectangle, text: [:0]const u8, active: *i32) i32 {
     return @as(i32, cdef.GuiComboBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// Dropdown Box control
-pub fn guiDropdownBox(bounds: Rectangle, text: [*:0]const u8, active: *i32, editMode: bool) i32 {
+pub fn guiDropdownBox(bounds: Rectangle, text: [:0]const u8, active: *i32, editMode: bool) i32 {
     return @as(i32, cdef.GuiDropdownBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(active)), editMode));
 }
 
 /// Spinner control
-pub fn guiSpinner(bounds: Rectangle, text: [*:0]const u8, value: *i32, minValue: i32, maxValue: i32, editMode: bool) i32 {
+pub fn guiSpinner(bounds: Rectangle, text: [:0]const u8, value: *i32, minValue: i32, maxValue: i32, editMode: bool) i32 {
     return @as(i32, cdef.GuiSpinner(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(value)), @as(c_int, minValue), @as(c_int, maxValue), editMode));
 }
 
 /// Value Box control, updates input text with numbers
-pub fn guiValueBox(bounds: Rectangle, text: [*:0]const u8, value: *i32, minValue: i32, maxValue: i32, editMode: bool) i32 {
+pub fn guiValueBox(bounds: Rectangle, text: [:0]const u8, value: *i32, minValue: i32, maxValue: i32, editMode: bool) i32 {
     return @as(i32, cdef.GuiValueBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(value)), @as(c_int, minValue), @as(c_int, maxValue), editMode));
 }
 
 /// Value box control for float values
-pub fn guiValueBoxFloat(bounds: Rectangle, text: [*:0]const u8, textValue: [*:0]u8, value: *f32, editMode: bool) i32 {
+pub fn guiValueBoxFloat(bounds: Rectangle, text: [:0]const u8, textValue: [:0]u8, value: *f32, editMode: bool) i32 {
     return @as(i32, cdef.GuiValueBoxFloat(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]u8, @ptrCast(textValue)), @as([*c]f32, @ptrCast(value)), editMode));
 }
 
 /// Text Box control, updates input text
-pub fn guiTextBox(bounds: Rectangle, text: [*:0]u8, textSize: i32, editMode: bool) i32 {
+pub fn guiTextBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) i32 {
     return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode));
 }
 
 /// Slider control
-pub fn guiSlider(bounds: Rectangle, textLeft: [*:0]const u8, textRight: [*:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn guiSlider(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSlider(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
 /// Slider Bar control
-pub fn guiSliderBar(bounds: Rectangle, textLeft: [*:0]const u8, textRight: [*:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn guiSliderBar(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSliderBar(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
 /// Progress Bar control
-pub fn guiProgressBar(bounds: Rectangle, textLeft: [*:0]const u8, textRight: [*:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn guiProgressBar(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiProgressBar(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
 /// Status Bar control, shows info text
-pub fn guiStatusBar(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiStatusBar(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiStatusBar(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Dummy control for placeholders
-pub fn guiDummyRec(bounds: Rectangle, text: [*:0]const u8) i32 {
+pub fn guiDummyRec(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiDummyRec(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
 /// Grid control
-pub fn guiGrid(bounds: Rectangle, text: [*:0]const u8, spacing: f32, subdivs: i32, mouseCell: *Vector2) i32 {
+pub fn guiGrid(bounds: Rectangle, text: [:0]const u8, spacing: f32, subdivs: i32, mouseCell: *Vector2) i32 {
     return @as(i32, cdef.GuiGrid(bounds, @as([*c]const u8, @ptrCast(text)), spacing, @as(c_int, subdivs), @as([*c]Vector2, @ptrCast(mouseCell))));
 }
 
 /// List View control
-pub fn guiListView(bounds: Rectangle, text: [*:0]const u8, scrollIndex: *i32, active: *i32) i32 {
+pub fn guiListView(bounds: Rectangle, text: [:0]const u8, scrollIndex: *i32, active: *i32) i32 {
     return @as(i32, cdef.GuiListView(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// Message Box control, displays a message
-pub fn guiMessageBox(bounds: Rectangle, title: [*:0]const u8, message: [*:0]const u8, buttons: [*:0]const u8) i32 {
+pub fn guiMessageBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8) i32 {
     return @as(i32, cdef.GuiMessageBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(buttons))));
 }
 
 /// Text Input Box control, ask for text, supports secret
-pub fn guiTextInputBox(bounds: Rectangle, title: [*:0]const u8, message: [*:0]const u8, buttons: [*:0]const u8, text: [*:0]u8, textMaxSize: i32, secretViewActive: *bool) i32 {
+pub fn guiTextInputBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8, text: [:0]u8, textMaxSize: i32, secretViewActive: *bool) i32 {
     return @as(i32, cdef.GuiTextInputBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(buttons)), @as([*c]u8, @ptrCast(text)), @as(c_int, textMaxSize), @as([*c]bool, @ptrCast(secretViewActive))));
 }
 
 /// Color Picker control (multiple color controls)
-pub fn guiColorPicker(bounds: Rectangle, text: [*:0]const u8, color: *Color) i32 {
+pub fn guiColorPicker(bounds: Rectangle, text: [:0]const u8, color: *Color) i32 {
     return @as(i32, cdef.GuiColorPicker(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Color, @ptrCast(color))));
 }
 
 /// Color Panel control
-pub fn guiColorPanel(bounds: Rectangle, text: [*:0]const u8, color: *Color) i32 {
+pub fn guiColorPanel(bounds: Rectangle, text: [:0]const u8, color: *Color) i32 {
     return @as(i32, cdef.GuiColorPanel(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Color, @ptrCast(color))));
 }
 
 /// Color Bar Alpha control
-pub fn guiColorBarAlpha(bounds: Rectangle, text: [*:0]const u8, alpha: *f32) i32 {
+pub fn guiColorBarAlpha(bounds: Rectangle, text: [:0]const u8, alpha: *f32) i32 {
     return @as(i32, cdef.GuiColorBarAlpha(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]f32, @ptrCast(alpha))));
 }
 
 /// Color Bar Hue control
-pub fn guiColorBarHue(bounds: Rectangle, text: [*:0]const u8, value: *f32) i32 {
+pub fn guiColorBarHue(bounds: Rectangle, text: [:0]const u8, value: *f32) i32 {
     return @as(i32, cdef.GuiColorBarHue(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]f32, @ptrCast(value))));
 }
 
 /// Color Picker control that avoids conversion to RGB on each call (multiple color controls)
-pub fn guiColorPickerHSV(bounds: Rectangle, text: [*:0]const u8, colorHsv: *Vector3) i32 {
+pub fn guiColorPickerHSV(bounds: Rectangle, text: [:0]const u8, colorHsv: *Vector3) i32 {
     return @as(i32, cdef.GuiColorPickerHSV(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Vector3, @ptrCast(colorHsv))));
 }
 
 /// Color Panel control that updates Hue-Saturation-Value color value, used by GuiColorPickerHSV()
-pub fn guiColorPanelHSV(bounds: Rectangle, text: [*:0]const u8, colorHsv: *Vector3) i32 {
+pub fn guiColorPanelHSV(bounds: Rectangle, text: [:0]const u8, colorHsv: *Vector3) i32 {
     return @as(i32, cdef.GuiColorPanelHSV(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Vector3, @ptrCast(colorHsv))));
 }
