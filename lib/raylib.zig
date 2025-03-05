@@ -1843,6 +1843,7 @@ pub const ShaderLocationIndex = enum(c_int) {
     vertex_boneids = 26,
     vertex_boneweights = 27,
     bone_matrices = 28,
+    shader_loc_vertex_instance_tx
 };
 
 pub const ShaderUniformDataType = enum(c_int) {
@@ -1975,7 +1976,7 @@ pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(.C) void;
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 5);
 pub const RAYLIB_VERSION_MINOR = @as(i32, 5);
 pub const RAYLIB_VERSION_PATCH = @as(i32, 0);
-pub const RAYLIB_VERSION = "5.5";
+pub const RAYLIB_VERSION = "5.6-devfn alloc(_: *anyopaque, len: usize, _: std.mem.Alignment, _: usize) ?[*]u8 {";
 
 pub const MAX_TOUCH_POINTS = 10;
 pub const MAX_MATERIAL_MAPS = 12;
@@ -2518,8 +2519,8 @@ pub fn loadUTF8(codepoints: []const c_int) [*:0]u8 {
 }
 
 /// Join text strings with delimiter
-pub fn textJoin(textList: [][*:0]const u8, delimiter: [*:0]const u8) [*:0]const u8 {
-    return std.mem.span(cdef.TextJoin(@as([*c][*c]const u8, @ptrCast(textList)), @as(c_int, @intCast(textList.len)), @as([*c]const u8, @ptrCast(delimiter))));
+pub fn textJoin(textList: [][*:0]u8, delimiter: [*:0]const u8) [*:0]const u8 {
+    return std.mem.span(cdef.TextJoin(@as([*c][*c]u8, @ptrCast(textList)), @as(c_int, @intCast(textList.len)), @as([*c]const u8, @ptrCast(delimiter))));
 }
 
 /// Draw a triangle strip defined by points
@@ -2528,24 +2529,34 @@ pub fn drawTriangleStrip3D(points: []const Vector3, color: Color) void {
 }
 
 /// Internal memory allocator
-fn alloc(_: *anyopaque, len: usize, _: u8, _: usize) ?[*]u8 {
+fn alloc(_: *anyopaque, len: usize, _: std.mem.Alignment, _: usize) ?[*]u8 {
     std.debug.assert(len > 0);
     return @ptrCast(cdef.MemAlloc(@intCast(len)));
 }
 
-fn resize(_: *anyopaque, buf: []u8, _: u8, new_len: usize, _: usize) bool {
+fn resize(_: *anyopaque, buf: []u8, _: std.mem.Alignment, new_len: usize, _: usize) bool {
     return (new_len <= buf.len);
 }
 
 /// Internal memory free
-fn free(_: *anyopaque, buf: []u8, _: u8, _: usize) void {
+fn free(_: *anyopaque, buf: []u8, _: std.mem.Alignment, _: usize) void {
     cdef.MemFree(buf.ptr);
 }
+
+fn remap(_: *anyopaque, buf: []u8, _: std.mem.Alignment, new_len: usize, _: usize) ?[*]u8 {
+    if (new_len <= buf.len) {
+        return buf.ptr;
+    } else {
+        return null;
+    }
+}
+
 
 const mem_vtable = std.mem.Allocator.VTable{
     .alloc = alloc,
     .resize = resize,
     .free = free,
+    .remap = remap,
 };
 
 pub const mem = std.mem.Allocator{
@@ -2948,7 +2959,7 @@ pub fn setShaderValueMatrix(shader: Shader, locIndex: i32, mat: Matrix) void {
     cdef.SetShaderValueMatrix(shader, @as(c_int, locIndex), mat);
 }
 
-/// Set shader uniform value for texture (sampler2d)
+/// Set shader uniform value and bind the texture (sampler2d)
 pub fn setShaderValueTexture(shader: Shader, locIndex: i32, texture: Texture2D) void {
     cdef.SetShaderValueTexture(shader, @as(c_int, locIndex), texture);
 }
@@ -3306,6 +3317,11 @@ pub fn getKeyPressed() KeyboardKey {
 /// Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
 pub fn getCharPressed() i32 {
     return @as(i32, cdef.GetCharPressed());
+}
+
+/// Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)
+pub fn getKeyName(key: KeyboardKey) [*:0]const u8 {
+    return std.mem.span(cdef.GetKeyName(key));
 }
 
 /// Set a custom key to exit program (default is ESC)
@@ -4439,36 +4455,36 @@ pub fn textFindIndex(text: [*:0]const u8, find: [*:0]const u8) i32 {
 }
 
 /// Get upper case version of provided string
-pub fn textToUpper(text: [*:0]const u8) [*:0]const u8 {
+pub fn textToUpper(text: [*:0]const u8) [*:0]u8 {
     return std.mem.span(cdef.TextToUpper(@as([*c]const u8, @ptrCast(text))));
 }
 
 /// Get lower case version of provided string
-pub fn textToLower(text: [*:0]const u8) [*:0]const u8 {
+pub fn textToLower(text: [*:0]const u8) [*:0]u8 {
     return std.mem.span(cdef.TextToLower(@as([*c]const u8, @ptrCast(text))));
 }
 
 /// Get Pascal case notation version of provided string
-pub fn textToPascal(text: [*:0]const u8) [*:0]const u8 {
+pub fn textToPascal(text: [*:0]const u8) [*:0]u8 {
     return std.mem.span(cdef.TextToPascal(@as([*c]const u8, @ptrCast(text))));
 }
 
 /// Get Snake case notation version of provided string
-pub fn textToSnake(text: [*:0]const u8) [*:0]const u8 {
+pub fn textToSnake(text: [*:0]const u8) [*:0]u8 {
     return std.mem.span(cdef.TextToSnake(@as([*c]const u8, @ptrCast(text))));
 }
 
 /// Get Camel case notation version of provided string
-pub fn textToCamel(text: [*:0]const u8) [*:0]const u8 {
+pub fn textToCamel(text: [*:0]const u8) [*:0]u8 {
     return std.mem.span(cdef.TextToCamel(@as([*c]const u8, @ptrCast(text))));
 }
 
-/// Get integer value from text (negative values not supported)
+/// Get integer value from text
 pub fn textToInteger(text: [*:0]const u8) i32 {
     return @as(i32, cdef.TextToInteger(@as([*c]const u8, @ptrCast(text))));
 }
 
-/// Get float value from text (negative values not supported)
+/// Get float value from text
 pub fn textToFloat(text: [*:0]const u8) f32 {
     return cdef.TextToFloat(@as([*c]const u8, @ptrCast(text)));
 }
@@ -5088,7 +5104,7 @@ pub fn setAudioStreamCallback(stream: AudioStream, callback: AudioCallback) void
     cdef.SetAudioStreamCallback(stream, callback);
 }
 
-/// Attach audio stream processor to stream, receives the samples as 'float'
+/// Attach audio stream processor to stream, receives frames x 2 samples as 'float' (stereo)
 pub fn attachAudioStreamProcessor(stream: AudioStream, processor: AudioCallback) void {
     cdef.AttachAudioStreamProcessor(stream, processor);
 }
@@ -5098,7 +5114,7 @@ pub fn detachAudioStreamProcessor(stream: AudioStream, processor: AudioCallback)
     cdef.DetachAudioStreamProcessor(stream, processor);
 }
 
-/// Attach audio stream processor to the entire audio pipeline, receives the samples as 'float'
+/// Attach audio stream processor to the entire audio pipeline, receives frames x 2 samples as 'float' (stereo)
 pub fn attachAudioMixedProcessor(processor: AudioCallback) void {
     cdef.AttachAudioMixedProcessor(processor);
 }

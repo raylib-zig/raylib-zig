@@ -83,6 +83,10 @@ pub fn vector2DotProduct(v1: Vector2, v2: Vector2) f32 {
     return cdef.Vector2DotProduct(v1, v2);
 }
 
+pub fn vector2CrossProduct(v1: Vector2, v2: Vector2) f32 {
+    return cdef.Vector2CrossProduct(v1, v2);
+}
+
 pub fn vector2Distance(v1: Vector2, v2: Vector2) f32 {
     return cdef.Vector2Distance(v1, v2);
 }

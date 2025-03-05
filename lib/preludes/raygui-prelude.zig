@@ -58,7 +58,7 @@ pub const GuiControl = enum(c_int) {
     dropdownbox,
     textbox,
     valuebox,
-    spinner,
+    control11,
     listview,
     colorpicker,
     scrollbar,
@@ -135,7 +135,7 @@ pub const GuiTextBoxProperty = enum(c_int) {
     text_readonly = 16,
 };
 
-pub const GuiSpinnerProperty = enum(c_int) {
+pub const GuiValueBoxProperty = enum(c_int) {
     spin_button_width = 16,
     spin_button_spacing,
 };
@@ -145,6 +145,7 @@ pub const GuiListViewProperty = enum(c_int) {
     list_items_spacing,
     scrollbar_width,
     scrollbar_side,
+    list_items_border_normal,
     list_items_border_width,
 };
 

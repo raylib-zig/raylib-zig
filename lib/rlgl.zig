@@ -266,6 +266,10 @@ pub const rl_default_shader_attrib_location_normal = @as(i32, 2);
 pub const rl_default_shader_attrib_location_color = @as(i32, 3);
 pub const rl_default_shader_attrib_location_tangent = @as(i32, 4);
 pub const rl_default_shader_attrib_location_texcoord2 = @as(i32, 5);
+pub const rl_default_shader_attrib_location_indices = @as(i32, 6);
+pub const rl_default_shader_attrib_location_boneids = @as(i32, 7);
+pub const rl_default_shader_attrib_location_boneweights = @as(i32, 5);
+pub const rl_default_shader_attrib_location_instance_tx = @as(i32, 9);
 
 /// Choose the current matrix to be transformed
 pub fn rlMatrixMode(mode: i32) void {
@@ -575,17 +579,22 @@ pub fn rlScissor(x: i32, y: i32, width: i32, height: i32) void {
     cdef.rlScissor(@as(c_int, x), @as(c_int, y), @as(c_int, width), @as(c_int, height));
 }
 
-/// Enable wire mode
-pub fn rlEnableWireMode() void {
-    cdef.rlEnableWireMode();
-}
-
 /// Enable point mode
 pub fn rlEnablePointMode() void {
     cdef.rlEnablePointMode();
 }
 
-/// Disable wire (and point) mode
+/// Disable point mode
+pub fn rlDisablePointMode() void {
+    cdef.rlDisablePointMode();
+}
+
+/// Enable wire mode
+pub fn rlEnableWireMode() void {
+    cdef.rlEnableWireMode();
+}
+
+/// Disable wire mode
 pub fn rlDisableWireMode() void {
     cdef.rlDisableWireMode();
 }

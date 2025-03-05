@@ -18,6 +18,7 @@ pub extern "c" fn Vector2SubtractValue(v: rl.Vector2, sub: f32) rl.Vector2;
 pub extern "c" fn Vector2Length(v: rl.Vector2) f32;
 pub extern "c" fn Vector2LengthSqr(v: rl.Vector2) f32;
 pub extern "c" fn Vector2DotProduct(v1: rl.Vector2, v2: rl.Vector2) f32;
+pub extern "c" fn Vector2CrossProduct(v1: rl.Vector2, v2: rl.Vector2) f32;
 pub extern "c" fn Vector2Distance(v1: rl.Vector2, v2: rl.Vector2) f32;
 pub extern "c" fn Vector2DistanceSqr(v1: rl.Vector2, v2: rl.Vector2) f32;
 pub extern "c" fn Vector2Angle(v1: rl.Vector2, v2: rl.Vector2) f32;
