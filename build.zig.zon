@@ -5,11 +5,11 @@
     .dependencies = .{
         .raylib = .{
             .url = "git+https://github.com/raysan5/raylib#f1385f3aec24a29ff50164e5c86337dbd005506a",
-            .hash = "1220c1097be0f2b1884392603978a28ac592e92eda2f1f2dcc4218e8ec62a9bce181",
+            .hash = "raylib-5.5.0-AAAAAKVFzQDBCXvg8rGIQ5JgOXiiisWS6S7aLx8tzEIY",
         },
         .raygui = .{
             .url = "git+https://github.com/raysan5/raygui#9a95871701a5fc63bea35eab73fef6414e048b73",
-            .hash = "122069ba45cdcb6eef6a3429ca23eb119a55ea338bcc8ebe3ad73f01d7f8129204e5",
+            .hash = "N-V-__8AAPZ7UgBpukXNy27vajQpyiPrEZpV6jOLzI6-Otc_",
         },
     },
     .minimum_zig_version = "0.14.0",
