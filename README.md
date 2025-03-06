@@ -70,7 +70,7 @@ zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
 Then add raylib-zig as a dependency and import its modules and artifact in your `build.zig`:
 
 ```zig
-const raylib_dep = b.dependency("raylib-zig", .{
+const raylib_dep = b.dependency("raylib_zig", .{
     .target = target,
     .optimize = optimize,
 });
@@ -89,7 +89,7 @@ exe.root_module.addImport("raygui", raygui);
 ```
 
 If you additionally want to support Web as a platform with emscripten, you will need to use `emcc.zig` by importing
-raylib-zig's build script with `const rlz = @import("raylib-zig");` and then accessing its functions with `rlz.emcc`.
+raylib-zig's build script with `const rlz = @import("raylib_zig");` and then accessing its functions with `rlz.emcc`.
 Refer to raylib-zig's project template on how to use them.
 
 ### Passing build options
@@ -98,7 +98,7 @@ raylib allows customisations of certain parts of its build process such as choos
 shared library or not including certain modules. You can optionally pass these options to raylib-zig dependency like so
 
 ```zig
-const raylib_dep = b.dependency("raylib-zig", .{
+const raylib_dep = b.dependency("raylib_zig", .{
     .target = target,
     .optimize = optimize,
     .shared = true, // Build raylib as a shared library
