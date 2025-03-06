@@ -11,13 +11,13 @@ Write-Output "Generating project files..."
 
 $BUILD_DOT_ZIG = @"
 const std = @import("std");
-const rlz = @import("raylib-zig");
+const rlz = @import("raylib_zig");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     
-    const raylib_dep = b.dependency("raylib-zig", .{
+    const raylib_dep = b.dependency("raylib_zig", .{
         .target = target,
         .optimize = optimize,
     });
@@ -63,9 +63,22 @@ New-Item -Name "build.zig" -ItemType "file" -Value $BUILD_DOT_ZIG -Force
 
 $ZON_FILE = @"
 .{
-    .name = "$PROJECT_NAME",
+    .name = .raylib_zig,
     .version = "0.0.1",
+    .fingerprint = 0xc4cfa8c610114f28,
     .dependencies = .{
+        .raylib = .{
+            .url = "git+https://github.com/raysan5/raylib#e70f9157bcae046804e754e98a2694adcfdbfa5d",
+            .hash = "1220f6aef0d678ba6e3d67a60069b5f32dc965a930c797f463840d224759d615b864",
+        },
+        .raygui = .{
+            .url = "git+https://github.com/raysan5/raygui#76b36b597edb70ffaf96f046076adc20d67e7827",
+            .hash = "1220ce6e40b454766d901ac4a19b2408f84365fcad4e4840c788b59f34a0ed698883",
+        },
+        .raylib_zig = .{
+            .url = "git+https://github.com/Not-Nik/raylib-zig?ref=devel#57a8a21b486af47d62cb8ce39a0c7902019a86d2",
+            .hash = "raylib_zig-5.6.0-dev-KE8RELUtBQD9ynf9BONdwukHlR4Ib8k_hZZUkqUPO7uJ",
+        },
     },
     .paths = .{""},
 }
