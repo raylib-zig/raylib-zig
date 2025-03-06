@@ -9,15 +9,18 @@ Set-Location -Path $PROJECT_NAME -ErrorAction Stop
 
 Write-Output "Generating project files..."
 
+zig init
+Remove-Item "build.zig", "src\root.zig"
+
 $BUILD_DOT_ZIG = @"
 const std = @import("std");
-const rlz = @import("raylib-zig");
+const rlz = @import("raylib_zig");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     
-    const raylib_dep = b.dependency("raylib-zig", .{
+    const raylib_dep = b.dependency("raylib_zig", .{
         .target = target,
         .optimize = optimize,
     });
@@ -61,21 +64,8 @@ pub fn build(b: *std.Build) !void {
 
 New-Item -Name "build.zig" -ItemType "file" -Value $BUILD_DOT_ZIG -Force
 
-$ZON_FILE = @"
-.{
-    .name = "$PROJECT_NAME",
-    .version = "0.0.1",
-    .dependencies = .{
-    },
-    .paths = .{""},
-}
-"@
-
 zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
 
-New-Item -Name "build.zig.zon" -ItemType "file" -Value $ZON_FILE -Force
-
-New-Item -Name "src" -ItemType "directory"
 New-Item -Name "resources" -ItemType "directory"
 New-Item -Name "resources/placeholder.txt" -ItemType "file" -Value "" -Force
 

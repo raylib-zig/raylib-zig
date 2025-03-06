@@ -9,14 +9,19 @@ fi
 mkdir "$PROJECT_NAME" && cd "$PROJECT_NAME" || exit
 touch build.zig
 echo "Generating project files..."
+
+zig init
+rm build.zig
+rm src/root.zig
+
 echo 'const std = @import("std");
-const rlz = @import("raylib-zig");
+const rlz = @import("raylib_zig");
 
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     
-    const raylib_dep = b.dependency("raylib-zig", .{
+    const raylib_dep = b.dependency("raylib_zig", .{
         .target = target,
         .optimize = optimize,
     });
@@ -57,17 +62,8 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(exe);
 }' >> build.zig
 
-echo '.{
-    .name = "'$PROJECT_NAME'",
-    .version = "0.0.1",
-    .dependencies = .{
-    },
-    .paths = .{""},
-}' >> build.zig.zon
-
 zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
 
-mkdir src
 mkdir resources
 touch resources/placeholder.txt
 
