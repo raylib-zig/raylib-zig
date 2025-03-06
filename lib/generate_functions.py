@@ -300,6 +300,7 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
                 ("rlLoadShaderBuffer", "data"),
                 ("rlLoadShaderCode", "vsCode"),
                 ("rlLoadShaderCode", "fsCode"),
+                ("GuiTextInputBox", "secretViewActive")
             ]
 
             zig_type = ziggify_type(arg_name, arg_type, func_name)

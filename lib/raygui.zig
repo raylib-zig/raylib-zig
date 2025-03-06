@@ -710,7 +710,7 @@ pub fn guiMessageBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const 
 }
 
 /// Text Input Box control, ask for text, supports secret
-pub fn guiTextInputBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8, text: [:0]u8, textMaxSize: i32, secretViewActive: *bool) i32 {
+pub fn guiTextInputBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8, text: [:0]u8, textMaxSize: i32, secretViewActive: ?*bool) i32 {
     return @as(i32, cdef.GuiTextInputBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(buttons)), @as([*c]u8, @ptrCast(text)), @as(c_int, textMaxSize), @as([*c]bool, @ptrCast(secretViewActive))));
 }
 
