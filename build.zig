@@ -108,6 +108,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Creates a basic window with text",
         },
         .{
+            .name = "basic_window_web",
+            .path = "examples/core/basic_window_web.zig",
+            .desc = "Creates a basic window with text (web)",
+        },
+        .{
             .name = "input_keys",
             .path = "examples/core/input_keys.zig",
             .desc = "Simple keyboard input",
