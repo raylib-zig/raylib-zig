@@ -13,7 +13,7 @@ const CircleWave = struct {
 const screenWidth = 800;
 const screenHeight = 450;
 
-const colors = [14]rl.Color{ rl.Color.orange, rl.Color.red, rl.Color.gold, rl.Color.lime, rl.Color.blue, rl.Color.violet, rl.Color.brown, rl.Color.light_gray, rl.Color.pink, rl.Color.yellow, rl.Color.green, rl.Color.sky_blue, rl.Color.purple, rl.Color.beige };
+const colors = [14]rl.Color{ .orange, .red, .gold, .lime, .blue, .violet, .brown, .light_gray, .pink, .yellow, .green, .sky_blue, .purple, .beige };
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -57,14 +57,14 @@ pub fn main() !void {
         rl.updateMusicStream(music); // Update music buffer with new stream data
 
         // Restart music playing (stop and play)
-        if (rl.isKeyPressed(rl.KeyboardKey.space)) {
+        if (rl.isKeyPressed(.space)) {
             rl.stopMusicStream(music);
             rl.playMusicStream(music);
             pause = false;
         }
 
         // Pause/Resume music playing
-        if (rl.isKeyPressed(rl.KeyboardKey.p)) {
+        if (rl.isKeyPressed(.p)) {
             pause = !pause;
 
             if (pause) {
@@ -74,9 +74,9 @@ pub fn main() !void {
             }
         }
 
-        if (rl.isKeyDown(rl.KeyboardKey.down)) {
+        if (rl.isKeyDown(.down)) {
             pitch -= 0.01;
-        } else if (rl.isKeyDown(rl.KeyboardKey.up)) {
+        } else if (rl.isKeyDown(.up)) {
             pitch += 0.01;
         }
 
@@ -103,24 +103,24 @@ pub fn main() !void {
         //----------------------------------------------------------------------------------
         rl.beginDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        rl.clearBackground(.white);
 
         for (circles) |circle| {
-            rl.drawCircleV(circle.position, circle.radius, rl.fade(circle.color, circle.alpha));
+            rl.drawCircleV(circle.position, circle.radius, .fade(circle.color, circle.alpha));
         }
 
         // Draw time bar
-        rl.drawRectangle(20, screenHeight - 20 - 12, screenWidth - 40, 12, rl.Color.light_gray);
-        rl.drawRectangle(20, screenHeight - 20 - 12, @intFromFloat(timePlayed), 12, rl.Color.maroon);
-        rl.drawRectangleLines(20, screenHeight - 20 - 12, screenWidth - 40, 12, rl.Color.gray);
+        rl.drawRectangle(20, screenHeight - 20 - 12, screenWidth - 40, 12, .light_gray);
+        rl.drawRectangle(20, screenHeight - 20 - 12, @intFromFloat(timePlayed), 12, .maroon);
+        rl.drawRectangleLines(20, screenHeight - 20 - 12, screenWidth - 40, 12, .gray);
 
         // Draw help instructions
-        rl.drawRectangle(20, 20, 425, 145, rl.Color.white);
-        rl.drawRectangleLines(20, 20, 425, 145, rl.Color.gray);
-        rl.drawText("PRESS SPACE TO RESTART MUSIC", 40, 40, 20, rl.Color.black);
-        rl.drawText("PRESS P TO PAUSE/RESUME", 40, 70, 20, rl.Color.black);
-        rl.drawText("PRESS UP/DOWN TO CHANGE SPEED", 40, 100, 20, rl.Color.black);
-        rl.drawText(rl.textFormat("SPEED: %f", .{pitch}), 40, 130, 20, rl.Color.maroon);
+        rl.drawRectangle(20, 20, 425, 145, .white);
+        rl.drawRectangleLines(20, 20, 425, 145, .gray);
+        rl.drawText("PRESS SPACE TO RESTART MUSIC", 40, 40, 20, .black);
+        rl.drawText("PRESS P TO PAUSE/RESUME", 40, 70, 20, .black);
+        rl.drawText("PRESS UP/DOWN TO CHANGE SPEED", 40, 100, 20, .black);
+        rl.drawText(rl.textFormat("SPEED: %f", .{pitch}), 40, 130, 20, .maroon);
 
         rl.endDrawing();
         //----------------------------------------------------------------------------------

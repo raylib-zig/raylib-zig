@@ -11,9 +11,9 @@ pub fn main() anyerror!void {
 
     // Define the camera to look into our 3d world
     var camera = rl.Camera{
-        .position = rl.Vector3.init(10, 10, 10),
-        .target = rl.Vector3.init(0, 0, 0),
-        .up = rl.Vector3.init(0, 1, 0),
+        .position = .init(10, 10, 10),
+        .target = .init(0, 0, 0),
+        .up = .init(0, 1, 0),
         .fovy = 45,
         .projection = .perspective,
     };
@@ -44,8 +44,8 @@ pub fn main() anyerror!void {
 
                 // Check collision between ray and box
                 collision = rl.getRayCollisionBox(ray, rl.BoundingBox{
-                    .max = rl.Vector3.init(cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2),
-                    .min = rl.Vector3.init(cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2),
+                    .max = .init(cubePosition.x - cubeSize.x / 2, cubePosition.y - cubeSize.y / 2, cubePosition.z - cubeSize.z / 2),
+                    .min = .init(cubePosition.x + cubeSize.x / 2, cubePosition.y + cubeSize.y / 2, cubePosition.z + cubeSize.z / 2),
                 });
             } else collision.hit = false;
         }
@@ -56,33 +56,33 @@ pub fn main() anyerror!void {
 
         rl.beginDrawing();
         defer rl.endDrawing();
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         {
             camera.begin();
             defer camera.end();
 
             if (collision.hit) {
-                rl.drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, rl.Color.red);
-                rl.drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, rl.Color.maroon);
+                rl.drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, .red);
+                rl.drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, .maroon);
 
-                rl.drawCubeWires(cubePosition, cubeSize.x + 0.2, cubeSize.y + 0.2, cubeSize.z + 0.2, rl.Color.green);
+                rl.drawCubeWires(cubePosition, cubeSize.x + 0.2, cubeSize.y + 0.2, cubeSize.z + 0.2, .green);
             } else {
-                rl.drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, rl.Color.gray);
-                rl.drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, rl.Color.dark_gray);
+                rl.drawCube(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, .gray);
+                rl.drawCubeWires(cubePosition, cubeSize.x, cubeSize.y, cubeSize.z, .dark_gray);
             }
 
-            rl.drawRay(ray, rl.Color.maroon);
+            rl.drawRay(ray, .maroon);
             rl.drawGrid(10, 1);
         }
 
-        rl.drawText("Try clicking on the box with your mouse!", 240, 10, 20, rl.Color.dark_gray);
+        rl.drawText("Try clicking on the box with your mouse!", 240, 10, 20, .dark_gray);
 
         if (collision.hit) {
-            rl.drawText("BOX SELECTED", @divTrunc((screenWidth - rl.measureText("BOX SELECTED", 30)), 2), screenHeight * 0.1, 30, rl.Color.green);
+            rl.drawText("BOX SELECTED", @divTrunc((screenWidth - rl.measureText("BOX SELECTED", 30)), 2), screenHeight * 0.1, 30, .green);
         }
 
-        rl.drawText("Right click mouse to toggle camera controls", 10, 430, 10, rl.Color.gray);
+        rl.drawText("Right click mouse to toggle camera controls", 10, 430, 10, .gray);
 
         rl.drawFPS(10, 10);
     }

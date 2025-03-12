@@ -1,8 +1,8 @@
 const rl = @import("raylib");
 
 fn boxFmt(colliding: bool) rl.Color {
-    if (colliding) return rl.Color.red;
-    return rl.Color.black;
+    if (colliding) return .red;
+    return .black;
 }
 
 pub fn main() anyerror!void {
@@ -83,12 +83,12 @@ pub fn main() anyerror!void {
 
         rl.drawRectangle(0, 0, screenWidth, screenUpperLimit, boxFmt(collision));
 
-        rl.drawRectangleRec(boxA, rl.Color.gold);
-        rl.drawRectangleRec(boxB, rl.Color.blue);
+        rl.drawRectangleRec(boxA, .gold);
+        rl.drawRectangleRec(boxB, .blue);
 
         if (collision) {
             // Draw collision area
-            rl.drawRectangleRec(boxCollision, rl.Color.lime);
+            rl.drawRectangleRec(boxCollision, .lime);
 
             // Draw collision message
             rl.drawText(
@@ -96,19 +96,19 @@ pub fn main() anyerror!void {
                 @divFloor(rl.getScreenWidth(), @as(i32, 2)) - @divFloor(rl.measureText("COLLISION!", 20), @as(i32, 2)),
                 screenUpperLimit / 2 - 10,
                 20,
-                rl.Color.black,
+                .black,
             );
 
             // Draw collision area
-            rl.drawText(rl.textFormat("Collision Area: %i", .{@as(i32, @intFromFloat(boxCollision.width * boxCollision.height))}), @divFloor(rl.getScreenWidth(), 2) - 100, screenUpperLimit + 10, 20, rl.Color.black);
+            rl.drawText(rl.textFormat("Collision Area: %i", .{@as(i32, @intFromFloat(boxCollision.width * boxCollision.height))}), @divFloor(rl.getScreenWidth(), 2) - 100, screenUpperLimit + 10, 20, .black);
         }
 
         // Draw help instructions
-        rl.drawText("Press SPACE to PAUSE/RESUME", 20, screenHeight - 35, 20, rl.Color.light_gray);
+        rl.drawText("Press SPACE to PAUSE/RESUME", 20, screenHeight - 35, 20, .light_gray);
 
         rl.drawFPS(10, 10);
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
         //----------------------------------------------------------------------------------
     }
 }

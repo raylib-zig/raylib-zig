@@ -6,8 +6,8 @@ fn collisionFmt(isColliding: bool) f32 {
 }
 
 fn movingFmt(isMoving: bool) rl.Color {
-    if (isMoving) return rl.Color.red;
-    return rl.Color.blue;
+    if (isMoving) return .red;
+    return .blue;
 }
 
 pub fn main() anyerror!void {
@@ -60,12 +60,12 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawText("MOVE START-END POINTS WITH MOUSE", 15, 20, 20, rl.Color.gray);
+        rl.drawText("MOVE START-END POINTS WITH MOUSE", 15, 20, 20, .gray);
 
         // Draw line Cubic Bezier, in-out interpolation (easing), no control points
-        rl.drawLineBezier(startPoint, endPoint, 4.0, rl.Color.blue);
+        rl.drawLineBezier(startPoint, endPoint, 4.0, .blue);
 
         // Draw start-end spline circles with some details
         rl.drawCircleV(startPoint, collisionFmt(rl.checkCollisionPointCircle(mouse, startPoint, 10.0)), movingFmt(moveStartPoint));

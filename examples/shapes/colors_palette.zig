@@ -20,27 +20,27 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     const colors = [maxColorCount]rl.Color{
-        rl.Color.dark_gray,
-        rl.Color.maroon,
-        rl.Color.orange,
-        rl.Color.dark_green,
-        rl.Color.dark_blue,
-        rl.Color.dark_purple,
-        rl.Color.dark_brown,
-        rl.Color.gray,
-        rl.Color.red,
-        rl.Color.gold,
-        rl.Color.lime,
-        rl.Color.blue,
-        rl.Color.violet,
-        rl.Color.brown,
-        rl.Color.light_gray,
-        rl.Color.pink,
-        rl.Color.yellow,
-        rl.Color.green,
-        rl.Color.sky_blue,
-        rl.Color.purple,
-        rl.Color.beige,
+        .dark_gray,
+        .maroon,
+        .orange,
+        .dark_green,
+        .dark_blue,
+        .dark_purple,
+        .dark_brown,
+        .gray,
+        .red,
+        .gold,
+        .lime,
+        .blue,
+        .violet,
+        .brown,
+        .light_gray,
+        .pink,
+        .yellow,
+        .green,
+        .sky_blue,
+        .purple,
+        .beige,
     };
 
     const colorNames = [maxColorCount][:0]const u8{
@@ -105,18 +105,18 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawText("raylib colors palette", 28, 42, 20, rl.Color.black);
-        rl.drawText("press SPACE to see all colors", rl.getScreenWidth() - 180, rl.getScreenHeight() - 40, 10, rl.Color.gray);
+        rl.drawText("raylib colors palette", 28, 42, 20, .black);
+        rl.drawText("press SPACE to see all colors", rl.getScreenWidth() - 180, rl.getScreenHeight() - 40, 10, .gray);
 
         i = 0;
         while (i < maxColorCount) : (i += 1) {
-            rl.drawRectangleRec(colorsRecs[i], rl.fade(colors[i], getAlpha(colorState[i])));
+            rl.drawRectangleRec(colorsRecs[i], .fade(colors[i], getAlpha(colorState[i])));
 
             if (rl.isKeyDown(.space) or colorState[i]) {
-                rl.drawRectangle(@intFromFloat(colorsRecs[i].x), @as(i32, @intFromFloat(colorsRecs[i].y)) + @as(i32, @intFromFloat(colorsRecs[i].height)) - 26, @as(i32, @intFromFloat(colorsRecs[i].width)), 20, rl.Color.black);
-                rl.drawRectangleLinesEx(colorsRecs[i], 6, rl.fade(rl.Color.black, 0.3));
+                rl.drawRectangle(@intFromFloat(colorsRecs[i].x), @as(i32, @intFromFloat(colorsRecs[i].y)) + @as(i32, @intFromFloat(colorsRecs[i].height)) - 26, @as(i32, @intFromFloat(colorsRecs[i].width)), 20, .black);
+                rl.drawRectangleLinesEx(colorsRecs[i], 6, .fade(.black, 0.3));
 
                 rl.drawText(colorNames[i], @as(i32, @intFromFloat(colorsRecs[i].x)) + @as(i32, @intFromFloat(colorsRecs[i].width)) - rl.measureText(colorNames[i], 10) - 12, @as(i32, @intFromFloat(colorsRecs[i].y)) + @as(i32, @intFromFloat(colorsRecs[i].height)) - 20, 10, colors[i]);
             }

@@ -15,7 +15,7 @@ pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "raylib [shaders] example - Apply an outline to a texture");
     defer rl.closeWindow(); // Close window and OpenGL context
 
-    const texture: rl.Texture = try rl.Texture.init("resources/textures/fudesumi.png");
+    const texture: rl.Texture = try .init("resources/textures/fudesumi.png");
     defer rl.unloadTexture(texture);
 
     const shdrOutline: rl.Shader = try rl.loadShader(null, "resources/shaders/glsl330/outline.fs");
@@ -76,7 +76,7 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         {
             rl.beginShaderMode(shdrOutline);
@@ -85,18 +85,18 @@ pub fn main() anyerror!void {
             texture.draw(
                 @divFloor(rl.getScreenWidth(), 2) - @divFloor(texture.width, 2),
                 -30,
-                rl.Color.white,
+                .white,
             );
         }
 
-        rl.drawText("Shader-based\ntexture\noutline", 10, 10, 20, rl.Color.gray);
+        rl.drawText("Shader-based\ntexture\noutline", 10, 10, 20, .gray);
 
         rl.drawText(
             rl.textFormat("Outline size: %i px", .{@as(i32, @intFromFloat(outlineSize))}),
             10,
             120,
             20,
-            rl.Color.maroon,
+            .maroon,
         );
 
         rl.drawFPS(710, 10);

@@ -111,12 +111,12 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         rl.drawText(rl.textFormat("sine frequency: %i", .{@as(i32, @intFromFloat(frequency))}),
-            rl.getScreenWidth() - 220, 10, 20, rl.Color.red);
+            rl.getScreenWidth() - 220, 10, 20, .red);
         rl.drawText("click mouse button to change frequency or pan",
-            10, 10, 20, rl.Color.dark_gray);
+            10, 10, 20, .dark_gray);
 
         // Draw the current buffer state proportionate to the screen
         for (0..screenWidth) |i| {
@@ -124,7 +124,7 @@ pub fn main() anyerror!void {
             const y: f32 = @floatFromInt(data[@divFloor(i * MAX_SAMPLES, screenWidth)]);
             position.y = 250 + 50 * y / 32000;
 
-            rl.drawPixelV(position, rl.Color.red);
+            rl.drawPixelV(position, .red);
         }
         //----------------------------------------------------------------------------------
     }

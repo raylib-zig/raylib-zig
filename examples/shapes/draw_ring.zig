@@ -9,8 +9,8 @@ fn labelFmt(segments: f32, minSegments: f32) [*c]const u8 {
 }
 
 fn colorFmt(segments: f32, minSegments: f32) rl.Color {
-    if (segments >= minSegments) return rl.Color.maroon;
-    return rl.Color.dark_gray;
+    if (segments >= minSegments) return .maroon;
+    return .dark_gray;
 }
 
 pub fn main() anyerror!void {
@@ -50,14 +50,14 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawLine(500, 0, 500, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.6));
-        rl.drawRectangle(500, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.3));
+        rl.drawLine(500, 0, 500, rl.getScreenHeight(), .fade(.light_gray, 0.6));
+        rl.drawRectangle(500, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), .fade(.light_gray, 0.3));
 
-        if (drawRing) rl.drawRing(center, innerRadius, outerRadius, startAngle, endAngle, @intFromFloat(segments), rl.fade(rl.Color.maroon, 0.3));
-        if (drawRingLines) rl.drawRingLines(center, innerRadius, outerRadius, startAngle, endAngle, @intFromFloat(segments), rl.fade(rl.Color.black, 0.4));
-        if (drawCircleLines) rl.drawCircleSectorLines(center, outerRadius, startAngle, endAngle, @intFromFloat(segments), rl.fade(rl.Color.black, 0.4));
+        if (drawRing) rl.drawRing(center, innerRadius, outerRadius, startAngle, endAngle, @intFromFloat(segments), .fade(.maroon, 0.3));
+        if (drawRingLines) rl.drawRingLines(center, innerRadius, outerRadius, startAngle, endAngle, @intFromFloat(segments), .fade(.black, 0.4));
+        if (drawCircleLines) rl.drawCircleSectorLines(center, outerRadius, startAngle, endAngle, @intFromFloat(segments), .fade(.black, 0.4));
 
         // Draw GUI controls
         //------------------------------------------------------------------------------

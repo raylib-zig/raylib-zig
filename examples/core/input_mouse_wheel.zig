@@ -30,18 +30,18 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        rl.clearBackground(.white);
 
-        rl.drawRectangle(screenWidth / 2 - 40, @as(i32, @intFromFloat(boxPositionY)), 80, 80, rl.Color.maroon);
+        rl.drawRectangle(screenWidth / 2 - 40, @as(i32, @intFromFloat(boxPositionY)), 80, 80, .maroon);
 
-        rl.drawText("Use mouse wheel to move the cube up and down!", 10, 10, 20, rl.Color.gray);
+        rl.drawText("Use mouse wheel to move the cube up and down!", 10, 10, 20, .gray);
 
         rl.drawText(
             rl.textFormat("Box position Y: %03i", .{@as(i32, @intFromFloat(boxPositionY))}),
             10,
             40,
             20,
-            rl.Color.light_gray,
+            .light_gray,
         );
         //----------------------------------------------------------------------------------
     }

@@ -149,17 +149,17 @@ pub fn main() anyerror!void {
             defer rl.endDrawing();
 
             if (rl.isWindowState(rl.ConfigFlags { .window_transparent = true })) {
-                rl.clearBackground(rl.Color.blank);
-            } else rl.clearBackground(rl.Color.ray_white);
+                rl.clearBackground(.blank);
+            } else rl.clearBackground(.ray_white);
 
-            rl.drawCircleV(ball_position, ball_radius, rl.Color.maroon);
+            rl.drawCircleV(ball_position, ball_radius, .maroon);
             rl.drawRectangleLinesEx(
-                rl.Rectangle.init(0, 0, @floatFromInt(rl.getScreenWidth()), @floatFromInt(rl.getScreenHeight())),
+                .init(0, 0, @floatFromInt(rl.getScreenWidth()), @floatFromInt(rl.getScreenHeight())),
                 4,
-                rl.Color.ray_white,
+                .ray_white,
             );
 
-            rl.drawCircleV(rl.getMousePosition(), 10, rl.Color.dark_blue);
+            rl.drawCircleV(rl.getMousePosition(), 10, .dark_blue);
 
             rl.drawFPS(10, 10);
 
@@ -168,7 +168,7 @@ pub fn main() anyerror!void {
                 10,
                 40,
                 10,
-                rl.Color.green,
+                .green,
             );
 
             // Draw window state info
@@ -177,7 +177,7 @@ pub fn main() anyerror!void {
                 10,
                 60,
                 10,
-                rl.Color.gray,
+                .gray,
             );
             rl.drawText(
                 rl.textFormat("[F] flag_fullscreen_mode: %d", .{
@@ -186,7 +186,7 @@ pub fn main() anyerror!void {
                 10,
                 80,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[R] flag_window_resizable: %d", .{
@@ -195,7 +195,7 @@ pub fn main() anyerror!void {
                 10,
                 100,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[D] flag_window_undecorated: %d", .{
@@ -204,7 +204,7 @@ pub fn main() anyerror!void {
                 10,
                 120,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[H] flag_window_hidden: %d", .{
@@ -213,7 +213,7 @@ pub fn main() anyerror!void {
                 10,
                 140,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[N] flag_window_minimized: %d", .{
@@ -222,7 +222,7 @@ pub fn main() anyerror!void {
                 10,
                 160,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[M] flag_window_maximized: %d", .{
@@ -231,7 +231,7 @@ pub fn main() anyerror!void {
                 10,
                 180,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[U] flag_window_unfocused: %d", .{
@@ -240,7 +240,7 @@ pub fn main() anyerror!void {
                 10,
                 200,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[T] flag_window_topmost: %d", .{
@@ -249,7 +249,7 @@ pub fn main() anyerror!void {
                 10,
                 220,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[A] flag_window_always_run: %d", .{
@@ -258,7 +258,7 @@ pub fn main() anyerror!void {
                 10,
                 240,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("[V] flag_vsync_hint: %d", .{
@@ -267,7 +267,7 @@ pub fn main() anyerror!void {
                 10,
                 260,
                 10,
-                rl.Color.lime,
+                .lime,
             );
 
             rl.drawText(
@@ -275,7 +275,7 @@ pub fn main() anyerror!void {
                 10,
                 300,
                 10,
-                rl.Color.gray,
+                .gray,
             );
             rl.drawText(
                 rl.textFormat("flag_window_highdpi: %d", .{
@@ -284,7 +284,7 @@ pub fn main() anyerror!void {
                 10,
                 320,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("flag_window_transparent: %d", .{
@@ -293,7 +293,7 @@ pub fn main() anyerror!void {
                 10,
                 340,
                 10,
-                rl.Color.lime,
+                .lime,
             );
             rl.drawText(
                 rl.textFormat("flag_msaa_4x_hint: %d", .{
@@ -302,7 +302,7 @@ pub fn main() anyerror!void {
                 10,
                 360,
                 10,
-                rl.Color.lime,
+                .lime,
             );
         }
         // ---------------------------------------------------------------------
