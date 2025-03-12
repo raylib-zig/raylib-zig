@@ -119,6 +119,7 @@ pub fn linkWithEmscripten(
         "-sUSE_GLFW=3",
         "-sASYNCIFY",
         "-O3",
+        "-fsanitize=undefined",
         "--emrun",
     });
     return emcc_command;
