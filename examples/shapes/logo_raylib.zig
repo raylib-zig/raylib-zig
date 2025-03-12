@@ -28,13 +28,13 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         rl.drawRectangle(screenWidth / 2 - 128, screenHeight / 2 - 128, 256, 256, raylib_zig);
-        rl.drawRectangle(screenWidth / 2 - 112, screenHeight / 2 - 112, 224, 224, rl.Color.ray_white);
+        rl.drawRectangle(screenWidth / 2 - 112, screenHeight / 2 - 112, 224, 224, .ray_white);
         rl.drawText("raylib-zig", screenWidth / 2 - 96, screenHeight / 2 + 57, 41, raylib_zig);
 
-        rl.drawText("this is NOT a texture!", 350, 370, 10, rl.Color.gray);
+        rl.drawText("this is NOT a texture!", 350, 370, 10, .gray);
         //----------------------------------------------------------------------------------
     }
 }

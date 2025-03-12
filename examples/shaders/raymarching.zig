@@ -87,7 +87,7 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         // We only draw a white full-screen rectangle,
         // frame is generated in shader using raymarching
@@ -100,7 +100,7 @@ pub fn main() anyerror!void {
                 0,
                 rl.getScreenWidth(),
                 rl.getScreenHeight(),
-                rl.Color.white,
+                .white,
             );
         }
 
@@ -109,7 +109,7 @@ pub fn main() anyerror!void {
             rl.getScreenWidth() - 280,
             rl.getScreenHeight() - 20,
             10,
-            rl.Color.black,
+            .black,
         );
         //----------------------------------------------------------------------------------
     }

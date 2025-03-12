@@ -7,8 +7,8 @@ fn labelFmt(segments: f32) [*c]const u8 {
 }
 
 fn colorFmt(segments: f32) rl.Color {
-    if (segments >= 4) return rl.Color.maroon;
-    return rl.Color.dark_gray;
+    if (segments >= 4) return .maroon;
+    return .dark_gray;
 }
 
 pub fn main() anyerror!void {
@@ -45,14 +45,14 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawLine(560, 0, 560, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.6));
-        rl.drawRectangle(560, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.3));
+        rl.drawLine(560, 0, 560, rl.getScreenHeight(), .fade(.light_gray, 0.6));
+        rl.drawRectangle(560, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), .fade(.light_gray, 0.3));
 
-        if (drawRect) rl.drawRectangleRec(rec, rl.fade(rl.Color.gold, 0.6));
-        if (drawRoundedRect) rl.drawRectangleRounded(rec, roundness, @as(i32, @intFromFloat(segments)), rl.fade(rl.Color.maroon, 0.2));
-        if (drawRoundedLines) rl.drawRectangleRoundedLinesEx(rec, roundness, @as(i32, @intFromFloat(segments)), lineThick, rl.fade(rl.Color.maroon, 0.4));
+        if (drawRect) rl.drawRectangleRec(rec, .fade(.gold, 0.6));
+        if (drawRoundedRect) rl.drawRectangleRounded(rec, roundness, @as(i32, @intFromFloat(segments)), .fade(.maroon, 0.2));
+        if (drawRoundedLines) rl.drawRectangleRoundedLinesEx(rec, roundness, @as(i32, @intFromFloat(segments)), lineThick, .fade(.maroon, 0.4));
 
         // Draw GUI controls
         _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 40, .width = 105, .height = 20 }, "Width", rl.textFormat("%.2", .{width}), &width, 0, @as(f32, @floatFromInt(rl.getScreenWidth() - 300)));

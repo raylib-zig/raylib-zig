@@ -28,16 +28,16 @@ pub fn main() anyerror!void {
     rl.setTargetFPS(60);
 
     while (!rl.windowShouldClose()) {
-        rl.updateCamera(&camera, rl.CameraMode.orbital);
+        rl.updateCamera(&camera, .orbital);
         rl.beginDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
         rl.beginMode3D(camera);
-        rl.drawModel(model, mapPosition, 1, rl.Color.red);
+        rl.drawModel(model, mapPosition, 1, .red);
         rl.drawGrid(20, 1.0);
         rl.endMode3D();
-        rl.drawTexture(texture, screenWidth - texture.width - 20, 20, rl.Color.white);
-        rl.drawRectangleLines(screenWidth - texture.width - 20, 20, texture.width, texture.height, rl.Color.green);
+        rl.drawTexture(texture, screenWidth - texture.width - 20, 20, .white);
+        rl.drawRectangleLines(screenWidth - texture.width - 20, 20, texture.width, texture.height, .green);
         rl.drawFPS(10, 10);
 
         rl.endDrawing();

@@ -69,17 +69,17 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.drawCircleV(scleraLeftPosition, scleraRadius, rl.Color.light_gray);
-        rl.drawCircleV(irisLeftPosition, irisRadius, rl.Color.brown);
-        rl.drawCircleV(irisLeftPosition, 10, rl.Color.black);
+        rl.drawCircleV(scleraLeftPosition, scleraRadius, .light_gray);
+        rl.drawCircleV(irisLeftPosition, irisRadius, .brown);
+        rl.drawCircleV(irisLeftPosition, 10, .black);
 
-        rl.drawCircleV(scleraRightPosition, scleraRadius, rl.Color.light_gray);
-        rl.drawCircleV(irisRightPosition, irisRadius, rl.Color.dark_green);
-        rl.drawCircleV(irisRightPosition, 10, rl.Color.black);
+        rl.drawCircleV(scleraRightPosition, scleraRadius, .light_gray);
+        rl.drawCircleV(irisRightPosition, irisRadius, .dark_green);
+        rl.drawCircleV(irisRightPosition, 10, .black);
 
         rl.drawFPS(10, 10);
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
         //----------------------------------------------------------------------------------
     }
 }

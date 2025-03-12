@@ -28,8 +28,8 @@ pub fn main() !void {
     {
         // Update
         //----------------------------------------------------------------------------------
-        if (rl.isKeyPressed(rl.KeyboardKey.space)) rl.playSound(fxWav); // Play WAV sound
-        if (rl.isKeyPressed(rl.KeyboardKey.enter)) rl.playSound(fxOgg); // Play OGG sound
+        if (rl.isKeyPressed(.space)) rl.playSound(fxWav); // Play WAV sound
+        if (rl.isKeyPressed(.enter)) rl.playSound(fxOgg); // Play OGG sound
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -37,10 +37,10 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        rl.clearBackground(.white);
 
-        rl.drawText("Press SPACE to PLAY the WAV sound!", 200, 180, 20, rl.Color.light_gray);
-        rl.drawText("Press ENTER to PLAY the OGG sound!", 200, 220, 20, rl.Color.light_gray);
+        rl.drawText("Press SPACE to PLAY the WAV sound!", 200, 180, 20, .light_gray);
+        rl.drawText("Press ENTER to PLAY the OGG sound!", 200, 220, 20, .light_gray);
         //----------------------------------------------------------------------------------
     }
 }

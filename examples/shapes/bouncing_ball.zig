@@ -53,14 +53,14 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawCircleV(ballPosition, ballRadius, rl.Color.maroon);
-        rl.drawText("PRESS SPACE to PAUSE BALL MOVEMENT", 10, rl.getScreenHeight() - 25, 20, rl.Color.light_gray);
+        rl.drawCircleV(ballPosition, ballRadius, .maroon);
+        rl.drawText("PRESS SPACE to PAUSE BALL MOVEMENT", 10, rl.getScreenHeight() - 25, 20, .light_gray);
 
         // On pause, we draw a blinking message
         if (pause and @mod(@divFloor(framesCounter, 30), 2) == 0) {
-            rl.drawText("PAUSED", 350, 200, 30, rl.Color.gray);
+            rl.drawText("PAUSED", 350, 200, 30, .gray);
         }
 
         rl.drawFPS(10, 10);

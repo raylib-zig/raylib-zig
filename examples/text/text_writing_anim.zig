@@ -25,9 +25,9 @@ pub fn main() void {
     {
         // Update
         //----------------------------------------------------------------------------------
-        framesCounter += if (rl.isKeyDown(rl.KeyboardKey.space)) 8 else 1;
+        framesCounter += if (rl.isKeyDown(.space)) 8 else 1;
 
-        if (rl.isKeyPressed(rl.KeyboardKey.enter)) framesCounter = 0;
+        if (rl.isKeyPressed(.enter)) framesCounter = 0;
         //----------------------------------------------------------------------------------
         // Draw
         //----------------------------------------------------------------------------------

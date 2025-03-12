@@ -85,18 +85,18 @@ pub fn main() anyerror!void {
             rl.beginDrawing();
             defer rl.endDrawing();
 
-            rl.clearBackground(rl.Color.ray_white);
+            rl.clearBackground(.ray_white);
 
             switch (current_screen) {
                 .logo => {
                     // TODO: Draw `logo` state here!
-                    rl.drawText("LOGO SCREEN", 20, 20, 40, rl.Color.light_gray);
+                    rl.drawText("LOGO SCREEN", 20, 20, 40, .light_gray);
                     rl.drawText(
                         "WAIT for 2 SECONDS...",
                         290,
                         220,
                         20,
-                        rl.Color.gray,
+                        .gray,
                     );
                 },
                 .title => {
@@ -106,21 +106,21 @@ pub fn main() anyerror!void {
                         0,
                         screen_width,
                         screen_height,
-                        rl.Color.green,
+                        .green,
                     );
                     rl.drawText(
                         "TITLE SCREEN",
                         20,
                         20,
                         40,
-                        rl.Color.dark_green,
+                        .dark_green,
                     );
                     rl.drawText(
                         "PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN",
                         120,
                         220,
                         20,
-                        rl.Color.dark_green,
+                        .dark_green,
                     );
                 },
                 .gameplay => {
@@ -130,15 +130,15 @@ pub fn main() anyerror!void {
                         0,
                         screen_width,
                         screen_height,
-                        rl.Color.purple,
+                        .purple,
                     );
-                    rl.drawText("GAMEPLAY SCREEN", 20, 20, 40, rl.Color.maroon);
+                    rl.drawText("GAMEPLAY SCREEN", 20, 20, 40, .maroon);
                     rl.drawText(
                         "PRESS ENTER or TAP to JUMP to ENDING SCREEN",
                         130,
                         220,
                         20,
-                        rl.Color.maroon,
+                        .maroon,
                     );
                 },
                 .ending => {
@@ -148,21 +148,21 @@ pub fn main() anyerror!void {
                         0,
                         screen_width,
                         screen_height,
-                        rl.Color.blue,
+                        .blue,
                     );
                     rl.drawText(
                         "ENDING SCREEN",
                         20,
                         20,
                         40,
-                        rl.Color.dark_blue,
+                        .dark_blue,
                     );
                     rl.drawText(
                         "PRESS ENTER or TAP to RETURN to TITLE SCREEN",
                         120,
                         220,
                         20,
-                        rl.Color.dark_blue,
+                        .dark_blue,
                     );
                 },
             }
