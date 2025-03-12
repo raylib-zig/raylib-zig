@@ -35,15 +35,15 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        rl.clearBackground(.white);
 
-        rl.drawText(rl.textFormat("Score: %08i", .{score}), 200, 80, 20, rl.Color.red);
+        rl.drawText(rl.textFormat("Score: %08i", .{score}), 200, 80, 20, .red);
 
-        rl.drawText(rl.textFormat("HiScore: %08i", .{hiscore}), 200, 120, 20, rl.Color.green);
+        rl.drawText(rl.textFormat("HiScore: %08i", .{hiscore}), 200, 120, 20, .green);
 
-        rl.drawText(rl.textFormat("Lives: %02i", .{lives}), 200, 160, 40, rl.Color.blue);
+        rl.drawText(rl.textFormat("Lives: %02i", .{lives}), 200, 160, 40, .blue);
 
-        rl.drawText(rl.textFormat("Elapsed Time: %02.02f ms", .{rl.getFrameTime() * 1000}), 200, 220, 20, rl.Color.black);
+        rl.drawText(rl.textFormat("Elapsed Time: %02.02f ms", .{rl.getFrameTime() * 1000}), 200, 220, 20, .black);
         //----------------------------------------------------------------------------------
     }
 }

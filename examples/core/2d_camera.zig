@@ -27,7 +27,7 @@ pub fn main() anyerror!void {
 
         spacing += @as(i32, @intFromFloat(buildings[i].width));
 
-        buildColors[i] = rl.Color.init(
+        buildColors[i] = .init(
             @as(u8, @intCast(rl.getRandomValue(200, 240))),
             @as(u8, @intCast(rl.getRandomValue(200, 240))),
             @as(u8, @intCast(rl.getRandomValue(200, 250))),
@@ -36,8 +36,8 @@ pub fn main() anyerror!void {
     }
 
     var camera = rl.Camera2D{
-        .target = rl.Vector2.init(player.x + 20, player.y + 20),
-        .offset = rl.Vector2.init(screenWidth / 2, screenHeight / 2),
+        .target = .init(player.x + 20, player.y + 20),
+        .offset = .init(screenWidth / 2, screenHeight / 2),
         .rotation = 0,
         .zoom = 1,
     };
@@ -58,7 +58,7 @@ pub fn main() anyerror!void {
         }
 
         // Camera target follows player
-        camera.target = rl.Vector2.init(player.x + 20, player.y + 20);
+        camera.target = .init(player.x + 20, player.y + 20);
 
         // Camera rotation controls
         if (rl.isKeyDown(.a)) {
@@ -87,51 +87,51 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         {
             camera.begin();
             defer camera.end();
 
-            rl.drawRectangle(-6000, 320, 13000, 8000, rl.Color.dark_gray);
+            rl.drawRectangle(-6000, 320, 13000, 8000, .dark_gray);
 
             for (buildings, 0..) |building, i| {
                 rl.drawRectangleRec(building, buildColors[i]);
             }
 
-            rl.drawRectangleRec(player, rl.Color.red);
+            rl.drawRectangleRec(player, .red);
 
             rl.drawLine(
                 @as(i32, @intFromFloat(camera.target.x)),
                 -screenHeight * 10,
                 @as(i32, @intFromFloat(camera.target.x)),
                 screenHeight * 10,
-                rl.Color.green,
+                .green,
             );
             rl.drawLine(
                 -screenWidth * 10,
                 @as(i32, @intFromFloat(camera.target.y)),
                 screenWidth * 10,
                 @as(i32, @intFromFloat(camera.target.y)),
-                rl.Color.green,
+                .green,
             );
         }
 
-        rl.drawText("SCREEN AREA", 640, 10, 20, rl.Color.red);
+        rl.drawText("SCREEN AREA", 640, 10, 20, .red);
 
-        rl.drawRectangle(0, 0, screenWidth, 5, rl.Color.red);
-        rl.drawRectangle(0, 5, 5, screenHeight - 10, rl.Color.red);
-        rl.drawRectangle(screenWidth - 5, 5, 5, screenHeight - 10, rl.Color.red);
-        rl.drawRectangle(0, screenHeight - 5, screenWidth, 5, rl.Color.red);
+        rl.drawRectangle(0, 0, screenWidth, 5, .red);
+        rl.drawRectangle(0, 5, 5, screenHeight - 10, .red);
+        rl.drawRectangle(screenWidth - 5, 5, 5, screenHeight - 10, .red);
+        rl.drawRectangle(0, screenHeight - 5, screenWidth, 5, .red);
 
-        rl.drawRectangle(10, 10, 250, 113, rl.Color.sky_blue.fade(0.5));
-        rl.drawRectangleLines(10, 10, 250, 113, rl.Color.blue);
+        rl.drawRectangle(10, 10, 250, 113, .fade(.sky_blue, 0.5));
+        rl.drawRectangleLines(10, 10, 250, 113, .blue);
 
-        rl.drawText("Free 2d camera controls:", 20, 20, 10, rl.Color.black);
-        rl.drawText("- Right/Left to move Offset", 40, 40, 10, rl.Color.dark_gray);
-        rl.drawText("- Mouse Wheel to Zoom in-out", 40, 60, 10, rl.Color.dark_gray);
-        rl.drawText("- A / S to Rotate", 40, 80, 10, rl.Color.dark_gray);
-        rl.drawText("- R to reset Zoom and Rotation", 40, 100, 10, rl.Color.dark_gray);
+        rl.drawText("Free 2d camera controls:", 20, 20, 10, .black);
+        rl.drawText("- Right/Left to move Offset", 40, 40, 10, .dark_gray);
+        rl.drawText("- Mouse Wheel to Zoom in-out", 40, 60, 10, .dark_gray);
+        rl.drawText("- A / S to Rotate", 40, 80, 10, .dark_gray);
+        rl.drawText("- R to reset Zoom and Rotation", 40, 100, 10, .dark_gray);
         //----------------------------------------------------------------------------------
     }
 }

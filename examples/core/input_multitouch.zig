@@ -26,16 +26,16 @@ pub fn main() anyerror!void {
         //----------------------------------------------------------------------------------
         ballPosition = rl.getMousePosition();
 
-        ballColor = rl.Color.beige;
+        ballColor = .beige;
 
         if (rl.isMouseButtonDown(.left)) {
-            ballColor = rl.Color.maroon;
+            ballColor = .maroon;
         }
         if (rl.isMouseButtonDown(.middle)) {
-            ballColor = rl.Color.lime;
+            ballColor = .lime;
         }
         if (rl.isMouseButtonDown(.right)) {
-            ballColor = rl.Color.dark_blue;
+            ballColor = .dark_blue;
         }
 
         if (rl.isMouseButtonPressed(.left)) {
@@ -58,7 +58,7 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         const nums = [_]i32{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         for (nums) |i| {
@@ -68,13 +68,13 @@ pub fn main() anyerror!void {
             if ((touchPosition.x >= 0) and (touchPosition.y >= 0)) {
 
                 // Draw circle and touch index number
-                rl.drawCircleV(touchPosition, 34, rl.Color.orange);
+                rl.drawCircleV(touchPosition, 34, .orange);
                 rl.drawText(
                     rl.textFormat("%d", .{i}),
                     @as(i32, @intFromFloat(touchPosition.x)) - 10,
                     @as(i32, @intFromFloat(touchPosition.y)) - 70,
                     40,
-                    rl.Color.black,
+                    .black,
                 );
             }
         }
@@ -82,8 +82,8 @@ pub fn main() anyerror!void {
         // Draw the normal mouse location
         rl.drawCircleV(ballPosition, 30 + (touchCounter * 3), ballColor);
 
-        rl.drawText("move ball with mouse and click mouse button to change color", 10, 10, 20, rl.Color.dark_gray);
-        rl.drawText("touch the screen at multiple locations to get multiple balls", 10, 30, 20, rl.Color.dark_gray);
+        rl.drawText("move ball with mouse and click mouse button to change color", 10, 10, 20, .dark_gray);
+        rl.drawText("touch the screen at multiple locations to get multiple balls", 10, 30, 20, .dark_gray);
         //----------------------------------------------------------------------------------
     }
 }

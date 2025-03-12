@@ -9,8 +9,8 @@ fn labelFmt(segments: f32, minSegments: f32) [*c]const u8 {
 }
 
 fn colorFmt(segments: f32, minSegments: f32) rl.Color {
-    if (segments >= minSegments) return rl.Color.maroon;
-    return rl.Color.dark_gray;
+    if (segments >= minSegments) return .maroon;
+    return .dark_gray;
 }
 
 pub fn main() anyerror!void {
@@ -45,13 +45,13 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawLine(500, 0, 500, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.6));
-        rl.drawRectangle(500, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), rl.fade(rl.Color.light_gray, 0.3));
+        rl.drawLine(500, 0, 500, rl.getScreenHeight(), .fade(.light_gray, 0.6));
+        rl.drawRectangle(500, 0, rl.getScreenWidth() - 500, rl.getScreenHeight(), .fade(.light_gray, 0.3));
 
-        rl.drawCircleSector(center, outerRadius, startAngle, endAngle, @as(i32, @intFromFloat(segments)), rl.fade(rl.Color.maroon, 0.3));
-        rl.drawCircleSectorLines(center, outerRadius, startAngle, endAngle, @as(i32, @intFromFloat(segments)), rl.fade(rl.Color.maroon, 0.6));
+        rl.drawCircleSector(center, outerRadius, startAngle, endAngle, @as(i32, @intFromFloat(segments)), .fade(.maroon, 0.3));
+        rl.drawCircleSectorLines(center, outerRadius, startAngle, endAngle, @as(i32, @intFromFloat(segments)), .fade(.maroon, 0.6));
 
         // Draw GUI controls
         _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 40, .width = 120, .height = 20 }, "StartAngle", rl.textFormat("%.2", .{startAngle}), &startAngle, 0, 720);

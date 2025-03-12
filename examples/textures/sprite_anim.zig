@@ -17,7 +17,7 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     // NOTE: Textures MUST be loaded after Window initialization (OpenGL context is required)
-    const scarfy: rl.Texture = try rl.Texture.init("resources/textures/scarfy.png"); // Texture loading
+    const scarfy = try rl.Texture.init("resources/textures/scarfy.png"); // Texture loading
     defer rl.unloadTexture(scarfy); // Texture unloading
 
     const position = rl.Vector2.init(350.0, 280.0);
@@ -70,37 +70,37 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawTexture(scarfy, 15, 40, rl.Color.white);
-        rl.drawRectangleLines(15, 40, scarfy.width, scarfy.height, rl.Color.lime);
+        rl.drawTexture(scarfy, 15, 40, .white);
+        rl.drawRectangleLines(15, 40, scarfy.width, scarfy.height, .lime);
         rl.drawRectangleLines(
             15 + @as(i32, @intFromFloat(frameRec.x)),
             40 + @as(i32, @intFromFloat(frameRec.y)),
             @as(i32, @intFromFloat(frameRec.width)),
             @as(i32, @intFromFloat(frameRec.height)),
-            rl.Color.red,
+            .red,
         );
 
-        rl.drawText("FRAME SPEED: ", 165, 210, 10, rl.Color.dark_gray);
-        rl.drawText(rl.textFormat("%02i FPS", .{framesSpeed}), 575, 210, 10, rl.Color.dark_gray);
-        rl.drawText("PRESS RIGHT/LEFT KEYS to CHANGE SPEED!", 290, 240, 10, rl.Color.dark_gray);
+        rl.drawText("FRAME SPEED: ", 165, 210, 10, .dark_gray);
+        rl.drawText(rl.textFormat("%02i FPS", .{framesSpeed}), 575, 210, 10, .dark_gray);
+        rl.drawText("PRESS RIGHT/LEFT KEYS to CHANGE SPEED!", 290, 240, 10, .dark_gray);
 
         for ([_]u32{0} ** MAX_FRAME_SPEED, 0..) |_, i| {
             if (i < framesSpeed) {
-                rl.drawRectangle(250 + 21 * @as(i32, @intCast(i)), 205, 20, 20, rl.Color.red);
+                rl.drawRectangle(250 + 21 * @as(i32, @intCast(i)), 205, 20, 20, .red);
             }
-            rl.drawRectangleLines(250 + 21 * @as(i32, @intCast(i)), 205, 20, 20, rl.Color.maroon);
+            rl.drawRectangleLines(250 + 21 * @as(i32, @intCast(i)), 205, 20, 20, .maroon);
         }
 
-        scarfy.drawRec(frameRec, position, rl.Color.white); // Draw part of the texture
+        scarfy.drawRec(frameRec, position, .white); // Draw part of the texture
 
         rl.drawText(
             "(c) Scarfy sprite by Eiden Marsal",
             screenWidth - 200,
             screenHeight - 20,
             10,
-            rl.Color.gray,
+            .gray,
         );
         //----------------------------------------------------------------------------------
     }

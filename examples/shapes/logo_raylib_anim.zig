@@ -90,37 +90,37 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
         if (state == 0) {
-            if (@mod(framesCounter, @as(u8, 15)) == 0) rl.drawRectangle(logoPositionX, logoPositionY, 16, 16, rl.Color.black);
+            if (@mod(framesCounter, @as(u8, 15)) == 0) rl.drawRectangle(logoPositionX, logoPositionY, 16, 16, .black);
         } else if (state == 1) {
-            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, rl.Color.black);
-            rl.drawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, rl.Color.black);
+            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, .black);
+            rl.drawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, .black);
         } else if (state == 2) {
-            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, rl.Color.black);
-            rl.drawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, rl.Color.black);
+            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, .black);
+            rl.drawRectangle(logoPositionX, logoPositionY, 16, leftSideRecHeight, .black);
 
-            rl.drawRectangle(logoPositionX + 240, logoPositionY, 16, rightSideRecHeight, rl.Color.black);
-            rl.drawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, rl.Color.black);
+            rl.drawRectangle(logoPositionX + 240, logoPositionY, 16, rightSideRecHeight, .black);
+            rl.drawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, .black);
         } else if (state == 3) {
-            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, rl.fade(rl.Color.black, alpha));
-            rl.drawRectangle(logoPositionX, logoPositionY + 16, 16, leftSideRecHeight - 32, rl.fade(rl.Color.black, alpha));
+            rl.drawRectangle(logoPositionX, logoPositionY, topSideRecWidth, 16, .fade(.black, alpha));
+            rl.drawRectangle(logoPositionX, logoPositionY + 16, 16, leftSideRecHeight - 32, .fade(.black, alpha));
 
-            rl.drawRectangle(logoPositionX + 240, logoPositionY + 16, 16, rightSideRecHeight - 32, rl.fade(rl.Color.black, alpha));
-            rl.drawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, rl.fade(rl.Color.black, alpha));
+            rl.drawRectangle(logoPositionX + 240, logoPositionY + 16, 16, rightSideRecHeight - 32, .fade(.black, alpha));
+            rl.drawRectangle(logoPositionX, logoPositionY + 240, bottomSideRecWidth, 16, .fade(.black, alpha));
 
             rl.drawRectangle(
                 (@divFloor(rl.getScreenWidth(), @as(i32, 2))) - 112,
                 (@divFloor(rl.getScreenHeight(), @as(i32, 2))) - 112,
                 224,
                 224,
-                rl.fade(rl.Color.ray_white, alpha),
+                .fade(.ray_white, alpha),
             );
 
-            rl.drawText(rl.textSubtext("raylib", 0, lettersCount), @divFloor(rl.getScreenWidth(), @as(i32, 2)) - 44, @divFloor(rl.getScreenHeight(), @as(i32, 2)) + 48, 50, rl.fade(rl.Color.black, alpha));
+            rl.drawText(rl.textSubtext("raylib", 0, lettersCount), @divFloor(rl.getScreenWidth(), @as(i32, 2)) - 44, @divFloor(rl.getScreenHeight(), @as(i32, 2)) + 48, 50, .fade(.black, alpha));
         } else if (state == 4) {
-            rl.drawText("[R] REPLAY", 340, 200, 20, rl.Color.gray);
+            rl.drawText("[R] REPLAY", 340, 200, 20, .gray);
         }
 
         //----------------------------------------------------------------------------------

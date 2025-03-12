@@ -34,13 +34,13 @@ pub fn main() !void {
         rl.updateMusicStream(music); // Update music buffer with new stream data
 
         // Restart music playing (stop and play)
-        if (rl.isKeyPressed(rl.KeyboardKey.space)) {
+        if (rl.isKeyPressed(.space)) {
             rl.stopMusicStream(music);
             rl.playMusicStream(music);
         }
 
         // Pause/Resume music playing
-        if (rl.isKeyPressed(rl.KeyboardKey.p)) {
+        if (rl.isKeyPressed(.p)) {
             pause = !pause;
 
             if (pause) {
@@ -63,16 +63,16 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.white);
+        rl.clearBackground(.white);
 
-        rl.drawText("MUSIC SHOULD BE PLAYING!", 255, 150, 20, rl.Color.light_gray);
+        rl.drawText("MUSIC SHOULD BE PLAYING!", 255, 150, 20, .light_gray);
 
-        rl.drawRectangle(200, 200, 400, 12, rl.Color.light_gray);
-        rl.drawRectangle(200, 200, @intFromFloat(timePlayed * 400), 12, rl.Color.maroon);
-        rl.drawRectangleLines(200, 200, 400, 12, rl.Color.gray);
+        rl.drawRectangle(200, 200, 400, 12, .light_gray);
+        rl.drawRectangle(200, 200, @intFromFloat(timePlayed * 400), 12, .maroon);
+        rl.drawRectangleLines(200, 200, 400, 12, .gray);
 
-        rl.drawText("PRESS SPACE TO RESTART MUSIC", 215, 250, 20, rl.Color.light_gray);
-        rl.drawText("PRESS P TO PAUSE/RESUME MUSIC", 208, 280, 20, rl.Color.light_gray);
+        rl.drawText("PRESS SPACE TO RESTART MUSIC", 215, 250, 20, .light_gray);
+        rl.drawText("PRESS P TO PAUSE/RESUME MUSIC", 208, 280, 20, .light_gray);
         //----------------------------------------------------------------------------------
     }
 }

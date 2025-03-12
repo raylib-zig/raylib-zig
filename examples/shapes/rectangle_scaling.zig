@@ -68,15 +68,15 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         defer rl.endDrawing();
 
-        rl.clearBackground(rl.Color.ray_white);
+        rl.clearBackground(.ray_white);
 
-        rl.drawText("Scale rectangle dragging from bottom-right corner!", 10, 10, 20, rl.Color.gray);
+        rl.drawText("Scale rectangle dragging from bottom-right corner!", 10, 10, 20, .gray);
 
-        rl.drawRectangleRec(rec, rl.fade(rl.Color.green, 0.5));
+        rl.drawRectangleRec(rec, .fade(.green, 0.5));
 
         if (mouseScaleReady) {
-            rl.drawRectangleLinesEx(rec, 1, rl.Color.red);
-            rl.drawTriangle(rl.Vector2{ .x = rec.x + rec.width - mouseScaleMarkSize, .y = rec.y + rec.height }, rl.Vector2{ .x = rec.x + rec.width, .y = rec.y + rec.height }, rl.Vector2{ .x = rec.x + rec.width, .y = rec.y + rec.height - mouseScaleMarkSize }, rl.Color.red);
+            rl.drawRectangleLinesEx(rec, 1, .red);
+            rl.drawTriangle(rl.Vector2{ .x = rec.x + rec.width - mouseScaleMarkSize, .y = rec.y + rec.height }, rl.Vector2{ .x = rec.x + rec.width, .y = rec.y + rec.height }, rl.Vector2{ .x = rec.x + rec.width, .y = rec.y + rec.height - mouseScaleMarkSize }, .red);
         }
         //----------------------------------------------------------------------------------
     }
