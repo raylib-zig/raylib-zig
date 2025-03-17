@@ -113,7 +113,7 @@ fonts, 3D models and audio, linkage variants. You can specify these options for 
 corresponding C macro before you link with it, e.g.:
 
 ```zig
-raylib_artifact.defineCMacro("SUPPORT_FILEFORMAT_JPG", null);
+raylib_artifact.root_module.addCMacro("SUPPORT_FILEFORMAT_JPG", "");
 ```
 
 ## Exporting for web
