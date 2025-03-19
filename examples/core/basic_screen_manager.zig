@@ -1,13 +1,4 @@
-//! # raylib-zig [core] examples - basic screen manager
-//!
-//! NOTE: This example illustrates a very simple screen manager based on a
-//! states machines
-//!
-//! Example originally created with raylib-zig 5.0, last time updated with
-//! raylib-zig 5.0
-//!
-//! Copyright (c) Nikolas Wipper 2024
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 const screen_width = 800;

@@ -1,3 +1,4 @@
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 fn boxFmt(colliding: bool) rl.Color {

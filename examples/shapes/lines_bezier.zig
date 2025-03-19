@@ -1,3 +1,4 @@
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 fn collisionFmt(isColliding: bool) f32 {

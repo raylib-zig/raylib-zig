@@ -1,5 +1,4 @@
-// raylib-zig (c) Nikolas Wipper 2023
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 const MAX_SAMPLES = 512;
@@ -35,7 +34,7 @@ pub fn main() anyerror!void {
     rl.initWindow(screenWidth, screenHeight, "raylib-zig [core] example - raw audio streaming");
     defer rl.closeWindow(); // Close window and OpenGL context
 
-    rl.initAudioDevice();        // Initialize audio device
+    rl.initAudioDevice(); // Initialize audio device
     defer rl.closeAudioDevice(); // Close audio device (music streaming is automatically stopped)
 
     rl.setAudioStreamBufferSizeDefault(MAX_SAMPLES_PER_UPDATE);
@@ -113,10 +112,8 @@ pub fn main() anyerror!void {
 
         rl.clearBackground(.ray_white);
 
-        rl.drawText(rl.textFormat("sine frequency: %i", .{@as(i32, @intFromFloat(frequency))}),
-            rl.getScreenWidth() - 220, 10, 20, .red);
-        rl.drawText("click mouse button to change frequency or pan",
-            10, 10, 20, .dark_gray);
+        rl.drawText(rl.textFormat("sine frequency: %i", .{@as(i32, @intFromFloat(frequency))}), rl.getScreenWidth() - 220, 10, 20, .red);
+        rl.drawText("click mouse button to change frequency or pan", 10, 10, 20, .dark_gray);
 
         // Draw the current buffer state proportionate to the screen
         for (0..screenWidth) |i| {

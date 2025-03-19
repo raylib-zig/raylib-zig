@@ -1,5 +1,4 @@
-// raylib-zig (c) Nikolas Wipper 2020-2024
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const std = @import("std");
 const this = @This();
 const rl = @import("raylib");

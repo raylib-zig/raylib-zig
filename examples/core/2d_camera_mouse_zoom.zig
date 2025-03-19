@@ -1,5 +1,4 @@
-// port of raylib example https://github.com/raysan5/raylib/blob/master/examples/core/core_2d_camera_mouse_zoom.c
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 pub fn main() anyerror!void {

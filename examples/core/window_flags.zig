@@ -1,13 +1,4 @@
-//! # raylib-zig [core] example - window flags
-//!
-//! Example originally created with raylib-zig 5.0, last time updated with
-//! raylib-zig 5.0
-//!
-//! Example licensed under an unmodified zlib/libpng license, which is an
-//! OSI-certified, BSD-like license that allows static linking with closed
-//! source software
-//!
-//! Copyright (c) Nikolas Wipper 2024
+//! raylib-zig (c) Nikolas Wipper 2025
 
 const rl = @import("raylib");
 
@@ -61,74 +52,74 @@ pub fn main() anyerror!void {
         if (rl.isKeyPressed(.f)) rl.toggleFullscreen(); // Modifies window size when scaling!
 
         if (rl.isKeyPressed(.r)) {
-            if (rl.isWindowState(rl.ConfigFlags { .window_resizable = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .window_resizable = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .window_resizable = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .window_resizable = true });
             } else {
-                rl.setWindowState(rl.ConfigFlags { .window_resizable = true });
+                rl.setWindowState(rl.ConfigFlags{ .window_resizable = true });
             }
         }
 
         if (rl.isKeyPressed(.d)) {
-            if (rl.isWindowState(rl.ConfigFlags { .window_undecorated = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .window_undecorated = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .window_undecorated = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .window_undecorated = true });
             } else {
-                rl.setWindowState(rl.ConfigFlags { .window_undecorated = true });
+                rl.setWindowState(rl.ConfigFlags{ .window_undecorated = true });
             }
         }
 
         if (rl.isKeyPressed(.h)) {
-            if (!rl.isWindowState(rl.ConfigFlags { .window_hidden = true })) {
-                rl.setWindowState(rl.ConfigFlags { .window_hidden = true });
+            if (!rl.isWindowState(rl.ConfigFlags{ .window_hidden = true })) {
+                rl.setWindowState(rl.ConfigFlags{ .window_hidden = true });
             }
             frames_counter = 0;
         }
 
-        if (rl.isWindowState(rl.ConfigFlags { .window_hidden = true })) {
+        if (rl.isWindowState(rl.ConfigFlags{ .window_hidden = true })) {
             frames_counter += 1;
-            if (frames_counter >= 240) rl.clearWindowState(rl.ConfigFlags { .window_hidden = true }); // Show window after 3 seconds
+            if (frames_counter >= 240) rl.clearWindowState(rl.ConfigFlags{ .window_hidden = true }); // Show window after 3 seconds
         }
 
         if (rl.isKeyPressed(.n)) {
-            if (!rl.isWindowState(rl.ConfigFlags { .window_minimized = true })) {
+            if (!rl.isWindowState(rl.ConfigFlags{ .window_minimized = true })) {
                 rl.minimizeWindow();
             }
             frames_counter = 0;
         }
 
-        if (rl.isWindowState(rl.ConfigFlags { .window_minimized = true })) {
+        if (rl.isWindowState(rl.ConfigFlags{ .window_minimized = true })) {
             frames_counter += 1;
             if (frames_counter >= 240) rl.restoreWindow(); // Restore window after 3 seconds
         }
 
         if (rl.isKeyPressed(.m)) {
             // NOTE: Requires `flag_window_resizable` enabled!
-            if (rl.isWindowState(rl.ConfigFlags { .window_maximized = true })) {
+            if (rl.isWindowState(rl.ConfigFlags{ .window_maximized = true })) {
                 rl.restoreWindow();
             } else rl.maximizeWindow();
         }
 
         if (rl.isKeyPressed(.u)) {
-            if (rl.isWindowState(rl.ConfigFlags { .window_unfocused = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .window_unfocused = true });
-            } else rl.setWindowState(rl.ConfigFlags { .window_unfocused = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .window_unfocused = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .window_unfocused = true });
+            } else rl.setWindowState(rl.ConfigFlags{ .window_unfocused = true });
         }
 
         if (rl.isKeyPressed(.t)) {
-            if (rl.isWindowState(rl.ConfigFlags { .window_topmost = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .window_topmost = true });
-            } else rl.setWindowState(rl.ConfigFlags { .window_topmost = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .window_topmost = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .window_topmost = true });
+            } else rl.setWindowState(rl.ConfigFlags{ .window_topmost = true });
         }
 
         if (rl.isKeyPressed(.a)) {
-            if (rl.isWindowState(rl.ConfigFlags { .window_always_run = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .window_always_run = true });
-            } else rl.setWindowState(rl.ConfigFlags { .window_always_run = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .window_always_run = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .window_always_run = true });
+            } else rl.setWindowState(rl.ConfigFlags{ .window_always_run = true });
         }
 
         if (rl.isKeyPressed(.v)) {
-            if (rl.isWindowState(rl.ConfigFlags { .vsync_hint = true })) {
-                rl.clearWindowState(rl.ConfigFlags { .vsync_hint = true });
-            } else rl.setWindowState(rl.ConfigFlags { .vsync_hint = true });
+            if (rl.isWindowState(rl.ConfigFlags{ .vsync_hint = true })) {
+                rl.clearWindowState(rl.ConfigFlags{ .vsync_hint = true });
+            } else rl.setWindowState(rl.ConfigFlags{ .vsync_hint = true });
         }
 
         // Bouncing ball logic
@@ -148,7 +139,7 @@ pub fn main() anyerror!void {
             rl.beginDrawing();
             defer rl.endDrawing();
 
-            if (rl.isWindowState(rl.ConfigFlags { .window_transparent = true })) {
+            if (rl.isWindowState(rl.ConfigFlags{ .window_transparent = true })) {
                 rl.clearBackground(.blank);
             } else rl.clearBackground(.ray_white);
 
@@ -181,7 +172,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[F] flag_fullscreen_mode: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .fullscreen_mode = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .fullscreen_mode = true }))),
                 }),
                 10,
                 80,
@@ -190,7 +181,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[R] flag_window_resizable: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_resizable = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_resizable = true }))),
                 }),
                 10,
                 100,
@@ -199,7 +190,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[D] flag_window_undecorated: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_undecorated = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_undecorated = true }))),
                 }),
                 10,
                 120,
@@ -208,7 +199,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[H] flag_window_hidden: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_hidden = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_hidden = true }))),
                 }),
                 10,
                 140,
@@ -217,7 +208,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[N] flag_window_minimized: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_minimized = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_minimized = true }))),
                 }),
                 10,
                 160,
@@ -226,7 +217,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[M] flag_window_maximized: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_maximized = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_maximized = true }))),
                 }),
                 10,
                 180,
@@ -235,7 +226,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[U] flag_window_unfocused: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_unfocused = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_unfocused = true }))),
                 }),
                 10,
                 200,
@@ -244,7 +235,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[T] flag_window_topmost: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_topmost = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_topmost = true }))),
                 }),
                 10,
                 220,
@@ -253,7 +244,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[A] flag_window_always_run: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_always_run = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_always_run = true }))),
                 }),
                 10,
                 240,
@@ -262,7 +253,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("[V] flag_vsync_hint: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .vsync_hint = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .vsync_hint = true }))),
                 }),
                 10,
                 260,
@@ -279,7 +270,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("flag_window_highdpi: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_highdpi = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_highdpi = true }))),
                 }),
                 10,
                 320,
@@ -288,7 +279,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("flag_window_transparent: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .window_transparent = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .window_transparent = true }))),
                 }),
                 10,
                 340,
@@ -297,7 +288,7 @@ pub fn main() anyerror!void {
             );
             rl.drawText(
                 rl.textFormat("flag_msaa_4x_hint: %d", .{
-                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags { .msaa_4x_hint = true }))),
+                    @as(i32, @intFromBool(rl.isWindowState(rl.ConfigFlags{ .msaa_4x_hint = true }))),
                 }),
                 10,
                 360,

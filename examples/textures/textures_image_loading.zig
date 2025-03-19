@@ -1,11 +1,4 @@
-// raylib-zig (c) Nikolas Wipper 2023
-//
-// raylib-zig [textures] example - image loading
-//
-// Example licensed under an unmodified zlib/libpng license, which is an
-// OSI-certified, BSD-like license that allows static linking with closed
-// source software
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 const Color = rl.Color;
 const screenWidth = 800;

@@ -1,11 +1,4 @@
-//! # raylib-zig [textures] example - background scrolling
-//!
-//! Example licensed under an unmodified zlib/libpng license, which is an
-//! OSI-certified, BSD-like license that allows static linking with closed
-//! source software
-//!
-//! Copyright (c) Nikolas Wipper 2024
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 const screen_width = 800;

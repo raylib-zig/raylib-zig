@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# raylib-zig (c) Nikolas Wipper 2025
 
 import re
 

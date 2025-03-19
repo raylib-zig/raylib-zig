@@ -1,5 +1,4 @@
-// A raylib port of https://github.com/raysan5/raylib/blob/master/examples/text/text_format_text.c
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 const std = @import("std");
 

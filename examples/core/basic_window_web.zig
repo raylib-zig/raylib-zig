@@ -1,5 +1,4 @@
-// A raylib-zig port of https://github.com/raysan5/raylib/blob/master/examples/core/core_basic_window_web.c
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 const builtin = @import("builtin");
 

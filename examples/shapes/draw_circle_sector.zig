@@ -1,3 +1,4 @@
+//! raylib-zig (c) Nikolas Wipper 2025
 const std = @import("std");
 const math = std.math;
 const rl = @import("raylib");

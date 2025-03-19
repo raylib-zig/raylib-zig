@@ -1,4 +1,4 @@
-// A raylib-zig port of https://github.com/raysan5/raylib/blob/master/examples/core/core_3d_picking.c
+//! raylib-zig (c) Nikolas Wipper 2025
 const rl = @import("raylib");
 
 pub fn main() anyerror!void {

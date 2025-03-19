@@ -1,5 +1,4 @@
-// Port of https://github.com/raysan5/raylib/blob/master/examples/textures/textures_sprite_anim.c to zig
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const std = @import("std");
 const rl = @import("raylib");
 
