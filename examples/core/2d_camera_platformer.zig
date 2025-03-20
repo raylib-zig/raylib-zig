@@ -11,7 +11,14 @@ const Vec2 = rl.Vector2;
 const Color = rl.Color;
 const Camera2D = rl.Camera2D;
 
-const CameraUpdater = *const fn (camera: *Camera2D, player: *Player, env_items: []EnvItem, delta: f32, width: i32, height: i32) void;
+const CameraUpdater = *const fn (
+    camera: *Camera2D,
+    player: *Player,
+    env_items: []EnvItem,
+    delta: f32,
+    width: i32,
+    height: i32,
+) void;
 
 const G: i32 = 400;
 const PLAYER_JUMP_SPD: f32 = 350;
@@ -43,11 +50,11 @@ pub fn main() anyerror!void {
 
     var player: Player = .{ .can_jump = false, .speed = 0, .position = Vec2.init(400, 280) };
     var env_items = [_]EnvItem{
-        .{ .rect = Rect.init(0, 0, 1000, 400), .blocking = false, .color = Color.light_gray },
-        .{ .rect = Rect.init(0, 400, 1000, 200), .blocking = true, .color = Color.gray },
-        .{ .rect = Rect.init(300, 200, 400, 10), .blocking = true, .color = Color.gray },
-        .{ .rect = Rect.init(250, 300, 100, 10), .blocking = true, .color = Color.gray },
-        .{ .rect = Rect.init(650, 300, 100, 10), .blocking = true, .color = Color.gray },
+        .{ .rect = Rect.init(0, 0, 1000, 400), .blocking = false, .color = .light_gray },
+        .{ .rect = Rect.init(0, 400, 1000, 200), .blocking = true, .color = .gray },
+        .{ .rect = Rect.init(300, 200, 400, 10), .blocking = true, .color = .gray },
+        .{ .rect = Rect.init(250, 300, 100, 10), .blocking = true, .color = .gray },
+        .{ .rect = Rect.init(650, 300, 100, 10), .blocking = true, .color = .gray },
     };
 
     var camera: rl.Camera2D = .{
@@ -92,18 +99,25 @@ pub fn main() anyerror!void {
         if (camera.zoom < 0.25) camera.zoom = 0.25;
 
         // input: reset
-        if (rl.isKeyPressed(rl.KeyboardKey.r)) {
+        if (rl.isKeyPressed(.r)) {
             camera.zoom = 1;
             player.position = Vec2.init(400, 280);
         }
 
         // input: cycle camera mode
-        if (rl.isKeyPressed(rl.KeyboardKey.c)) {
+        if (rl.isKeyPressed(.c)) {
             camera_option = (camera_option + 1) % camera_updaters.len;
         }
 
         // call update camera by pointer
-        camera_updaters[camera_option](&camera, &player, &env_items, delta_time, screen_width, screen_height);
+        camera_updaters[camera_option](
+            &camera,
+            &player,
+            &env_items,
+            delta_time,
+            screen_width,
+            screen_height,
+        );
         //----------------------------------------------------------------------------------
 
         // Draw
@@ -112,7 +126,7 @@ pub fn main() anyerror!void {
             rl.beginDrawing();
             defer rl.endDrawing();
 
-            rl.clearBackground(Color.light_gray);
+            rl.clearBackground(.light_gray);
 
             {
                 rl.beginMode2D(camera);
@@ -123,15 +137,15 @@ pub fn main() anyerror!void {
                 }
 
                 const player_rect = Rect.init(player.position.x - 20, player.position.y - 40, 40, 40);
-                rl.drawRectangleRec(player_rect, Color.red);
-                rl.drawCircleV(player.position, 5, Color.gold);
+                rl.drawRectangleRec(player_rect, .red);
+                rl.drawCircleV(player.position, 5, .gold);
             }
 
-            rl.drawText("Controls:", 20, 20, 10, Color.black);
-            rl.drawText("- Right/Left to move", 40, 40, 10, Color.dark_gray);
+            rl.drawText("Controls:", 20, 20, 10, .black);
+            rl.drawText("- Right/Left to move", 40, 40, 10, .dark_gray);
             // todo: controls text
-            rl.drawText("- Current camera mode:", 20, 120, 10, Color.black);
-            rl.drawText(camera_descriptions[camera_option], 40, 140, 10, Color.dark_gray);
+            rl.drawText("- Current camera mode:", 20, 120, 10, .black);
+            rl.drawText(camera_descriptions[camera_option], 40, 140, 10, .dark_gray);
         }
 
         //----------------------------------------------------------------------------------
@@ -143,9 +157,9 @@ pub fn main() anyerror!void {
 //------------------------------------------------------------------------------------
 
 fn updatePlayer(player: *Player, env_items: []EnvItem, delta: f32) void {
-    if (rl.isKeyDown(rl.KeyboardKey.left)) player.position.x -= PLAYER_HOR_SPD * delta;
-    if (rl.isKeyDown(rl.KeyboardKey.right)) player.position.x += PLAYER_HOR_SPD * delta;
-    if (rl.isKeyDown(rl.KeyboardKey.space) and player.can_jump) {
+    if (rl.isKeyDown(.left)) player.position.x -= PLAYER_HOR_SPD * delta;
+    if (rl.isKeyDown(.right)) player.position.x += PLAYER_HOR_SPD * delta;
+    if (rl.isKeyDown(.space) and player.can_jump) {
         player.speed = -PLAYER_JUMP_SPD;
         player.can_jump = false;
     }
@@ -178,7 +192,14 @@ fn updatePlayer(player: *Player, env_items: []EnvItem, delta: f32) void {
 //------------------------------------------------------------------------------------
 
 // Follow player center
-fn updateCameraCenter(camera: *Camera2D, player: *Player, _: []EnvItem, _: f32, width: i32, height: i32) void {
+fn updateCameraCenter(
+    camera: *Camera2D,
+    player: *Player,
+    _: []EnvItem,
+    _: f32,
+    width: i32,
+    height: i32,
+) void {
     const widthf: f32 = @floatFromInt(width);
     const heightf: f32 = @floatFromInt(height);
     camera.offset = Vec2.init(widthf / 2, heightf / 2);
@@ -186,7 +207,14 @@ fn updateCameraCenter(camera: *Camera2D, player: *Player, _: []EnvItem, _: f32, 
 }
 
 // Follow player center, but clamp to map edges
-fn updatecameraCenterInsideMap(camera: *Camera2D, player: *Player, env_items: []EnvItem, _: f32, width: i32, height: i32) void {
+fn updatecameraCenterInsideMap(
+    camera: *Camera2D,
+    player: *Player,
+    env_items: []EnvItem,
+    _: f32,
+    width: i32,
+    height: i32,
+) void {
     const widthf: f32 = @floatFromInt(width);
     const heightf: f32 = @floatFromInt(height);
     camera.offset = Vec2.init(widthf / 2, heightf / 2);
@@ -214,7 +242,14 @@ fn updatecameraCenterInsideMap(camera: *Camera2D, player: *Player, env_items: []
 }
 
 // Follow player center; smoothed
-fn updateCameraCenterSmoothFollow(camera: *Camera2D, player: *Player, _: []EnvItem, delta: f32, width: i32, height: i32) void {
+fn updateCameraCenterSmoothFollow(
+    camera: *Camera2D,
+    player: *Player,
+    _: []EnvItem,
+    delta: f32,
+    width: i32,
+    height: i32,
+) void {
     const min_speed = 30;
     const min_effect_length = 10;
     const fraction_speed = 0.8;
@@ -236,7 +271,14 @@ var evening_out: bool = false;
 var even_out_target: f32 = 0;
 
 // Follow player center horizontally; update player center vertically after landing
-fn updateCameraEvenOutOnLanding(camera: *Camera2D, player: *Player, _: []EnvItem, delta: f32, width: i32, height: i32) void {
+fn updateCameraEvenOutOnLanding(
+    camera: *Camera2D,
+    player: *Player,
+    _: []EnvItem,
+    delta: f32,
+    width: i32,
+    height: i32,
+) void {
     const even_out_speed = 700;
 
     const widthf: f32 = @floatFromInt(width);
@@ -268,7 +310,14 @@ fn updateCameraEvenOutOnLanding(camera: *Camera2D, player: *Player, _: []EnvItem
 }
 
 // Player push camera on getting too close to screen edge
-fn updateCameraPlayerBoundsPush(camera: *Camera2D, player: *Player, _: []EnvItem, _: f32, width: i32, height: i32) void {
+fn updateCameraPlayerBoundsPush(
+    camera: *Camera2D,
+    player: *Player,
+    _: []EnvItem,
+    _: f32,
+    width: i32,
+    height: i32,
+) void {
     const bbox = Vec2.init(0.2, 0.2);
 
     const widthf: f32 = @floatFromInt(width);
