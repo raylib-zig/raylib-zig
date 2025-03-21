@@ -13,6 +13,7 @@ pub fn main() anyerror!void {
     const screen_height = 450;
 
     rl.initWindow(screen_width, screen_height, "raylib-zig [core] example - input gestures");
+    defer rl.closeWindow(); // Close window and OpenGL context
 
     var touch_position: rl.Vector2 = .zero();
     const touch_area: rl.Rectangle = .init(
