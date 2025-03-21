@@ -1,5 +1,4 @@
-// raylib-zig (c) Nikolas Wipper 2020-2024
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const std = @import("std");
 const this = @This();
 const rl = @import("raylib");
@@ -76,6 +75,7 @@ pub fn build(b: *std.Build) !void {
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
 
+    // TODO: Generate this automatically
     const examples = [_]Program{
         .{
             .name = "raw_stream",
