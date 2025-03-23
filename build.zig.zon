@@ -4,12 +4,12 @@
     .fingerprint = 0xc4cfa8c610114f28,
     .dependencies = .{
         .raylib = .{
-            .url = "git+https://github.com/raysan5/raylib?ref=master#61a026f7ef54f17428ee6fdf079b0d2e7bdbca73",
-            .hash = "raylib-5.5.0-whq8uGZGzQDi3_L7tJzgEINoZN-HwmOs0zkkc2g7ysIZ",
+            .url = "git+https://github.com/raysan5/raylib?ref=master#f5c96302d5623950dccdca31f8dd66d6d633dbd1",
+            .hash = "raylib-5.5.0-whq8uFV0zQA9NXxhpYFZk_yHW6xzg5eKGmOtMJ2DOTdU",
         },
         .raygui = .{
-            .url = "git+https://github.com/raysan5/raygui#9a95871701a5fc63bea35eab73fef6414e048b73",
-            .hash = "N-V-__8AAPZ7UgBpukXNy27vajQpyiPrEZpV6jOLzI6-Otc_",
+            .url = "git+https://github.com/raysan5/raygui#1536ae35c7b42d863135f4181fd2a225e531f68b",
+            .hash = "N-V-__8AAEp9UgBJ2n1eks3_3YZk3GCO1XOENazWaCO7ggM2",
         },
     },
     .minimum_zig_version = "0.14.0",

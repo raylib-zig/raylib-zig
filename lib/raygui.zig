@@ -674,6 +674,11 @@ pub fn guiSlider(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const
     return @as(i32, cdef.GuiSlider(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
+/// Slider control with extended parameters
+pub fn guiSliderPro(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32, sliderWidth: i32) i32 {
+    return @as(i32, cdef.GuiSliderPro(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue, @as(c_int, sliderWidth)));
+}
+
 /// Slider Bar control
 pub fn guiSliderBar(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSliderBar(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
