@@ -138,6 +138,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Shows the functionality of a 2D camera",
         },
         .{
+            .name = "2d_camera_platformer",
+            .path = "examples/core/2d_camera_platformer.zig",
+            .desc = "2D camera platformer",
+        },
+        .{
             .name = "3d_camera_first_person",
             .path = "examples/core/3d_camera_first_person.zig",
             .desc = "Simple first person demo",
