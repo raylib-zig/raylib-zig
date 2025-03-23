@@ -294,6 +294,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Mix 2d and 3d elements",
         },
         .{
+            .name = "window_letterbox",
+            .path = "examples/core/window_letterbox.zig",
+            .desc = "Render to a scaled texture",
+        },
+        .{
             .name = "scissor_test",
             .path = "examples/core/scissor_test.zig",
             .desc = "Scissor mode test",
