@@ -122,6 +122,8 @@ def add_namespace_to_type(t: str) -> str:
 def make_return_cast(source_type: str, dest_type: str, inner: str) -> str:
     if source_type == dest_type:
         return inner
+    if "ExportImageToMemory" in inner:
+        return f"{inner}[0..@as(usize, @intCast(fileSize.*))]"
     if source_type in ["[*c]const u8", "[*c]u8"]:
         return f"std.mem.span({inner})"
 
