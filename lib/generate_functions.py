@@ -23,17 +23,93 @@ ZIGGIFY = {
     "c_uint": "u32"
 }
 
-IGNORE_TYPES = [
-    "[*c]Color",
-    "[*c]GlyphInfo",
-    "[*c]c_int",
-    "[*c]c_uint",
-    "[*c][*c]u8",
-    "[*c][*c]const u8",
-    "[*c]Material",
-    "[*c]ModelAnimation",
-    "[*c]f32",
+IGNORE_C_TYPE = [
+    "rlGetShaderLocsDefault",
 ]
+
+TRIVIAL_SIZE = [
+    "LoadFileData",
+    "CompressData",
+    "DecompressData",
+    "EncodeDataBase64",
+    "DecodeDataBase64",
+    "ExportImageToMemory",
+    "LoadImagePalette",
+    "LoadCodepoints",
+    "TextSplit",
+    #"LoadMaterials",
+    "LoadModelAnimations",
+]
+
+HAS_ERROR = TRIVIAL_SIZE
+
+MANUAL = [
+    "TextFormat",
+    "TraceLog",
+    "LoadShader",
+    "LoadRandomSequence",
+    "ExportDataAsCode",
+    "SaveFileData",
+    "LoadImage",
+    "LoadImageRaw",
+    "LoadImageAnim",
+    "LoadImageFromTexture",
+    "LoadImageFromScreen",
+    "LoadImageFromMemory",
+    "LoadImageColors",
+    "LoadMaterialDefault",
+    "LoadMaterials", # todo: Make this automatic, by adding a IsXValid check in this script
+    "LoadModel",
+    "LoadModelFromMesh",
+    "LoadTexture",
+    "LoadTextureFromImage",
+    "LoadTextureCubemap",
+    "LoadRenderTexture",
+    "LoadWave",
+    "LoadWaveSamples",
+    "LoadSound",
+    "LoadMusicStream",
+    "LoadAudioStream",
+    "DrawMeshInstanced",
+    "UnloadModelAnimations",
+    "ComputeCRC32",
+    "ComputeMD5",
+    "ComputeSHA1",
+    "SetWindowIcons",
+    "CheckCollisionPointPoly",
+    "ColorToInt",
+    "GetFontDefault",
+    "LoadFont",
+    "LoadFontEx",
+    "LoadFontFromImage",
+    "LoadFontData",
+    "ImageText",
+    "ImageTextEx",
+    "GenImageFontAtlas",
+    "UnloadFontData",
+    "DrawTextCodepoints",
+    "LoadUTF8",
+    "TextJoin",
+    "DrawLineStrip",
+    "DrawTriangleFan",
+    "DrawTriangleStrip",
+    "DrawTriangleStrip3D",
+    "GuiTabBar",
+    "GuiListViewEx",
+    "GuiPanel",
+    "GuiScrollPanel",
+    "DrawSplineLinear",
+    "DrawSplineBasis",
+    "DrawSplineCatmullRom",
+    "DrawSplineBezierQuadratic",
+    "DrawSplineBezierCubic",
+    "ImageKernelConvolution",
+    "GuiGetIcons",
+    "GuiLoadIcons",
+    "GuiSetStyle",
+    "GuiGetStyle"
+]
+
 # Some C types have a different sizes on different systems and Zig
 # knows that so we tell it to get the system specific size for us.
 def c_to_zig_type(c: str) -> str:
@@ -47,7 +123,9 @@ def c_to_zig_type(c: str) -> str:
     return const + c
 
 
-def ziggify_type(name: str, t: str, func_name) -> str:
+def ziggify_type(name: str, t: str, func_name: str) -> str:
+    if func_name in IGNORE_C_TYPE:
+        return t
     NO_STRINGS = ["data", "fileData", "compData"]
 
     single = [
@@ -65,7 +143,7 @@ def ziggify_type(name: str, t: str, func_name) -> str:
         "data", "compData", "points", "fileData", "colors", "pixels",
         "fontChars", "chars", "recs", "codepoints", "textList", "transforms",
         "animations", "samples", "LoadImageColors", "LoadImagePalette",
-        "LoadFontData", "LoadCodepoints", "TextSplit", "LoadMaterials",
+        "LoadFontData", "LoadCodepoints", "LoadMaterials",
         "LoadModelAnimations", "LoadWaveSamples", "images",
         "LoadRandomSequence", "sequence", "kernel", "GlyphInfo", "glyphs", "glyphRecs",
         "matf", "rlGetShaderLocsDefault", "locs", "GuiGetIcons", "GuiLoadIcons"
@@ -76,7 +154,7 @@ def ziggify_type(name: str, t: str, func_name) -> str:
         return "[][:0]const u8"
 
     if t.startswith("[*c]") and name not in single and name not in multi:
-        if (t == "[*c]const u8" or t == "[*c]u8") and name not in NO_STRINGS:  # Strings are multis.
+        if (t == "[*c]const u8" or t == "[*c]u8" or name == "TextSplit") and name not in NO_STRINGS:  # Strings are multis.
             string = True
         else:
             raise ValueError(f"{t} {name} not classified")
@@ -84,7 +162,9 @@ def ziggify_type(name: str, t: str, func_name) -> str:
     pre = ""
     while t.startswith("[*c]"):
         t = t[4:]
-        if string and not t.startswith("[*c]"):
+        if func_name in TRIVIAL_SIZE and not pre:
+            pre += "[]"
+        elif string and not t.startswith("[*c]"):
             pre += "[:0]"
         elif name in single:
             pre += "*"
@@ -94,7 +174,11 @@ def ziggify_type(name: str, t: str, func_name) -> str:
     if t in ZIGGIFY:
         t = ZIGGIFY[t]
 
-    return pre + t
+    error = ""
+    if name in HAS_ERROR:
+        error = "RaylibError!"
+
+    return error + pre + t
 
 
 def add_namespace_to_type(t: str) -> str:
@@ -119,23 +203,20 @@ def add_namespace_to_type(t: str) -> str:
     return pre + t
 
 
-def make_return_cast(source_type: str, dest_type: str, inner: str) -> str:
-    if source_type == dest_type:
+def make_return_cast(func_name: str, source_type: str, dest_type: str, inner: str) -> str:
+    if source_type == dest_type or func_name in IGNORE_C_TYPE:
         return inner
-    if "ExportImageToMemory" in inner:
-        return f"{inner}[0..@as(usize, @intCast(fileSize.*))]"
+    if source_type.startswith("[*c][*c]"):
+        inner = f"@as([*][:0]{source_type[8:]}, @ptrCast({inner}))"
+    if func_name in TRIVIAL_SIZE:
+        return f"{inner}[0..@as(usize, @intCast(_len))]"
     if source_type in ["[*c]const u8", "[*c]u8"]:
         return f"std.mem.span({inner})"
 
     if source_type in ZIGGIFY:
         return f"@as({dest_type}, {inner})"
 
-    # These all have to be done manually because their sizes depend on the
-    # function arguments.
-    if source_type in IGNORE_TYPES:
-        return None
-    else:
-        raise ValueError(f"Don't know what to do {source_type} {dest_type} {inner}")
+    raise ValueError(f"Don't know what to do with '{func_name}': {source_type} {dest_type} {inner}")
 
 
 def fix_pointer(name: str, t: str):
@@ -329,87 +410,34 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
 
         zig_name = convert_name_case(func_name)
 
-        # TODO: Ziggify return type
+        func_prelude = ""
+
+        if func_name in TRIVIAL_SIZE:
+            zig_arguments.pop()
+            zig_call_args[-1] = "@as([*c]c_int, @ptrCast(&_len))"
+            func_prelude = "var _len: i32 = 0;\n    "
+
         zig_arguments = ", ".join(zig_arguments)
         zig_call_args = ", ".join(zig_call_args)
 
-        manual = [
-            "TextFormat",
-            "TraceLog",
-            "LoadShader",
-            "ExportDataAsCode",
-            "LoadFileData",
-            "SaveFileData",
-            "LoadImage",
-            "LoadImageRaw",
-            "LoadImageAnim",
-            "LoadImageFromTexture",
-            "LoadImageFromScreen",
-            "LoadImageFromMemory",
-            "LoadMaterialDefault",
-            "LoadMaterials",
-            "LoadModel",
-            "LoadModelFromMesh",
-            "LoadTexture",
-            "LoadTextureFromImage",
-            "LoadTextureCubemap",
-            "LoadRenderTexture",
-            "LoadWave",
-            "LoadSound",
-            "LoadMusicStream",
-            "LoadAudioStream",
-            "DrawMeshInstanced",
-            "UnloadModelAnimations",
-            "CompressData",
-            "DecompressData",
-            "EncodeDataBase64",
-            "DecodeDataBase64",
-            "ComputeCRC32",
-            "ComputeMD5",
-            "ComputeSHA1",
-            "SetWindowIcons",
-            "CheckCollisionPointPoly",
-            "ColorToInt",
-            "GetFontDefault",
-            "LoadFont",
-            "LoadFontEx",
-            "LoadFontFromImage",
-            "ImageText",
-            "ImageTextEx",
-            "GenImageFontAtlas",
-            "UnloadFontData",
-            "DrawTextCodepoints",
-            "LoadUTF8",
-            "TextJoin",
-            "DrawLineStrip",
-            "DrawTriangleFan",
-            "DrawTriangleStrip",
-            "DrawTriangleStrip3D",
-            "GuiTabBar",
-            "GuiListViewEx",
-            "GuiPanel",
-            "GuiScrollPanel",
-            "DrawSplineLinear",
-            "DrawSplineBasis",
-            "DrawSplineCatmullRom",
-            "DrawSplineBezierQuadratic",
-            "DrawSplineBezierCubic",
-            "ImageKernelConvolution",
-            "GuiSetStyle",
-            "GuiGetStyle"
-        ]
-
-        if func_name in manual or "FromMemory" in func_name:
+        if func_name in MANUAL or "FromMemory" in func_name:
             continue
 
+        inner = f"cdef.{func_name}({zig_call_args})"
+
+        if func_name in TRIVIAL_SIZE:
+            func_prelude += f"const _ptr = {inner};\n    if (_ptr == 0) return RaylibError.{func_name};\n    "
+            inner = "_ptr"
+
         zig_return = ziggify_type(func_name, return_type, func_name)
-        return_cast = make_return_cast(return_type, zig_return, f"cdef.{func_name}({zig_call_args})")
+        return_cast = make_return_cast(func_name, return_type, zig_return, inner)
 
         if return_cast:
             zig_funcs.append(
                 inline_comment +
                 f"pub fn {zig_name}({zig_arguments}) {zig_return}" +
                 " {\n    " +
+                func_prelude +
                 ("return " if zig_return != "void" else "") +
                 return_cast + ";"
                 "\n}"

@@ -714,6 +714,11 @@ pub fn rlGetShaderIdDefault() u32 {
     return @as(u32, cdef.rlGetShaderIdDefault());
 }
 
+/// Get default shader locations
+pub fn rlGetShaderLocsDefault() [*c]c_int {
+    return cdef.rlGetShaderLocsDefault();
+}
+
 /// Load a render batch system
 pub fn rlLoadRenderBatch(numBuffers: i32, bufferElements: i32) rlRenderBatch {
     return cdef.rlLoadRenderBatch(@as(c_int, numBuffers), @as(c_int, bufferElements));
