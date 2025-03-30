@@ -2022,6 +2022,16 @@ pub fn loadShaderFromMemory(vsCode: ?[:0]const u8, fsCode: ?[:0]const u8) Raylib
     return if (isValid) shader else RaylibError.LoadShader;
 }
 
+pub fn loadRandomSequence(count: u32, min: i32, max: i32) []i32 {
+    var res: []i32 = undefined;
+
+    const ptr = cdef.LoadRandomSequence(@as(c_uint, @intCast(count)), @as(c_int, @intCast(min)), @as(c_int, @intCast(max)));
+
+    res.ptr = @as([*]i32, @ptrCast(ptr));
+    res.len = @as(usize, @intCast(count));
+    return res;
+}
+
 /// Load file data as byte array (read)
 pub fn loadFileData(fileName: [:0]const u8) RaylibError![]u8 {
     var bytesRead: i32 = 0;
