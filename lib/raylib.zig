@@ -3838,7 +3838,7 @@ pub fn exportImage(image: Image, fileName: [:0]const u8) bool {
 
 /// Export image to memory buffer
 pub fn exportImageToMemory(image: Image, fileType: [:0]const u8, fileSize: *i32) [:0]u8 {
-    return std.mem.span(cdef.ExportImageToMemory(image, @as([*c]const u8, @ptrCast(fileType)), @as([*c]c_int, @ptrCast(fileSize))));
+    return cdef.ExportImageToMemory(image, @as([*c]const u8, @ptrCast(fileType)), @as([*c]c_int, @ptrCast(fileSize)))[0..@as(usize, @intCast(fileSize.*))];
 }
 
 /// Export image as code file defining an array of bytes, returns true on success
