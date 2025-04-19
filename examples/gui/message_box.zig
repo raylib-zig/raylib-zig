@@ -13,9 +13,9 @@ const std = @import("std");
 const rl = @import("raylib");
 const rg = @import("raygui");
 
-// `rl.getColor` only accepts a `u32`. Performing `@intCast` on the return value
-// of `rg.getStyle` invokes checked undefined behavior from Zig when passed to
-// `rl.getColor`, hence the custom implementation here...
+/// `rl.getColor` only accepts a `u32`. Performing `@intCast` on the return value
+/// of `rg.getStyle` invokes checked undefined behavior from Zig when passed to
+/// `rl.getColor`, hence the custom implementation here...
 fn getColor(hex: i32) rl.Color {
     var color: rl.Color = .black;
     // zig fmt: off
@@ -43,7 +43,7 @@ pub fn main() !void {
 
         rl.clearBackground(getColor(color_int));
 
-        if (rg.button(.init(24, 24, 120, 30), "#191#Show Message") > 0)
+        if (rg.button(.init(24, 24, 120, 30), "#191#Show Message"))
             show_message_box = true;
 
         if (show_message_box) {

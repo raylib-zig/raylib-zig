@@ -488,6 +488,28 @@ pub fn scrollPanel(bounds: Rectangle, text: ?[*:0]const u8, content: Rectangle, 
     return @as(i32, cdef.GuiScrollPanel(bounds, textFinal, content, @as([*c]Vector2, @ptrCast(scroll)), @as([*c]Rectangle, @ptrCast(view))));
 }
 
+/// Button control, returns true when clicked
+pub fn button(bounds: Rectangle, text: [:0]const u8) bool {
+    return @as(i32, cdef.GuiButton(bounds, @as([*c]const u8, @ptrCast(text)))) > 0;
+}
+
+/// Label button control, returns true when clicked
+pub fn labelButton(bounds: Rectangle, text: [:0]const u8) i32 {
+    return @as(i32, cdef.GuiLabelButton(bounds, @as([*c]const u8, @ptrCast(text)))) > 0;
+}
+
+/// Check Box control, returns true when active
+pub fn checkBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) bool {
+    return @as(i32, cdef.GuiCheckBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]bool, @ptrCast(checked)))) > 0;
+}
+
+/// Text Box control, updates input text
+/// Returns true on ENTER pressed (useful for data validation)
+pub fn textBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) bool {
+    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode)) > 0;
+}
+
+
 /// Enable gui controls (global state)
 pub fn enable() void {
     cdef.GuiEnable();
@@ -598,16 +620,6 @@ pub fn label(bounds: Rectangle, text: [:0]const u8) i32 {
     return @as(i32, cdef.GuiLabel(bounds, @as([*c]const u8, @ptrCast(text))));
 }
 
-/// Button control, returns true when clicked
-pub fn button(bounds: Rectangle, text: [:0]const u8) i32 {
-    return @as(i32, cdef.GuiButton(bounds, @as([*c]const u8, @ptrCast(text))));
-}
-
-/// Label button control, returns true when clicked
-pub fn labelButton(bounds: Rectangle, text: [:0]const u8) i32 {
-    return @as(i32, cdef.GuiLabelButton(bounds, @as([*c]const u8, @ptrCast(text))));
-}
-
 /// Toggle Button control
 pub fn toggle(bounds: Rectangle, text: [:0]const u8, active: *bool) i32 {
     return @as(i32, cdef.GuiToggle(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]bool, @ptrCast(active))));
@@ -621,11 +633,6 @@ pub fn toggleGroup(bounds: Rectangle, text: [:0]const u8, active: *i32) i32 {
 /// Toggle Slider control
 pub fn toggleSlider(bounds: Rectangle, text: [:0]const u8, active: *i32) i32 {
     return @as(i32, cdef.GuiToggleSlider(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(active))));
-}
-
-/// Check Box control, returns true when active
-pub fn checkBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) i32 {
-    return @as(i32, cdef.GuiCheckBox(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]bool, @ptrCast(checked))));
 }
 
 /// Combo Box control
@@ -651,11 +658,6 @@ pub fn valueBox(bounds: Rectangle, text: [:0]const u8, value: *i32, minValue: i3
 /// Value box control for float values
 pub fn valueBoxFloat(bounds: Rectangle, text: [:0]const u8, textValue: [:0]u8, value: *f32, editMode: bool) i32 {
     return @as(i32, cdef.GuiValueBoxFloat(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]u8, @ptrCast(textValue)), @as([*c]f32, @ptrCast(value)), editMode));
-}
-
-/// Text Box control, updates input text
-pub fn textBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) i32 {
-    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode));
 }
 
 /// Slider control
