@@ -192,7 +192,8 @@ def add_namespace_to_type(t: str) -> str:
         pre += "const "
 
     if t.startswith("Gui"):
-        t = "rgui." + t
+        # Strip "Gui" prefix to match types in prelude
+        t = "rgui." + t[3:]
     elif t[0].isupper():
         t = "rl." + t
     elif t in ["float3", "float16"]:
@@ -258,8 +259,8 @@ _fix_enums_data = [
     ("button",      "GamepadButton",         r".*GamepadButton.*"),
     ("axis",        "GamepadAxis",           r".*GamepadAxis.*"),
     ("button",      "MouseButton",           r".*MouseButton.*"),
-    ("control",     "GuiControl",            r"Gui.etStyle"),
-#    ("property",    "GuiControlProperty",    r"Gui.etStyle"),
+    ("control",     "GuiControl",            r"Gui.etStyle"), # "Gui" prefix needed here for type parsing later
+#    ("property",    "GuiControlProperty",    r"Gui.etStyle"), # "Gui" prefix needed here for type parsing later
 ]
 def fix_enums(arg_name, arg_type, func_name):
     if func_name.startswith("rl"):
