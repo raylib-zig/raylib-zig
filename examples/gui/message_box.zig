@@ -43,13 +43,18 @@ pub fn main() !void {
 
         rl.clearBackground(getColor(color_int));
 
-        if (rg.guiButton(.init(24, 24, 120, 30), "#191#Show Message") > 0) show_message_box = true;
+        if (rg.button(.init(24, 24, 120, 30), "#191#Show Message") > 0)
+            show_message_box = true;
 
         if (show_message_box) {
-            const result = rg.guiMessageBox(.init(85, 70, 250, 100), "#191#Message Box", "Hi! This is a message", "Nice;Cool");
+            const result = rg.messageBox(
+                .init(85, 70, 250, 100),
+                "#191#Message Box",
+                "Hi! This is a message",
+                "Nice;Cool",
+            );
 
             if (result >= 0) show_message_box = false;
         }
     }
 }
-
