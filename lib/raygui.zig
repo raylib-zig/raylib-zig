@@ -427,7 +427,7 @@ pub const IconName = enum(c_int) {
 /// Set one style property
 pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, value: i32) void {
     const property_int: c_int = switch (property) {
-        inline else => |val| @intCast(@intFromEnum(val))
+        inline else => |val| @intCast(@intFromEnum(val)),
     };
 
     cdef.GuiSetStyle(control, property_int, @as(c_int, value));
@@ -436,7 +436,7 @@ pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, v
 /// Get one style property
 pub fn getStyle(control: Control, comptime property: ControlOrDefaultProperty) i32 {
     const property_int: c_int = switch (property) {
-        inline else => |val| @intCast(@intFromEnum(val))
+        inline else => |val| @intCast(@intFromEnum(val)),
     };
 
     return @as(i32, cdef.GuiGetStyle(control, property_int));
@@ -494,7 +494,7 @@ pub fn button(bounds: Rectangle, text: [:0]const u8) bool {
 }
 
 /// Label button control, returns true when clicked
-pub fn labelButton(bounds: Rectangle, text: [:0]const u8) i32 {
+pub fn labelButton(bounds: Rectangle, text: [:0]const u8) bool {
     return @as(i32, cdef.GuiLabelButton(bounds, @as([*c]const u8, @ptrCast(text)))) > 0;
 }
 
@@ -508,7 +508,6 @@ pub fn checkBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) bool {
 pub fn textBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) bool {
     return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode)) > 0;
 }
-
 
 /// Enable gui controls (global state)
 pub fn enable() void {
