@@ -170,6 +170,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates various flags used during and after window creation",
         },
         .{
+            .name = "gui_message_box",
+            .path = "examples/gui/message_box.zig",
+            .desc = "Demonstrates showing and hiding a message box",
+        },
+        .{
             .name = "raymarching",
             .path = "examples/shaders/raymarching.zig",
             .desc = "Uses a raymarching in a shader to render shapes",

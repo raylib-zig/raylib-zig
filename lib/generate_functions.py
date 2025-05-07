@@ -98,6 +98,10 @@ MANUAL = [
     "GuiListViewEx",
     "GuiPanel",
     "GuiScrollPanel",
+    "GuiButton",
+    "GuiLabelButton",
+    "GuiCheckBox",
+    "GuiTextBox",
     "DrawSplineLinear",
     "DrawSplineBasis",
     "DrawSplineCatmullRom",
@@ -192,7 +196,8 @@ def add_namespace_to_type(t: str) -> str:
         pre += "const "
 
     if t.startswith("Gui"):
-        t = "rgui." + t
+        # Strip "Gui" prefix to match types in prelude
+        t = "rgui." + t[3:]
     elif t[0].isupper():
         t = "rl." + t
     elif t in ["float3", "float16"]:
@@ -258,8 +263,8 @@ _fix_enums_data = [
     ("button",      "GamepadButton",         r".*GamepadButton.*"),
     ("axis",        "GamepadAxis",           r".*GamepadAxis.*"),
     ("button",      "MouseButton",           r".*MouseButton.*"),
-    ("control",     "GuiControl",            r"Gui.etStyle"),
-#    ("property",    "GuiControlProperty",    r"Gui.etStyle"),
+    ("control",     "GuiControl",            r"Gui.etStyle"), # "Gui" prefix needed here for type parsing later
+#    ("property",    "GuiControlProperty",    r"Gui.etStyle"), # "Gui" prefix needed here for type parsing later
 ]
 def fix_enums(arg_name, arg_type, func_name):
     if func_name.startswith("rl"):
@@ -274,8 +279,12 @@ def fix_enums(arg_name, arg_type, func_name):
     return arg_type
 
 
-def convert_name_case(name):
-    return name[:1].lower() + name[1:] if name else ''
+def convert_name(name):
+    if not name:
+        return ''
+    if name.startswith("Gui"):
+        name = name[3:]
+    return name[:1].lower() + name[1:]
 
 
 def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str, prelude_file: str, ext_prelude_file: str, skip_after: str = "#/never\\#"):
@@ -408,7 +417,7 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
         ext_ret = add_namespace_to_type(return_type)
         ext_heads.append(f"pub extern \"c\" fn {func_name}({zig_c_arguments}) {ext_ret};")
 
-        zig_name = convert_name_case(func_name)
+        zig_name = convert_name(func_name)
 
         func_prelude = ""
 
