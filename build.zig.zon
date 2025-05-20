@@ -1,15 +1,15 @@
 .{
-    .name = .raylib_zig,
+    .name = "raylib_zig",
     .version = "5.6.0-dev",
     .fingerprint = 0xc4cfa8c610114f28,
     .dependencies = .{
         .raylib = .{
             .url = "git+https://github.com/raysan5/raylib?ref=master#f5c96302d5623950dccdca31f8dd66d6d633dbd1",
-            .hash = "raylib-5.5.0-whq8uFV0zQA9NXxhpYFZk_yHW6xzg5eKGmOtMJ2DOTdU",
+            .hash = "122049da7d5e92cdffdd8664dc608ed5738435acd66823bb8203361057efb1381186",
         },
         .raygui = .{
             .url = "git+https://github.com/raysan5/raygui#1536ae35c7b42d863135f4181fd2a225e531f68b",
-            .hash = "N-V-__8AAEp9UgBJ2n1eks3_3YZk3GCO1XOENazWaCO7ggM2",
+            .hash = "122049da7d5e92cdffdd8664dc608ed5738435acd66823bb8203361057efb1381186",
         },
     },
     .minimum_zig_version = "0.14.0",
