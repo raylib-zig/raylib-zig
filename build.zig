@@ -316,6 +316,7 @@ pub fn build(b: *std.Build) !void {
             // output file, so it also needs to be linked with emscripten.
             exe_lib.linkLibrary(raylib_artifact);
             const link_step = try emcc.linkWithEmscripten(b, &[_]*std.Build.Step.Compile{ exe_lib, raylib_artifact });
+            link_step.addArg("--emrun");
             link_step.addArg("--embed-file");
             link_step.addArg("resources/");
 
