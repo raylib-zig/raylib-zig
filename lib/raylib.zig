@@ -2540,7 +2540,7 @@ pub fn minimizeWindow() void {
     cdef.MinimizeWindow();
 }
 
-/// Set window state: not minimized/maximized
+/// Restore window from being minimized/maximized
 pub fn restoreWindow() void {
     cdef.RestoreWindow();
 }
@@ -3029,8 +3029,8 @@ pub fn unloadFileText(text: [:0]u8) void {
 }
 
 /// Save text data to file (write), string must be '\0' terminated, returns true on success
-pub fn saveFileText(fileName: [:0]const u8, text: [:0]u8) bool {
-    return cdef.SaveFileText(@as([*c]const u8, @ptrCast(fileName)), @as([*c]u8, @ptrCast(text)));
+pub fn saveFileText(fileName: [:0]const u8, text: [:0]const u8) bool {
+    return cdef.SaveFileText(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(text)));
 }
 
 /// Check if file exists
@@ -3159,7 +3159,7 @@ pub fn decompressData(compData: []const u8, compDataSize: i32) RaylibError![]u8 
     return _ptr[0..@as(usize, @intCast(_len))];
 }
 
-/// Encode data to Base64 string, memory must be MemFree()
+/// Encode data to Base64 string (includes NULL terminator), memory must be MemFree()
 pub fn encodeDataBase64(data: []const u8, dataSize: i32) RaylibError![]u8 {
     var _len: i32 = 0;
     const _ptr = cdef.EncodeDataBase64(@as([*c]const u8, @ptrCast(data)), @as(c_int, dataSize), @as([*c]c_int, @ptrCast(&_len)));
@@ -3167,10 +3167,10 @@ pub fn encodeDataBase64(data: []const u8, dataSize: i32) RaylibError![]u8 {
     return _ptr[0..@as(usize, @intCast(_len))];
 }
 
-/// Decode Base64 string data, memory must be MemFree()
-pub fn decodeDataBase64(data: []const u8) RaylibError![]u8 {
+/// Decode Base64 string (expected NULL terminated), memory must be MemFree()
+pub fn decodeDataBase64(text: []const u8) RaylibError![]u8 {
     var _len: i32 = 0;
-    const _ptr = cdef.DecodeDataBase64(@as([*c]const u8, @ptrCast(data)), @as([*c]c_int, @ptrCast(&_len)));
+    const _ptr = cdef.DecodeDataBase64(@as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(&_len)));
     if (_ptr == 0) return RaylibError.DecodeDataBase64;
     return _ptr[0..@as(usize, @intCast(_len))];
 }
@@ -3295,12 +3295,12 @@ pub fn getGamepadButtonPressed() GamepadButton {
     return cdef.GetGamepadButtonPressed();
 }
 
-/// Get gamepad axis count for a gamepad
+/// Get axis count for a gamepad
 pub fn getGamepadAxisCount(gamepad: i32) i32 {
     return @as(i32, cdef.GetGamepadAxisCount(@as(c_int, gamepad)));
 }
 
-/// Get axis movement value for a gamepad axis
+/// Get movement value for a gamepad axis
 pub fn getGamepadAxisMovement(gamepad: i32, axis: GamepadAxis) f32 {
     return cdef.GetGamepadAxisMovement(@as(c_int, gamepad), axis);
 }
@@ -3545,9 +3545,19 @@ pub fn drawEllipse(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color
     cdef.DrawEllipse(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
 }
 
+/// Draw ellipse (Vector version)
+pub fn drawEllipseV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipseV(center, radiusH, radiusV, color);
+}
+
 /// Draw ellipse outline
 pub fn drawEllipseLines(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: Color) void {
     cdef.DrawEllipseLines(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
+}
+
+/// Draw ellipse outline (Vector version)
+pub fn drawEllipseLinesV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipseLinesV(center, radiusH, radiusV, color);
 }
 
 /// Draw ring
@@ -3591,8 +3601,8 @@ pub fn drawRectangleGradientH(posX: i32, posY: i32, width: i32, height: i32, lef
 }
 
 /// Draw a gradient-filled rectangle with custom vertex colors
-pub fn drawRectangleGradientEx(rec: Rectangle, topLeft: Color, bottomLeft: Color, topRight: Color, bottomRight: Color) void {
-    cdef.DrawRectangleGradientEx(rec, topLeft, bottomLeft, topRight, bottomRight);
+pub fn drawRectangleGradientEx(rec: Rectangle, topLeft: Color, bottomLeft: Color, bottomRight: Color, topRight: Color) void {
+    cdef.DrawRectangleGradientEx(rec, topLeft, bottomLeft, bottomRight, topRight);
 }
 
 /// Draw rectangle outline
@@ -4067,13 +4077,13 @@ pub fn imageDrawTriangleLines(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2
 }
 
 /// Draw a triangle fan defined by points within an image (first vertex is the center)
-pub fn imageDrawTriangleFan(dst: *Image, points: []Vector2, pointCount: i32, color: Color) void {
-    cdef.ImageDrawTriangleFan(@as([*c]Image, @ptrCast(dst)), @as([*c]Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
+pub fn imageDrawTriangleFan(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
+    cdef.ImageDrawTriangleFan(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
 }
 
 /// Draw a triangle strip defined by points within an image
-pub fn imageDrawTriangleStrip(dst: *Image, points: []Vector2, pointCount: i32, color: Color) void {
-    cdef.ImageDrawTriangleStrip(@as([*c]Image, @ptrCast(dst)), @as([*c]Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
+pub fn imageDrawTriangleStrip(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
+    cdef.ImageDrawTriangleStrip(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
 }
 
 /// Draw a source image within a destination image (tint applied to source)

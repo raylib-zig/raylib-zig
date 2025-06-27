@@ -30,6 +30,8 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .shared = options.shared,
         .linux_display_backend = options.linux_display_backend,
         .opengl_version = options.opengl_version,
+        .android_api_version = options.android_api_version,
+        .android_ndk = options.android_ndk
     });
 
     const raylib = raylib_dep.artifact("raylib");
@@ -39,7 +41,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .optimize = optimize,
     });
 
-    rl.addRaygui(b, raylib, raygui_dep);
+    rl.addRaygui(b, raylib, raygui_dep, options);
 
     b.installArtifact(raylib);
     return raylib;
