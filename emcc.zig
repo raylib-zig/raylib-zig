@@ -120,7 +120,6 @@ pub fn linkWithEmscripten(
         "-sASYNCIFY",
         "-O3",
         "-fsanitize=undefined",
-        "--emrun",
     });
     return emcc_command;
 }

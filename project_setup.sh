@@ -39,6 +39,7 @@ pub fn build(b: *std.Build) !void {
         // Note that raylib itself is not actually added to the exe_lib output file, so it also needs to be linked with emscripten.
         const link_step = try rlz.emcc.linkWithEmscripten(b, &[_]*std.Build.Step.Compile{ exe_lib, raylib_artifact });
         //this lets your program access files like "resources/my-image.png":
+        link_step.addArg("--emrun");
         link_step.addArg("--embed-file");
         link_step.addArg("resources/");
 
