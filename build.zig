@@ -39,7 +39,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .optimize = optimize,
     });
 
-    rl.addRaygui(b, raylib, raygui_dep);
+    rl.addRaygui(b, raylib, raygui_dep, options);
 
     b.installArtifact(raylib);
     return raylib;
