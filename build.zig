@@ -78,6 +78,8 @@ pub fn build(b: *std.Build) !void {
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
 
+    const output = b.option(bool, "output", "Install example(s) to exe directory") orelse false;
+
     const examples = [_]Program{
         .{
             .name = "raw_stream",
@@ -349,6 +351,12 @@ pub fn build(b: *std.Build) !void {
 
             run_step.dependOn(&run_cmd.step);
             examples_step.dependOn(&exe.step);
+
+            if (output) {
+                const install = b.addInstallArtifact(exe, .{});
+                examples_step.dependOn(&install.step);
+                run_step.dependOn(&install.step);
+            }
         }
     }
 }
