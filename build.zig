@@ -185,6 +185,16 @@ pub fn build(b: *std.Build) !void {
             .desc = "Uses a raymarching in a shader to render shapes",
         },
         .{
+            .name = "shaders_basic_pbr",
+            .path = "examples/shaders/shaders_basic_pbr.zig",
+            .desc = "Demonstrates physically based rendering",
+        },
+        .{
+            .name = "shaders_hybrid_render",
+            .path = "examples/shaders/shaders_hybrid_render.zig",
+            .desc = "Demonstrates hybrid rendering",
+        },
+        .{
             .name = "texture_outline",
             .path = "examples/shaders/texture_outline.zig",
             .desc = "Uses a shader to create an outline around a sprite",
