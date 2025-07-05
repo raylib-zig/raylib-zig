@@ -61,17 +61,17 @@ pub fn main() anyerror!void {
 
         // Draw GUI controls
         //------------------------------------------------------------------------------
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 40, .width = 120, .height = 20 }, "StartAngle", rl.textFormat("%.2", .{startAngle}), &startAngle, -450, 450);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 70, .width = 120, .height = 20 }, "EndAngle", rl.textFormat("%.2", .{endAngle}), &endAngle, -450, 450);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 40, .width = 120, .height = 20 }, "StartAngle", rl.textFormat("%.2", .{startAngle}), &startAngle, -450, 450);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 70, .width = 120, .height = 20 }, "EndAngle", rl.textFormat("%.2", .{endAngle}), &endAngle, -450, 450);
 
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 140, .width = 120, .height = 20 }, "InnerRadius", rl.textFormat("%.2", .{innerRadius}), &innerRadius, 0, 100);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 170, .width = 120, .height = 20 }, "OuterRadius", rl.textFormat("%.2", .{outerRadius}), &outerRadius, 0, 200);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 140, .width = 120, .height = 20 }, "InnerRadius", rl.textFormat("%.2", .{innerRadius}), &innerRadius, 0, 100);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 170, .width = 120, .height = 20 }, "OuterRadius", rl.textFormat("%.2", .{outerRadius}), &outerRadius, 0, 200);
 
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 240, .width = 120, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 100);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 240, .width = 120, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 100);
 
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 600, .y = 320, .width = 20, .height = 20 }, "Draw Ring", &drawRing);
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 600, .y = 350, .width = 20, .height = 20 }, "Draw RingLines", &drawRingLines);
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 600, .y = 380, .width = 20, .height = 20 }, "Draw CircleLines", &drawCircleLines);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 600, .y = 320, .width = 20, .height = 20 }, "Draw Ring", &drawRing);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 600, .y = 350, .width = 20, .height = 20 }, "Draw RingLines", &drawRingLines);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 600, .y = 380, .width = 20, .height = 20 }, "Draw CircleLines", &drawCircleLines);
         //------------------------------------------------------------------------------
 
         const minSegments: f32 = math.ceil((endAngle - startAngle) / 90);
