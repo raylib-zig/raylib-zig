@@ -136,6 +136,6 @@ implementation stuff should be updatable with some hacks on your side.
 
 ### What needs to be done?
 
-+ _(Done)_ Set up a proper package build and a build script for the examples
-+ Port all the examples
-+ Member functions/initialisers
++ [x] Set up a proper package build and a build script for the examples
++ [ ] Port all the examples
++ [ ] Member functions/initialisers
