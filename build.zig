@@ -31,7 +31,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .linux_display_backend = options.linux_display_backend,
         .opengl_version = options.opengl_version,
         .android_api_version = options.android_api_version,
-        .android_ndk = options.android_ndk
+        .android_ndk = options.android_ndk,
     });
 
     const raylib = raylib_dep.artifact("raylib");
@@ -288,16 +288,20 @@ pub fn build(b: *std.Build) !void {
     };
 
     const raylib_test = b.addTest(.{
-        .root_source_file = b.path("lib/raylib.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("lib/raylib.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     raylib_test.linkLibC();
 
     const raygui_test = b.addTest(.{
-        .root_source_file = b.path("lib/raygui.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("lib/raygui.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     raygui_test.root_module.addImport("raylib-zig", raylib);
     raygui_test.linkLibC();
@@ -331,9 +335,11 @@ pub fn build(b: *std.Build) !void {
         } else {
             const exe = b.addExecutable(.{
                 .name = ex.name,
-                .root_source_file = b.path(ex.path),
-                .optimize = optimize,
-                .target = target,
+                .root_module = b.createModule(.{
+                    .root_source_file = b.path(ex.path),
+                    .optimize = optimize,
+                    .target = target,
+                }),
             });
             exe.linkLibrary(raylib_artifact);
             exe.root_module.addImport("raylib", raylib);
