@@ -18,21 +18,7 @@ const Program = struct {
 };
 
 fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode, options: Options) *std.Build.Step.Compile {
-    const raylib_dep = b.dependency("raylib", .{
-        .target = target,
-        .optimize = optimize,
-        .raudio = options.raudio,
-        .rmodels = options.rmodels,
-        .rshapes = options.rshapes,
-        .rtext = options.rtext,
-        .rtextures = options.rtextures,
-        .platform = options.platform,
-        .shared = options.shared,
-        .linux_display_backend = options.linux_display_backend,
-        .opengl_version = options.opengl_version,
-        .android_api_version = options.android_api_version,
-        .android_ndk = options.android_ndk
-    });
+    const raylib_dep = b.dependency("raylib", .{ .target = target, .optimize = optimize, .raudio = options.raudio, .rmodels = options.rmodels, .rshapes = options.rshapes, .rtext = options.rtext, .rtextures = options.rtextures, .platform = options.platform, .shared = options.shared, .linux_display_backend = options.linux_display_backend, .opengl_version = options.opengl_version, .android_api_version = options.android_api_version, .android_ndk = options.android_ndk });
 
     const raylib = raylib_dep.artifact("raylib");
 
@@ -163,6 +149,11 @@ pub fn build(b: *std.Build) !void {
             .name = "3d_picking",
             .path = "examples/core/3d_picking.zig",
             .desc = "Shows picking in 3d mode",
+        },
+        .{
+            .name = "drop_files",
+            .path = "examples/core/drop_files.zig",
+            .desc = "Demonstrates how to implement a drop files functionality",
         },
         .{
             .name = "window_flags",
