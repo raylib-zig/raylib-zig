@@ -55,15 +55,15 @@ pub fn main() anyerror!void {
         if (drawRoundedLines) rl.drawRectangleRoundedLinesEx(rec, roundness, @as(i32, @intFromFloat(segments)), lineThick, .fade(.maroon, 0.4));
 
         // Draw GUI controls
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 40, .width = 105, .height = 20 }, "Width", rl.textFormat("%.2", .{width}), &width, 0, @as(f32, @floatFromInt(rl.getScreenWidth() - 300)));
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 70, .width = 105, .height = 20 }, "Height", rl.textFormat("%.2", .{height}), &height, 0, @as(f32, @floatFromInt(rl.getScreenHeight() - 50)));
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 140, .width = 105, .height = 20 }, "Roundness", rl.textFormat("%.2", .{roundness}), &roundness, 0.0, 1.0);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 170, .width = 105, .height = 20 }, "Thickness", rl.textFormat("%.2", .{lineThick}), &lineThick, 0, 20);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 640, .y = 240, .width = 105, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 60);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 640, .y = 40, .width = 105, .height = 20 }, "Width", rl.textFormat("%.2", .{width}), &width, 0, @as(f32, @floatFromInt(rl.getScreenWidth() - 300)));
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 640, .y = 70, .width = 105, .height = 20 }, "Height", rl.textFormat("%.2", .{height}), &height, 0, @as(f32, @floatFromInt(rl.getScreenHeight() - 50)));
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 640, .y = 140, .width = 105, .height = 20 }, "Roundness", rl.textFormat("%.2", .{roundness}), &roundness, 0.0, 1.0);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 640, .y = 170, .width = 105, .height = 20 }, "Thickness", rl.textFormat("%.2", .{lineThick}), &lineThick, 0, 20);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 640, .y = 240, .width = 105, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 60);
 
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 640, .y = 320, .width = 20, .height = 20 }, "DrawRoundedRect", &drawRoundedRect);
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 640, .y = 350, .width = 20, .height = 20 }, "DrawRoundedLines", &drawRoundedLines);
-        _ = rgui.guiCheckBox(rl.Rectangle{ .x = 640, .y = 380, .width = 20, .height = 20 }, "DrawRect", &drawRect);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 640, .y = 320, .width = 20, .height = 20 }, "DrawRoundedRect", &drawRoundedRect);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 640, .y = 350, .width = 20, .height = 20 }, "DrawRoundedLines", &drawRoundedLines);
+        _ = rgui.checkBox(rl.Rectangle{ .x = 640, .y = 380, .width = 20, .height = 20 }, "DrawRect", &drawRect);
 
         rl.drawText(rl.textFormat("MODE: %s", .{labelFmt(segments)}), 640, 280, 10, colorFmt(segments));
 

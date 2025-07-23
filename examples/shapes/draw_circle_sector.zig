@@ -54,11 +54,11 @@ pub fn main() anyerror!void {
         rl.drawCircleSectorLines(center, outerRadius, startAngle, endAngle, @as(i32, @intFromFloat(segments)), .fade(.maroon, 0.6));
 
         // Draw GUI controls
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 40, .width = 120, .height = 20 }, "StartAngle", rl.textFormat("%.2", .{startAngle}), &startAngle, 0, 720);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 70, .width = 120, .height = 20 }, "EndAngle", rl.textFormat("%.2", .{endAngle}), &endAngle, 0, 720);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 40, .width = 120, .height = 20 }, "StartAngle", rl.textFormat("%.2", .{startAngle}), &startAngle, 0, 720);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 70, .width = 120, .height = 20 }, "EndAngle", rl.textFormat("%.2", .{endAngle}), &endAngle, 0, 720);
 
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 140, .width = 120, .height = 20 }, "Radius", rl.textFormat("%.2", .{outerRadius}), &outerRadius, 0, 200);
-        _ = rgui.guiSliderBar(rl.Rectangle{ .x = 600, .y = 170, .width = 120, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 100);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 140, .width = 120, .height = 20 }, "Radius", rl.textFormat("%.2", .{outerRadius}), &outerRadius, 0, 200);
+        _ = rgui.sliderBar(rl.Rectangle{ .x = 600, .y = 170, .width = 120, .height = 20 }, "Segments", rl.textFormat("%.2", .{segments}), &segments, 0, 100);
 
         minSegments = math.trunc(math.ceil((endAngle - startAngle) / 90));
         rl.drawText(rl.textFormat("MODE: %s", .{labelFmt(segments, minSegments)}), 600, 200, 10, colorFmt(segments, minSegments));
