@@ -240,6 +240,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders a ball that demonstrates various easing functions",
         },
         .{
+            .name = "easings_box_anim",
+            .path = "examples/shapes/easings_box_anim.zig",
+            .desc = "Renders a box that demonstrates various easing functions",
+        },
+        .{
             .name = "following_eyes",
             .path = "examples/shapes/following_eyes.zig",
             .desc = "Renders eyes that follow mouse movement",
