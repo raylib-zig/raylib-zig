@@ -265,6 +265,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders a resizable rectangle",
         },
         .{
+            .name = "splines_drawing",
+            .path = "examples/shapes/splines_drawing.zig",
+            .desc = "Renders a spline",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
