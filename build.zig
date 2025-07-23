@@ -270,6 +270,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders a spline",
         },
         .{
+            .name = "top_down_lights",
+            .path = "examples/shapes/top_down_lights.zig",
+            .desc = "Renders a sceen with shadows and a top down persepective",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
