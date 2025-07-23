@@ -235,6 +235,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Dynaically renders a ring using raygui",
         },
         .{
+            .name = "easings_ball_anim",
+            .path = "examples/shapes/easings_ball_anim.zig",
+            .desc = "Renders a ball that demonstrates various easing functions",
+        },
+        .{
             .name = "following_eyes",
             .path = "examples/shapes/following_eyes.zig",
             .desc = "Renders eyes that follow mouse movement",
