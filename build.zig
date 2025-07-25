@@ -295,6 +295,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Background scrolling & parallax demo",
         },
         .{
+            .name = "codepoints_loading",
+            .path = "examples/text/codepoints_loading.zig",
+            .desc = "Renders UTF-8 text",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",
