@@ -305,6 +305,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders an example of text rendered in a 3d world",
         },
         .{
+            .name = "font_filters",
+            .path = "examples/text/font_filters.zig",
+            .desc = "Demonstrates the various font filters",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",

@@ -1,6 +1,6 @@
 //!******************************************************************************************
 //!
-//!   raylib-zog port of the [text] example - Draw 3d
+//!   raylib-zig port of the [text] example - Draw 3d
 //!   https://github.com/raysan5/raylib/blob/master/examples/text/text_draw_3d.c
 //!
 //!   Example complexity rating: [★★★★] 4/4
