@@ -300,6 +300,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders UTF-8 text",
         },
         .{
+            .name = "draw_3d",
+            .path = "examples/text/draw_3d.zig",
+            .desc = "Renders an example of text rendered in a 3d world",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",
