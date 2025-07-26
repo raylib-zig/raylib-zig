@@ -320,6 +320,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates rending a sdf font",
         },
         .{
+            .name = "font_spritefont",
+            .path = "examples/text/font_spritefont.zig",
+            .desc = "Demonstrates rendering spritefonts",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",
