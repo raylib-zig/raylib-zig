@@ -310,6 +310,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates the various font filters",
         },
         .{
+            .name = "font_loading",
+            .path = "examples/text/font_loading.zig",
+            .desc = "Demonstrates how to load fonts",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",
