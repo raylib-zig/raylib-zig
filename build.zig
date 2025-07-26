@@ -315,6 +315,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates how to load fonts",
         },
         .{
+            .name = "font_sdf",
+            .path = "examples/text/font_sdf.zig",
+            .desc = "Demonstrates rending a sdf font",
+        },
+        .{
             .name = "text_format_text",
             .path = "examples/text/text_format_text.zig",
             .desc = "Renders variables as text",
