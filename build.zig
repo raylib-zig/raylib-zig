@@ -330,6 +330,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders variables as text",
         },
         .{
+            .name = "input_box",
+            .path = "examples/text/input_box.zig",
+            .desc = "Show and example of an input_box",
+        },
+        .{
             .name = "text_raylib_fonts",
             .path = "examples/text/text_raylib_fonts.zig",
             .desc = "Show fonts included with raylib",
