@@ -340,6 +340,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Show fonts included with raylib",
         },
         .{
+            .name = "rectangle_bounds",
+            .path = "examples/text/rectangle_bounds.zig",
+            .desc = "demonstrate a flexible, resizeable, text box",
+        },
+        .{
             .name = "text_writing_anim",
             .path = "examples/text/text_writing_anim.zig",
             .desc = "Simple text animation",
