@@ -325,8 +325,8 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates rendering spritefonts",
         },
         .{
-            .name = "text_format_text",
-            .path = "examples/text/text_format_text.zig",
+            .name = "format_text",
+            .path = "examples/text/format_text.zig",
             .desc = "Renders variables as text",
         },
         .{
@@ -335,8 +335,8 @@ pub fn build(b: *std.Build) !void {
             .desc = "Show and example of an input_box",
         },
         .{
-            .name = "text_raylib_fonts",
-            .path = "examples/text/text_raylib_fonts.zig",
+            .name = "raylib_fonts",
+            .path = "examples/text/raylib_fonts.zig",
             .desc = "Show fonts included with raylib",
         },
         .{
@@ -350,8 +350,8 @@ pub fn build(b: *std.Build) !void {
             .desc = "demonstrate rendering of unicode",
         },
         .{
-            .name = "text_writing_anim",
-            .path = "examples/text/text_writing_anim.zig",
+            .name = "writing_anim",
+            .path = "examples/text/writing_anim.zig",
             .desc = "Simple text animation",
         },
         .{
