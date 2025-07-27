@@ -345,6 +345,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "demonstrate a flexible, resizeable, text box",
         },
         .{
+            .name = "unicode",
+            .path = "examples/text/unicode.zig",
+            .desc = "demonstrate rendering of unicode",
+        },
+        .{
             .name = "text_writing_anim",
             .path = "examples/text/text_writing_anim.zig",
             .desc = "Simple text animation",
