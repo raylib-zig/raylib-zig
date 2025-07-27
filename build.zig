@@ -294,6 +294,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Various blend modes",
         },
         .{
+            .name = "bunnymark",
+            .path = "examples/textures/bunnymark.zig",
+            .desc = "Renders a lot of cute bunnies",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
