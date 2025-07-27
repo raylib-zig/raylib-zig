@@ -289,6 +289,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Background scrolling & parallax demo",
         },
         .{
+            .name = "blend_modes",
+            .path = "examples/textures/blend_modes.zig",
+            .desc = "Various blend modes",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
