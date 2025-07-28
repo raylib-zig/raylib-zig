@@ -299,6 +299,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Renders a lot of cute bunnies",
         },
         .{
+            .name = "draw_tiled",
+            .path = "examples/textures/draw_tiled.zig",
+            .desc = "various texted rendered using tiling",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
