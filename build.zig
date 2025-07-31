@@ -51,7 +51,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     if (b.modules.contains("raylib")) {
         return b.modules.get("raylib").?;
     }
-    return b.addModule("raylib", .{
+    return b.createModule(.{
         .root_source_file = b.path("lib/raylib.zig"),
         .target = target,
         .optimize = optimize,
@@ -61,7 +61,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
 const gui = struct {
     fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
         const raylib = this.getModule(b, target, optimize);
-        return b.addModule("raygui", .{
+        return b.createModule(.{
             .root_source_file = b.path("lib/raygui.zig"),
             .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
             .target = target,
@@ -293,16 +293,12 @@ pub fn build(b: *std.Build) !void {
     };
 
     const raylib_test = b.addTest(.{
-        .root_source_file = b.path("lib/raylib.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = raylib,
     });
     raylib_test.linkLibC();
 
     const raygui_test = b.addTest(.{
-        .root_source_file = b.path("lib/raygui.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = raygui,
     });
     raygui_test.root_module.addImport("raylib-zig", raylib);
     raygui_test.linkLibC();
@@ -336,9 +332,11 @@ pub fn build(b: *std.Build) !void {
         } else {
             const exe = b.addExecutable(.{
                 .name = ex.name,
-                .root_source_file = b.path(ex.path),
-                .optimize = optimize,
-                .target = target,
+                .root_module = b.createModule(.{
+                    .root_source_file = b.path(ex.path),
+                    .target = target,
+                    .optimize = optimize,
+                }),
             });
             exe.linkLibrary(raylib_artifact);
             exe.root_module.addImport("raylib", raylib);
