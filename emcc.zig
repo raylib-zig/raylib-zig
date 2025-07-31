@@ -40,7 +40,7 @@ pub fn compileForEmscripten(
     // The project is built as a library and linked later.
     const lib = b.addLibrary(.{
         .name = name,
-        .linkage = .dynamic,
+        .linkage = .static,
         .root_module = b.createModule(.{
             .root_source_file = b.path(root_source_file),
             .target = target,
