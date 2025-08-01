@@ -15,17 +15,9 @@ pub fn emscriptenRunStep(b: *std.Build) !*std.Build.Step.Run {
     defer b.allocator.free(emrun_run_arg);
 
     if (b.sysroot == null) {
-        emrun_run_arg = try std.fmt.bufPrint(
-            emrun_run_arg,
-            "{s}",
-            .{ emrunExe }
-        );
+        emrun_run_arg = try std.fmt.bufPrint(emrun_run_arg, "{s}", .{emrunExe});
     } else {
-        emrun_run_arg = try std.fmt.bufPrint(
-            emrun_run_arg,
-            "{s}" ++ std.fs.path.sep_str ++ "{s}",
-            .{ b.sysroot.?, emrunExe }
-        );
+        emrun_run_arg = try std.fmt.bufPrint(emrun_run_arg, "{s}" ++ std.fs.path.sep_str ++ "{s}", .{ b.sysroot.?, emrunExe });
     }
 
     const run_cmd = b.addSystemCommand(&[_][]const u8{ emrun_run_arg, emccOutputDir ++ emccOutputFile });
@@ -38,7 +30,7 @@ pub fn compileForEmscripten(
     name: []const u8,
     root_source_file: []const u8,
     target: std.Build.ResolvedTarget,
-    optimize: std.builtin.Mode,
+    optimize: std.builtin.OptimizeMode,
 ) !*std.Build.Step.Compile {
     // TODO: It might be a good idea to create a custom compile step, that does
     // both the compile to static library and the link with emcc by overidding
@@ -46,11 +38,14 @@ pub fn compileForEmscripten(
     // it messes with the build system itself.
 
     // The project is built as a library and linked later.
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addLibrary(.{
         .name = name,
-        .root_source_file = b.path(root_source_file),
-        .target = target,
-        .optimize = optimize,
+        .linkage = .static,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path(root_source_file),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     const emscripten_headers = try std.fs.path.join(b.allocator, &.{ b.sysroot.?, "cache", "sysroot", "include" });
@@ -83,11 +78,7 @@ pub fn linkWithEmscripten(
     defer b.allocator.free(emcc_run_arg);
 
     if (b.sysroot == null) {
-        emcc_run_arg = try std.fmt.bufPrint(
-            emcc_run_arg,
-            "{s}",
-            .{ emccExe }
-        );
+        emcc_run_arg = try std.fmt.bufPrint(emcc_run_arg, "{s}", .{emccExe});
     } else {
         emcc_run_arg = try std.fmt.bufPrint(
             emcc_run_arg,
