@@ -37,6 +37,7 @@ pub const RaylibError = error{
     LoadSound,
     LoadMusic,
     LoadAudioStream,
+    GenImageFontAtlas,
 };
 
 pub const Vector2 = extern struct {
@@ -2398,10 +2399,19 @@ pub fn imageKernelConvolution(image: *Image, kernel: []const f32) void {
 }
 
 /// Generate image font atlas using chars info
-pub fn genImageFontAtlas(chars: []const GlyphInfo, recs: [][]Rectangle, fontSize: i32, padding: i32, packMethod: i32) RaylibError!Image {
-    const image = cdef.GenImageFontAtlas(@as([*c]const GlyphInfo, @ptrCast(chars)), @as([*c][*c]Rectangle, @ptrCast(recs)), @as(c_int, @intCast(recs.len)), @as(c_int, fontSize), @as(c_int, padding), @as(c_int, packMethod));
+pub fn genImageFontAtlas(glyphs: []const GlyphInfo, fontSize: i32, padding: i32, packMethod: i32) RaylibError!struct{
+    Image, []Rectangle } {
+    var res: []Rectangle = undefined;
+    var recs: [*c]Rectangle = 0;
+    const image = cdef.GenImageFontAtlas(@as([*c]const GlyphInfo, @ptrCast(glyphs)), @as([*c][*c]Rectangle, @ptrCast(&recs)), @as(c_int, @intCast(glyphs.len)), @as(c_int, fontSize), @as(c_int, padding), @as(c_int, packMethod));
     const isValid = cdef.IsImageValid(image);
-    return if (isValid) image else RaylibError.LoadImage;
+
+    if (!isValid) return RaylibError.GenImageFontAtlas;
+
+    res.ptr = @as([*]Rectangle, @ptrCast(@alignCast(recs)));
+    res.len = @as(usize, @intCast(glyphs.len));
+
+    return .{ image, res };
 }
 
 /// Unload font chars info data (RAM)
