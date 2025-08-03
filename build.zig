@@ -51,7 +51,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     if (b.modules.contains("raylib")) {
         return b.modules.get("raylib").?;
     }
-    return b.createModule(.{
+    return b.addModule("raylib", .{
         .root_source_file = b.path("lib/raylib.zig"),
         .target = target,
         .optimize = optimize,
@@ -61,7 +61,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
 const gui = struct {
     fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
         const raylib = this.getModule(b, target, optimize);
-        return b.createModule(.{
+        return b.addModule("raygui", .{
             .root_source_file = b.path("lib/raygui.zig"),
             .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
             .target = target,
