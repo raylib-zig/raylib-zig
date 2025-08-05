@@ -309,6 +309,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "demonstrate a programattic render texture",
         },
         .{
+            .name = "gif_player",
+            .path = "examples/textures/gif_player.zig",
+            .desc = "GIF player example",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
