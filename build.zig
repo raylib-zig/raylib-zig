@@ -304,6 +304,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "various texted rendered using tiling",
         },
         .{
+            .name = "fog_of_war",
+            .path = "examples/textures/fog_of_war.zig",
+            .desc = "demonstrate a programattic render texture",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
