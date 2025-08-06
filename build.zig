@@ -314,6 +314,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "GIF player example",
         },
         .{
+            .name = "image_channel",
+            .path = "examples/textures/image_channel.zig",
+            .desc = "Image channel extraction",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
