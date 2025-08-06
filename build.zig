@@ -324,6 +324,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Image drawing and manipulation",
         },
         .{
+            .name = "image_generation",
+            .path = "examples/textures/image_generation.zig",
+            .desc = "Image generation",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
