@@ -329,6 +329,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Image generation",
         },
         .{
+            .name = "image_kernel",
+            .path = "examples/textures/image_kernel.zig",
+            .desc = "Image kernel convolution",
+        },
+        .{
             .name = "image_loading",
             .path = "examples/textures/image_loading.zig",
             .desc = "Image loading and texture creation",
