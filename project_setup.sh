@@ -63,7 +63,7 @@ pub fn build(b: *std.Build) !void {
     b.installArtifact(exe);
 }' >> build.zig
 
-zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
+zig fetch --save git+https://github.com/raylib-zig/raylib-zig#devel
 
 mkdir resources
 touch resources/placeholder.txt

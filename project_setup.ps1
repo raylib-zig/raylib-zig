@@ -65,7 +65,7 @@ pub fn build(b: *std.Build) !void {
 
 New-Item -Name "build.zig" -ItemType "file" -Value $BUILD_DOT_ZIG -Force
 
-zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
+zig fetch --save git+https://github.com/raylib-zig/raylib-zig#devel
 
 New-Item -Name "resources" -ItemType "directory"
 New-Item -Name "resources/placeholder.txt" -ItemType "file" -Value "" -Force

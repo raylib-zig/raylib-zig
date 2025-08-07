@@ -1,4 +1,4 @@
-![logo](https://github.com/Not-Nik/raylib-zig/raw/devel/logo/logo.png)
+![logo](https://github.com/raylib-zig/raylib-zig/raw/devel/logo/logo.png)
 
 # raylib-zig
 
@@ -6,7 +6,7 @@ Manually tweaked, auto-generated [raylib](https://github.com/raysan5/raylib) bin
 
 Bindings tested on raylib version 5.6-dev and Zig 0.14.0
 
-Thanks to all the [contributors](https://github.com/Not-Nik/raylib-zig/graphs/contributors) for their help with this
+Thanks to all the [contributors](https://github.com/raylib-zig/raylib-zig/graphs/contributors) for their help with this
 binding.
 
 ## Example
@@ -64,7 +64,7 @@ want to run an example, say `basic_window` run `zig build basic_window`
 Download and add raylib-zig as a dependency by running the following command in your project root:
 
 ```
-zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
+zig fetch --save git+https://github.com/raylib-zig/raylib-zig#devel
 ```
 
 Then add raylib-zig as a dependency and import its modules and artifact in your `build.zig`:
