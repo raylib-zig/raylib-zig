@@ -1411,6 +1411,11 @@ pub const Mesh = extern struct {
     pub fn drawInstanced(self: Mesh, material: Material, transforms: []const Matrix) void {
         rl.drawMeshInstanced(self, material, transforms);
     }
+
+    /// Unload mesh data from CPU and GPU
+    pub fn unload(self: Mesh) void {
+        rl.unloadMesh(self);
+    }
 };
 
 pub const Shader = extern struct {
@@ -1426,6 +1431,11 @@ pub const Shader = extern struct {
     pub fn deactivate(_: Shader) void {
         rl.endShaderMode();
     }
+
+    /// Unload shader from GPU memory (VRAM)
+    pub fn unload(self: Shader) void {
+        rl.unloadShader(self);
+    }
 };
 
 pub const MaterialMap = extern struct {
@@ -1438,6 +1448,11 @@ pub const Material = extern struct {
     shader: Shader,
     maps: [*c]MaterialMap,
     params: [4]f32,
+
+    /// Unload material from GPU memory (VRAM)
+    pub fn unload(self: Material) void {
+        rl.unloadMaterial(self);
+    }
 };
 
 pub const Transform = extern struct {
@@ -1504,6 +1519,11 @@ pub const ModelAnimation = extern struct {
     bones: [*c]BoneInfo,
     framePoses: [*c][*c]Transform,
     name: [32]u8,
+
+    /// Unload animation data
+    pub fn unload(self: ModelAnimation) void {
+        rl.unloadModelAnimation(self);
+    }
 };
 
 pub const Ray = extern struct {
@@ -1529,6 +1549,11 @@ pub const Wave = extern struct {
     sampleSize: c_uint,
     channels: c_uint,
     data: *anyopaque,
+
+    /// Unload wave data
+    pub fn unload(self: Wave) void {
+        rl.unloadWave(self);
+    }
 };
 
 pub const rAudioBuffer = opaque {};
@@ -1540,11 +1565,21 @@ pub const AudioStream = extern struct {
     sampleRate: c_uint,
     sampleSize: c_uint,
     channels: c_uint,
+
+    /// Unload audio stream and free memory
+    pub fn unload(self: AudioStream) void {
+        rl.unloadAudioStream(self);
+    }
 };
 
 pub const Sound = extern struct {
     stream: AudioStream,
     frameCount: c_uint,
+
+    /// Unload sound
+    pub fn unload(self: Sound) void {
+        rl.unloadSound(self);
+    }
 };
 
 pub const Music = extern struct {
@@ -1553,6 +1588,11 @@ pub const Music = extern struct {
     looping: bool,
     ctxType: c_int,
     ctxData: *anyopaque,
+
+    /// Unload music stream
+    pub fn unload(self: Music) void {
+        rl.unloadMusicStream(self);
+    }
 };
 
 pub const VrDeviceInfo = extern struct {
@@ -1577,6 +1617,11 @@ pub const VrStereoConfig = extern struct {
     rightScreenCenter: [2]f32,
     scale: [2]f32,
     scaleIn: [2]f32,
+
+    /// Unload VR stereo config
+    pub fn unload(self: VrStereoConfig) void {
+        rl.unloadVrStereoConfig(self);
+    }
 };
 
 pub const FilePathList = extern struct {
@@ -1591,7 +1636,16 @@ pub const AutomationEvent = extern struct {
     params: [4]c_int,
 };
 
-pub const AutomationEventList = extern struct { capacity: c_uint, count: c_uint, events: [*c]AutomationEvent };
+pub const AutomationEventList = extern struct {
+    capacity: c_uint,
+    count: c_uint,
+    events: [*c]AutomationEvent,
+
+    /// Unload automation events list from file
+    pub fn unload(self: AutomationEventList) void {
+        rl.unloadAutomationEventList(self);
+    }
+};
 
 pub const ConfigFlags = packed struct {
     __reserved: bool = false,
