@@ -344,6 +344,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Image processing and manipulation",
         },
         .{
+            .name = "image_rotate",
+            .path = "examples/textures/image_rotate.zig",
+            .desc = "Image rotation",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
