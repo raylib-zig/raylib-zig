@@ -1280,7 +1280,7 @@ pub const NPatchInfo = extern struct {
     top: c_int,
     right: c_int,
     bottom: c_int,
-    layout: c_int,
+    layout: NPatchType,
 };
 
 pub const GlyphInfo = extern struct {
