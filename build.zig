@@ -359,6 +359,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Animate a sprite",
         },
         .{
+            .name = "textures_logo_raylib",
+            .path = "examples/textures/textures_logo_raylib.zig",
+            .desc = "Logo drawing",
+        },
+        .{
             .name = "codepoints_loading",
             .path = "examples/text/codepoints_loading.zig",
             .desc = "Renders UTF-8 text",
