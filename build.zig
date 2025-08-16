@@ -354,6 +354,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Image text drawing",
         },
         .{
+            .name = "mouse_painting",
+            .path = "examples/textures/mouse_painting.zig",
+            .desc = "Mouse painting example",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
