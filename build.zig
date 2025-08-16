@@ -339,6 +339,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Image loading and texture creation",
         },
         .{
+            .name = "image_processing",
+            .path = "examples/textures/image_processing.zig",
+            .desc = "Image processing and manipulation",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
