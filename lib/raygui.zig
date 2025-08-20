@@ -93,9 +93,20 @@ pub const DefaultProperty = enum(c_int) {
     text_wrap_mode,
 };
 
-pub const ControlOrDefaultProperty = union(enum) {
+pub const StyleProperty = union(enum) {
     control: ControlProperty,
     default: DefaultProperty,
+    _2: void,
+    _3: void,
+    _4: void,
+    _5: void,
+    _6: void,
+    _7: void,
+    _8: void,
+    _9: void,
+    _10: void,
+    _11: void,
+    listview: ListViewProperty,
 };
 
 pub const ToggleProperty = enum(c_int) {
@@ -425,7 +436,7 @@ pub const IconName = enum(c_int) {
 };
 
 /// Set one style property
-pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, value: i32) void {
+pub fn setStyle(control: Control, comptime property: StyleProperty, value: i32) void {
     const property_int: c_int = switch (property) {
         inline else => |val| @intCast(@intFromEnum(val)),
     };
@@ -434,7 +445,7 @@ pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, v
 }
 
 /// Get one style property
-pub fn getStyle(control: Control, comptime property: ControlOrDefaultProperty) i32 {
+pub fn getStyle(control: Control, comptime property: StyleProperty) i32 {
     const property_int: c_int = switch (property) {
         inline else => |val| @intCast(@intFromEnum(val)),
     };
