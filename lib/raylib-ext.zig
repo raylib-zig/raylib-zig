@@ -389,7 +389,7 @@ pub extern "c" fn ColorContrast(color: rl.Color, contrast: f32) rl.Color;
 pub extern "c" fn ColorAlpha(color: rl.Color, alpha: f32) rl.Color;
 pub extern "c" fn ColorAlphaBlend(dst: rl.Color, src: rl.Color, tint: rl.Color) rl.Color;
 pub extern "c" fn ColorLerp(color1: rl.Color, color2: rl.Color, factor: f32) rl.Color;
-pub extern "c" fn GetColor(hexValue: c_uint) rl.Color;
+pub extern "c" fn GetColor(hexValue: c_int) rl.Color;
 pub extern "c" fn GetPixelColor(srcPtr: *anyopaque, format: rl.PixelFormat) rl.Color;
 pub extern "c" fn SetPixelColor(dstPtr: *anyopaque, color: rl.Color, format: rl.PixelFormat) void;
 pub extern "c" fn GetPixelDataSize(width: c_int, height: c_int, format: rl.PixelFormat) c_int;

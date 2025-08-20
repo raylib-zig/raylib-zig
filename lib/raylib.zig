@@ -4310,8 +4310,8 @@ pub fn colorLerp(color1: Color, color2: Color, factor: f32) Color {
 }
 
 /// Get Color structure from hexadecimal value
-pub fn getColor(hexValue: u32) Color {
-    return cdef.GetColor(@as(c_uint, hexValue));
+pub fn getColor(hexValue: i32) Color {
+    return cdef.GetColor(@as(c_int, hexValue));
 }
 
 /// Get Color from a source pixel pointer of certain format
