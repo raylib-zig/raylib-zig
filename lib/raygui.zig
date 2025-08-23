@@ -389,17 +389,17 @@ pub const IconName = enum(c_int) {
     warning = 220,
     help_box = 221,
     info_box = 222,
-    icon_223 = 223,
-    icon_224 = 224,
-    icon_225 = 225,
-    icon_226 = 226,
-    icon_227 = 227,
-    icon_228 = 228,
-    icon_229 = 229,
-    icon_230 = 230,
-    icon_231 = 231,
-    icon_232 = 232,
-    icon_233 = 233,
+    priority = 223,
+    layers_iso = 224,
+    layers2 = 225,
+    mlayers = 226,
+    maps = 227,
+    hot = 228,
+    label = 229,
+    name_id = 230,
+    slicing = 231,
+    manual_control = 232,
+    collision = 233,
     icon_234 = 234,
     icon_235 = 235,
     icon_236 = 236,
@@ -599,6 +599,11 @@ pub fn drawIcon(iconId: i32, posX: i32, posY: i32, pixelSize: i32, color: Color)
     cdef.GuiDrawIcon(@as(c_int, iconId), @as(c_int, posX), @as(c_int, posY), @as(c_int, pixelSize), color);
 }
 
+/// Get text width considering gui style and icon size (if required)
+pub fn getTextWidth(text: [:0]const u8) i32 {
+    return @as(i32, cdef.GuiGetTextWidth(@as([*c]const u8, @ptrCast(text))));
+}
+
 /// Window Box control, shows a window that can be closed
 pub fn windowBox(bounds: Rectangle, title: [:0]const u8) i32 {
     return @as(i32, cdef.GuiWindowBox(bounds, @as([*c]const u8, @ptrCast(title))));
@@ -662,11 +667,6 @@ pub fn valueBoxFloat(bounds: Rectangle, text: [:0]const u8, textValue: [:0]u8, v
 /// Slider control
 pub fn slider(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSlider(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
-}
-
-/// Slider control with extended parameters
-pub fn sliderPro(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32, sliderWidth: i32) i32 {
-    return @as(i32, cdef.GuiSliderPro(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue, @as(c_int, sliderWidth)));
 }
 
 /// Slider Bar control

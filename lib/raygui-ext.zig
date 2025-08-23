@@ -25,6 +25,7 @@ pub extern "c" fn GuiSetIconScale(scale: c_int) void;
 pub extern "c" fn GuiGetIcons() [*c]c_uint;
 pub extern "c" fn GuiLoadIcons(fileName: [*c]const u8, loadIconsName: bool) [*c][*c]u8;
 pub extern "c" fn GuiDrawIcon(iconId: c_int, posX: c_int, posY: c_int, pixelSize: c_int, color: rl.Color) void;
+pub extern "c" fn GuiGetTextWidth(text: [*c]const u8) c_int;
 pub extern "c" fn GuiWindowBox(bounds: rl.Rectangle, title: [*c]const u8) c_int;
 pub extern "c" fn GuiGroupBox(bounds: rl.Rectangle, text: [*c]const u8) c_int;
 pub extern "c" fn GuiLine(bounds: rl.Rectangle, text: [*c]const u8) c_int;
@@ -45,7 +46,6 @@ pub extern "c" fn GuiValueBox(bounds: rl.Rectangle, text: [*c]const u8, value: [
 pub extern "c" fn GuiValueBoxFloat(bounds: rl.Rectangle, text: [*c]const u8, textValue: [*c]u8, value: [*c]f32, editMode: bool) c_int;
 pub extern "c" fn GuiTextBox(bounds: rl.Rectangle, text: [*c]u8, textSize: c_int, editMode: bool) c_int;
 pub extern "c" fn GuiSlider(bounds: rl.Rectangle, textLeft: [*c]const u8, textRight: [*c]const u8, value: [*c]f32, minValue: f32, maxValue: f32) c_int;
-pub extern "c" fn GuiSliderPro(bounds: rl.Rectangle, textLeft: [*c]const u8, textRight: [*c]const u8, value: [*c]f32, minValue: f32, maxValue: f32, sliderWidth: c_int) c_int;
 pub extern "c" fn GuiSliderBar(bounds: rl.Rectangle, textLeft: [*c]const u8, textRight: [*c]const u8, value: [*c]f32, minValue: f32, maxValue: f32) c_int;
 pub extern "c" fn GuiProgressBar(bounds: rl.Rectangle, textLeft: [*c]const u8, textRight: [*c]const u8, value: [*c]f32, minValue: f32, maxValue: f32) c_int;
 pub extern "c" fn GuiStatusBar(bounds: rl.Rectangle, text: [*c]const u8) c_int;

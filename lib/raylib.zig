@@ -8,6 +8,8 @@ pub const cdef = @import("raylib-ext.zig");
 pub const gl = @import("rlgl.zig");
 pub const math = @import("raymath.zig");
 
+const C = std.builtin.CallingConvention.c;
+
 test {
     std.testing.refAllDeclsRecursive(@This());
 }
@@ -1996,12 +1998,12 @@ pub const NPatchType = enum(c_int) {
     three_patch_horizontal = 2,
 };
 
-// pub const TraceLogCallback = ?fn (c_int, [*c]const u8, [*c]struct___va_list_tag) callconv(.C) void;
-pub const LoadFileDataCallback = *const fn ([*c]const u8, [*c]c_uint) callconv(.C) [*c]u8;
-pub const SaveFileDataCallback = *const fn ([*c]const u8, ?*anyopaque, c_uint) callconv(.C) bool;
-pub const LoadFileTextCallback = *const fn ([*c]const u8) callconv(.C) [*c]u8;
-pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(.C) bool;
-pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(.C) void;
+// pub const TraceLogCallback = ?fn (c_int, [*c]const u8, [*c]struct___va_list_tag) callconv(C) void;
+pub const LoadFileDataCallback = *const fn ([*c]const u8, [*c]c_uint) callconv(C) [*c]u8;
+pub const SaveFileDataCallback = *const fn ([*c]const u8, ?*anyopaque, c_uint) callconv(C) bool;
+pub const LoadFileTextCallback = *const fn ([*c]const u8) callconv(C) [*c]u8;
+pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(C) bool;
+pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(C) void;
 
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 5);
 pub const RAYLIB_VERSION_MINOR = @as(i32, 5);
@@ -3116,7 +3118,7 @@ pub fn directoryExists(dirPath: [:0]const u8) bool {
     return cdef.DirectoryExists(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
-/// Check file extension (including point: .png, .wav)
+/// Check file extension (recommended include point: .png, .wav)
 pub fn isFileExtension(fileName: [:0]const u8, ext: [:0]const u8) bool {
     return cdef.IsFileExtension(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(ext)));
 }
@@ -4194,12 +4196,12 @@ pub fn unloadRenderTexture(target: RenderTexture2D) void {
     cdef.UnloadRenderTexture(target);
 }
 
-/// Update GPU texture with new data
+/// Update GPU texture with new data (pixels should be able to fill texture)
 pub fn updateTexture(texture: Texture2D, pixels: *const anyopaque) void {
     cdef.UpdateTexture(texture, pixels);
 }
 
-/// Update GPU texture rectangle with new data
+/// Update GPU texture rectangle with new data (pixels and rec should fit in texture)
 pub fn updateTextureRec(texture: Texture2D, rec: Rectangle, pixels: *const anyopaque) void {
     cdef.UpdateTextureRec(texture, rec, pixels);
 }
@@ -4472,7 +4474,7 @@ pub fn textInsert(text: [:0]const u8, insert: [:0]const u8, position: i32) [:0]u
     return std.mem.span(cdef.TextInsert(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(insert)), @as(c_int, position)));
 }
 
-/// Split text into multiple strings
+/// Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
 pub fn textSplit(text: []const u8, delimiter: u8) RaylibError![][:0]u8 {
     var _len: i32 = 0;
     const _ptr = cdef.TextSplit(@as([*c]const u8, @ptrCast(text)), delimiter, @as([*c]c_int, @ptrCast(&_len)));
@@ -4485,7 +4487,7 @@ pub fn textAppend(text: [:0]u8, append: [:0]const u8, position: *i32) void {
     cdef.TextAppend(@as([*c]u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(append)), @as([*c]c_int, @ptrCast(position)));
 }
 
-/// Find first text occurrence within a string
+/// Find first text occurrence within a string, -1 if not found
 pub fn textFindIndex(text: [:0]const u8, find: [:0]const u8) i32 {
     return @as(i32, cdef.TextFindIndex(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(find))));
 }
@@ -4918,7 +4920,7 @@ pub fn isSoundValid(sound: Sound) bool {
     return cdef.IsSoundValid(sound);
 }
 
-/// Update sound buffer with new data
+/// Update sound buffer with new data (data and frame count should fit in sound)
 pub fn updateSound(sound: Sound, data: *const anyopaque, sampleCount: i32) void {
     cdef.UpdateSound(sound, data, @as(c_int, sampleCount));
 }

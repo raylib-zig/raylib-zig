@@ -679,6 +679,11 @@ pub fn rlLoadExtensions(loader: *anyopaque) void {
     cdef.rlLoadExtensions(loader);
 }
 
+/// Get OpenGL procedure address
+pub fn rlGetProcAddress(procName: [:0]const u8) *anyopaque {
+    return cdef.rlGetProcAddress(@as([*c]const u8, @ptrCast(procName)));
+}
+
 /// Get current OpenGL version
 pub fn rlGetVersion() i32 {
     return @as(i32, cdef.rlGetVersion());

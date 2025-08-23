@@ -8,6 +8,8 @@ pub const cdef = @import("raylib-ext.zig");
 pub const gl = @import("rlgl.zig");
 pub const math = @import("raymath.zig");
 
+const C = std.builtin.CallingConvention.c;
+
 test {
     std.testing.refAllDeclsRecursive(@This());
 }
@@ -1996,12 +1998,12 @@ pub const NPatchType = enum(c_int) {
     three_patch_horizontal = 2,
 };
 
-// pub const TraceLogCallback = ?fn (c_int, [*c]const u8, [*c]struct___va_list_tag) callconv(.C) void;
-pub const LoadFileDataCallback = *const fn ([*c]const u8, [*c]c_uint) callconv(.C) [*c]u8;
-pub const SaveFileDataCallback = *const fn ([*c]const u8, ?*anyopaque, c_uint) callconv(.C) bool;
-pub const LoadFileTextCallback = *const fn ([*c]const u8) callconv(.C) [*c]u8;
-pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(.C) bool;
-pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(.C) void;
+// pub const TraceLogCallback = ?fn (c_int, [*c]const u8, [*c]struct___va_list_tag) callconv(C) void;
+pub const LoadFileDataCallback = *const fn ([*c]const u8, [*c]c_uint) callconv(C) [*c]u8;
+pub const SaveFileDataCallback = *const fn ([*c]const u8, ?*anyopaque, c_uint) callconv(C) bool;
+pub const LoadFileTextCallback = *const fn ([*c]const u8) callconv(C) [*c]u8;
+pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(C) bool;
+pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(C) void;
 
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 5);
 pub const RAYLIB_VERSION_MINOR = @as(i32, 5);

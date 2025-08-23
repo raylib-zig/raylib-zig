@@ -1,17 +1,20 @@
 // raylib-zig (c) Nikolas Wipper 2023
 
 const rl = @import("raylib");
+const std = @import("std");
 
 const MAX_SAMPLES = 512;
 const MAX_SAMPLES_PER_UPDATE = 4096;
 
 const pi = @import("std").math.pi;
+const C = std.builtin.CallingConvention.c;
+
 var frequency: f32 = 440;
 var audioFrequency: f32 = 440;
 var oldFrequency: f32 = 1;
 var sineIdx: f32 = 0;
 
-fn audioInputCallback(buffer: ?*anyopaque, frames: c_uint) callconv(.C) void {
+fn audioInputCallback(buffer: ?*anyopaque, frames: c_uint) callconv(C) void {
     audioFrequency = frequency + (audioFrequency - frequency) * 0.95;
 
     const incr = audioFrequency / 44100;
