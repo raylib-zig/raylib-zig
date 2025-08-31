@@ -55,13 +55,8 @@ pub fn build(b: *std.Build) !void {
             .flags = emcc_flags,
             .settings = emcc_settings,
             .shell_file_path = emsdk.shell(raylib_dep.builder),
-            .embed_paths = &.{
-                .{
-                    .src_path = b.pathJoin(&.{ "resources" }),
-                    .virtual_path = "resources",
-                },
-            },
             .install_dir = install_dir,
+            .embed_paths = &.{.{ .src_path = "resources/" }},
         });
         b.getInstallStep().dependOn(emcc_step);
 
