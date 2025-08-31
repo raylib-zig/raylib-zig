@@ -60,7 +60,7 @@ pub fn build(b: *std.Build) !void {
             .shell_file_path = emsdk.shell(raylib_dep.builder),
             .embed_paths = &.{
                 .{
-                    .src_path = b.pathJoin(&.{ module_subpath, "resources" }),
+                    .src_path = b.pathJoin(&.{ "resources" }),
                     .virtual_path = "resources",
                 },
             },
@@ -94,8 +94,8 @@ pub fn build(b: *std.Build) !void {
 
 New-Item -Name "build.zig" -ItemType "file" -Value $BUILD_DOT_ZIG -Force
 
-zig fetch --save git+https://github.com/Not-Nik/raylib-zig#devel
-zig fetch --save git+https://github.com/emscripten-core/emsdk#4.0.9
+zig fetch --save git+https://github.com/raylib-zig/raylib-zig#devel
+zig fetch --save=emsdk git+https://github.com/emscripten-core/emsdk#4.0.9
 
 New-Item -Name "resources" -ItemType "directory"
 New-Item -Name "resources/placeholder.txt" -ItemType "file" -Value "" -Force
