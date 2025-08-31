@@ -3,8 +3,7 @@
 const std = @import("std");
 const this = @This();
 const rl = @import("raylib");
-
-pub const emcc = @import("emcc.zig");
+pub const emsdk = rl.emsdk;
 
 pub const Options = rl.Options;
 pub const OpenglVersion = rl.OpenglVersion;
@@ -27,7 +26,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .rtext = options.rtext,
         .rtextures = options.rtextures,
         .platform = options.platform,
-        .shared = options.shared,
+        .linkage = options.linkage,
         .linux_display_backend = options.linux_display_backend,
         .opengl_version = options.opengl_version,
         .android_api_version = options.android_api_version,
@@ -390,33 +389,54 @@ pub fn build(b: *std.Build) !void {
     const examples_step = b.step("examples", "Builds all the examples");
 
     for (examples) |ex| {
+        const mod = b.createModule(.{
+            .root_source_file = b.path(ex.path),
+            .target = target,
+            .optimize = optimize,
+        });
+
         if (target.query.os_tag == .emscripten) {
-            const exe_lib = try emcc.compileForEmscripten(b, ex.name, ex.path, target, optimize);
-            exe_lib.root_module.addImport("raylib", raylib);
-            exe_lib.root_module.addImport("raygui", raygui);
+            const wasm = b.addLibrary(.{
+                .name = ex.name,
+                .root_module = mod,
+            });
+            wasm.root_module.addImport("raylib", raylib);
+            wasm.root_module.addImport("raygui", raygui);
+            wasm.linkLibrary(raylib_artifact);
 
-            // Note that raylib itself isn't actually added to the exe_lib
-            // output file, so it also needs to be linked with emscripten.
-            exe_lib.linkLibrary(raylib_artifact);
-            const link_step = try emcc.linkWithEmscripten(b, &[_]*std.Build.Step.Compile{ exe_lib, raylib_artifact });
-            link_step.addArg("--emrun");
-            link_step.addArg("--embed-file");
-            link_step.addArg("resources/");
+            const install_dir: std.Build.InstallDir = .{ .custom = "web" };
+            const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
+                .optimize = optimize,
+                .asyncify = !std.mem.endsWith(u8, ex.name, "web"),
+            });
+            const emcc_settings = emsdk.emccDefaultSettings(b.allocator, .{
+                .optimize = optimize,
+            });
 
-            const run_step = try emcc.emscriptenRunStep(b);
-            run_step.step.dependOn(&link_step.step);
+            const emcc_step = emsdk.emccStep(b, raylib_artifact, wasm, .{
+                .optimize = optimize,
+                .flags = emcc_flags,
+                .settings = emcc_settings,
+                .shell_file_path = emsdk.shell(b),
+                .install_dir = install_dir,
+                .embed_paths = &.{.{ .src_path = "resources/" }},
+            });
+
+            const html_filename = try std.fmt.allocPrint(b.allocator, "{s}.html", .{wasm.name});
+            const emrun_step = emsdk.emrunStep(
+                b,
+                b.getInstallPath(install_dir, html_filename),
+                &.{},
+            );
+            emrun_step.dependOn(emcc_step);
+
             const run_option = b.step(ex.name, ex.desc);
-
-            run_option.dependOn(&run_step.step);
-            examples_step.dependOn(&exe_lib.step);
+            run_option.dependOn(emrun_step);
+            examples_step.dependOn(emcc_step);
         } else {
             const exe = b.addExecutable(.{
                 .name = ex.name,
-                .root_module = b.createModule(.{
-                    .root_source_file = b.path(ex.path),
-                    .target = target,
-                    .optimize = optimize,
-                }),
+                .root_module = mod,
             });
             exe.linkLibrary(raylib_artifact);
             exe.root_module.addImport("raylib", raylib);
