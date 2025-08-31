@@ -395,9 +395,9 @@ pub extern "c" fn SetPixelColor(dstPtr: *anyopaque, color: rl.Color, format: rl.
 pub extern "c" fn GetPixelDataSize(width: c_int, height: c_int, format: rl.PixelFormat) c_int;
 pub extern "c" fn GetFontDefault() rl.Font;
 pub extern "c" fn LoadFont(fileName: [*c]const u8) rl.Font;
-pub extern "c" fn LoadFontEx(fileName: [*c]const u8, fontSize: c_int, codepoints: [*c]c_int, codepointCount: c_int) rl.Font;
+pub extern "c" fn LoadFontEx(fileName: [*c]const u8, fontSize: c_int, codepoints: [*c]const c_int, codepointCount: c_int) rl.Font;
 pub extern "c" fn LoadFontFromImage(image: rl.Image, key: rl.Color, firstChar: c_int) rl.Font;
-pub extern "c" fn LoadFontFromMemory(fileType: [*c]const u8, fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, codepoints: [*c]c_int, codepointCount: c_int) rl.Font;
+pub extern "c" fn LoadFontFromMemory(fileType: [*c]const u8, fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, codepoints: [*c]const c_int, codepointCount: c_int) rl.Font;
 pub extern "c" fn IsFontValid(font: rl.Font) bool;
 pub extern "c" fn LoadFontData(fileData: [*c]const u8, dataSize: c_int, fontSize: c_int, codepoints: [*c]c_int, codepointCount: c_int, ty: rl.FontType) [*c]rl.GlyphInfo;
 pub extern "c" fn GenImageFontAtlas(glyphs: [*c]const rl.GlyphInfo, glyphRecs: [*c][*c]rl.Rectangle, glyphCount: c_int, fontSize: c_int, padding: c_int, packMethod: c_int) rl.Image;
@@ -425,6 +425,8 @@ pub extern "c" fn GetCodepoint(text: [*c]const u8, codepointSize: [*c]c_int) c_i
 pub extern "c" fn GetCodepointNext(text: [*c]const u8, codepointSize: [*c]c_int) c_int;
 pub extern "c" fn GetCodepointPrevious(text: [*c]const u8, codepointSize: [*c]c_int) c_int;
 pub extern "c" fn CodepointToUTF8(codepoint: c_int, utf8Size: [*c]c_int) [*c]const u8;
+pub extern "c" fn LoadTextLines(text: [*c]const u8, count: [*c]c_int) [*c][*c]u8;
+pub extern "c" fn UnloadTextLines(text: [*c][*c]u8) void;
 pub extern "c" fn TextCopy(dst: [*c]u8, src: [*c]const u8) c_int;
 pub extern "c" fn TextIsEqual(text1: [*c]const u8, text2: [*c]const u8) bool;
 pub extern "c" fn TextLength(text: [*c]const u8) c_uint;

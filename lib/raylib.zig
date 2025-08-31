@@ -26,6 +26,7 @@ pub const RaylibError = error{
     LoadFont,
     LoadFontData,
     LoadCodepoints,
+    LoadTextLines,
     TextSplit,
     LoadMaterial,
     LoadMaterials,
@@ -2215,11 +2216,11 @@ pub fn loadFont(fileName: [:0]const u8) RaylibError!Font {
 }
 
 /// Load font from file with extended parameters, use null for fontChars to load the default character set
-pub fn loadFontEx(fileName: [:0]const u8, fontSize: i32, fontChars: ?[]i32) RaylibError!Font {
-    var fontCharsFinal = @as([*c]c_int, 0);
+pub fn loadFontEx(fileName: [:0]const u8, fontSize: i32, fontChars: ?[]const i32) RaylibError!Font {
+    var fontCharsFinal = @as([*c]const c_int, 0);
     var fontCharsLen: c_int = @as(c_int, 0);
     if (fontChars) |fontCharsSure| {
-        fontCharsFinal = @as([*c]c_int, @ptrCast(fontCharsSure));
+        fontCharsFinal = @as([*c]const c_int, @ptrCast(fontCharsSure));
         fontCharsLen = @as(i32, @intCast(fontCharsSure.len));
     }
     const font = cdef.LoadFontEx(@as([*c]const u8, @ptrCast(fileName)), @as(c_int, fontSize), fontCharsFinal, fontCharsLen);
@@ -2228,7 +2229,7 @@ pub fn loadFontEx(fileName: [:0]const u8, fontSize: i32, fontChars: ?[]i32) Rayl
 }
 
 /// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
-pub fn loadFontFromMemory(fileType: [:0]const u8, fileData: ?[]const u8, fontSize: i32, fontChars: ?[]i32) RaylibError!Font {
+pub fn loadFontFromMemory(fileType: [:0]const u8, fileData: ?[]const u8, fontSize: i32, fontChars: ?[]const i32) RaylibError!Font {
     var fileDataFinal = @as([*c]const u8, 0);
     var fileDataLen: i32 = 0;
     if (fileData) |fileDataSure| {
@@ -2236,7 +2237,7 @@ pub fn loadFontFromMemory(fileType: [:0]const u8, fileData: ?[]const u8, fontSiz
         fileDataLen = @as(i32, @intCast(fileDataSure.len));
     }
     const codepointCount: c_int = if (fontChars) |fontCharsSure| @intCast(fontCharsSure.len) else 0;
-    const font = cdef.LoadFontFromMemory(@as([*c]const u8, @ptrCast(fileType)), @as([*c]const u8, @ptrCast(fileDataFinal)), @as(c_int, @intCast(fileDataLen)), @as(c_int, fontSize), @as([*c]c_int, @ptrCast(fontChars)), codepointCount);
+    const font = cdef.LoadFontFromMemory(@as([*c]const u8, @ptrCast(fileType)), @as([*c]const u8, @ptrCast(fileDataFinal)), @as(c_int, @intCast(fileDataLen)), @as(c_int, fontSize), @as([*c]const c_int, @ptrCast(fontChars)), codepointCount);
     const isValid = cdef.IsFontValid(font);
     return if (isValid) font else RaylibError.LoadFont;
 }
@@ -2455,8 +2456,7 @@ pub fn imageKernelConvolution(image: *Image, kernel: []const f32) void {
 }
 
 /// Generate image font atlas using chars info
-pub fn genImageFontAtlas(glyphs: []const GlyphInfo, fontSize: i32, padding: i32, packMethod: i32) RaylibError!struct{
-    Image, []Rectangle } {
+pub fn genImageFontAtlas(glyphs: []const GlyphInfo, fontSize: i32, padding: i32, packMethod: i32) RaylibError!struct { Image, []Rectangle } {
     var res: []Rectangle = undefined;
     var recs: [*c]Rectangle = 0;
     const image = cdef.GenImageFontAtlas(@as([*c]const GlyphInfo, @ptrCast(glyphs)), @as([*c][*c]Rectangle, @ptrCast(&recs)), @as(c_int, @intCast(glyphs.len)), @as(c_int, fontSize), @as(c_int, padding), @as(c_int, packMethod));
@@ -2483,6 +2483,20 @@ pub fn drawTextCodepoints(font: Font, codepoints: []const c_int, position: Vecto
 /// Load UTF-8 text encoded from codepoints array
 pub fn loadUTF8(codepoints: []const c_int) [:0]u8 {
     return std.mem.span(cdef.LoadUTF8(@as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, @intCast(codepoints.len))));
+}
+
+// Load text as separate lines ('\n')
+pub fn loadTextLines(text: [:0]const u8) RaylibError![][:0]u8 {
+    var lineCount: i32 = 0;
+    var res: [][:0]u8 = undefined;
+
+    const ptr = cdef.LoadTextLines(@as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(&lineCount)));
+    if (ptr == 0) return RaylibError.LoadTextLines;
+
+    res.ptr = @as([*][:0]u8, @ptrCast(ptr));
+    res.len = @as(usize, @intCast(lineCount));
+
+    return res;
 }
 
 /// Join text strings with delimiter
@@ -4442,6 +4456,11 @@ pub fn getCodepointPrevious(text: [:0]const u8, codepointSize: *i32) i32 {
 /// Encode one codepoint into UTF-8 byte array (array length returned as parameter)
 pub fn codepointToUTF8(codepoint: i32, utf8Size: *i32) [:0]const u8 {
     return std.mem.span(cdef.CodepointToUTF8(@as(c_int, codepoint), @as([*c]c_int, @ptrCast(utf8Size))));
+}
+
+/// Unload text lines
+pub fn unloadTextLines(text: [][:0]const u8) void {
+    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(text)));
 }
 
 /// Copy one string to another, returns bytes copied

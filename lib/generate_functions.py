@@ -89,6 +89,7 @@ MANUAL = [
     "UnloadFontData",
     "DrawTextCodepoints",
     "LoadUTF8",
+    "LoadTextLines",
     "TextJoin",
     "DrawLineStrip",
     "DrawTriangleFan",
@@ -154,7 +155,7 @@ def ziggify_type(name: str, t: str, func_name: str) -> str:
     ]
     string = False
 
-    if name == "text" and t == "[*c][*c]const u8":
+    if name == "text" and (t == "[*c][*c]const u8" or t == "[*c][*c]u8"):
         return "[][:0]const u8"
 
     if t.startswith("[*c]") and name not in single and name not in multi:
