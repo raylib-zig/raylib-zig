@@ -1,11 +1,10 @@
 // A raylib-zig port of https://github.com/raysan5/raylib/blob/master/examples/core/core_basic_window_web.c
 
+const std = @import("std");
 const rl = @import("raylib");
 const builtin = @import("builtin");
 
-const c = if (builtin.os.tag == .emscripten) @cImport({
-    @cInclude("emscripten/emscripten.h");
-});
+const emscripten = std.os.emscripten;
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition
@@ -24,7 +23,7 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     if (builtin.os.tag == .emscripten) {
-        c.emscripten_set_main_loop(@ptrCast(&updateDrawFrame), 0, 1);
+        emscripten.emscripten_set_main_loop(@ptrCast(&updateDrawFrame), 0, 1);
     } else {
         rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 

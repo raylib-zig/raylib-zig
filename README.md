@@ -55,9 +55,9 @@ want to run an example, say `basic_window` run `zig build basic_window`
 
 ### Using raylib-zig's template
 
-* Execute `project_setup.sh project_name`, this will create a folder with the name specified
-* You can copy that folder anywhere you want and edit the source
-* Run `zig build run` at any time to test your project
+- Execute `project_setup.sh project_name`, this will create a folder with the name specified
+- You can copy that folder anywhere you want and edit the source
+- Run `zig build run` at any time to test your project
 
 ### In an existing project (e.g. created with `zig init`)
 
@@ -88,8 +88,8 @@ exe.root_module.addImport("raylib", raylib);
 exe.root_module.addImport("raygui", raygui);
 ```
 
-If you additionally want to support Web as a platform with emscripten, you will need to use `emcc.zig` by importing
-raylib-zig's build script with `const rlz = @import("raylib_zig");` and then accessing its functions with `rlz.emcc`.
+If you additionally want to support Web as a platform with emscripten, you will need to use `emsdk` by importing
+raylib-zig's build script with `const rlz = @import("raylib_zig");` and then accessing like described here [Exporting for web](https://github.com/raylib-zig/raylib-zig?tab=readme-ov-file#exporting-for-web).
 Refer to raylib-zig's project template on how to use them.
 
 ### Passing build options
@@ -118,16 +118,50 @@ raylib_artifact.root_module.addCMacro("SUPPORT_FILEFORMAT_JPG", "");
 
 ## Exporting for web
 
-To export your project for the web, first install emsdk.
-Once emsdk is installed, set it up by running
+To export your project for the web, first add emsdk to your dependencies.
+Its also possible to use a local emsdk folder.
 
-`emsdk install latest`
+`zig fetch --save git+https://github.com/emscripten-core/emsdk#4.0.9`
 
-Find the folder where it's installed and run
+Add this to your build method to build for the web
 
-`zig build -Dtarget=wasm32-emscripten --sysroot [path to emsdk]/upstream/emscripten`
+```zig
+if (target.query.os_tag == .emscripten) {
+    const emsdk = rlz.emsdk;
+    const wasm = b.addLibrary(.{
+        .name = <your_project_name>,
+        .root_module = exe_mod,
+    });
 
-once that is finished, the exported project should be located at `zig-out/htmlout`
+    const install_dir: std.Build.InstallDir = .{ .custom = "web" };
+    const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{ .optimize = optimize });
+    const emcc_settings = emsdk.emccDefaultSettings(b.allocator, .{ .optimize = optimize });
+
+    const emcc_step = emsdk.emccStep(b, raylib_artifact, wasm, .{
+        .optimize = optimize,
+        .flags = emcc_flags,
+        .settings = emcc_settings,
+        .install_dir = install_dir,
+    });
+    b.getInstallStep().dependOn(emcc_step);
+
+    const html_filename = try std.fmt.allocPrint(b.allocator, "{s}.html", .{wasm.name});
+    const emrun_step = emsdk.emrunStep(
+        b,
+        b.getInstallPath(install_dir, html_filename),
+        &.{},
+    );
+
+    emrun_step.dependOn(emcc_step);
+    run_step.dependOn(emrun_step);
+}
+```
+
+then you can run
+
+`zig build -Dtarget=wasm32-emscripten`
+
+once that is finished, the exported project should be located at `zig-out/web`
 
 ### When is the binding updated?
 
@@ -136,6 +170,6 @@ implementation stuff should be updatable with some hacks on your side.
 
 ### What needs to be done?
 
-+ _(Done)_ Set up a proper package build and a build script for the examples
-+ Port all the examples
-+ Member functions/initialisers
+- _(Done)_ Set up a proper package build and a build script for the examples
+- Port all the examples
+- Member functions/initialisers
