@@ -121,7 +121,7 @@ raylib_artifact.root_module.addCMacro("SUPPORT_FILEFORMAT_JPG", "");
 To export your project for the web, first add emsdk to your dependencies.
 Its also possible to use a local emsdk folder.
 
-`zig fetch --save git+https://github.com/emscripten-core/emsdk#4.0.9`
+`zig fetch --save=emsdk git+https://github.com/emscripten-core/emsdk#4.0.9`
 
 Add this to your build method to build for the web
 
