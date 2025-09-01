@@ -101,7 +101,7 @@ shared library or not including certain modules. You can optionally pass these o
 const raylib_dep = b.dependency("raylib_zig", .{
     .target = target,
     .optimize = optimize,
-    .shared = true, // Build raylib as a shared library
+    .linkage = .dynamic, // Build raylib as a shared library
     .opengl_version = rlz.OpenglVersion.gl_2_1, // Use OpenGL 2.1 (requires importing raylib-zig's build script)
 });
 ```
