@@ -364,6 +364,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "N-patch drawing example",
         },
         .{
+            .name = "particles_blending",
+            .path = "examples/textures/particles_blending.zig",
+            .desc = "Particles blending",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
