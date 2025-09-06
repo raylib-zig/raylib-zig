@@ -359,6 +359,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Mouse painting example",
         },
         .{
+            .name = "npatch_drawing",
+            .path = "examples/textures/npatch_drawing.zig",
+            .desc = "N-patch drawing example",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
