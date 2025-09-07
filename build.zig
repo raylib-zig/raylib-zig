@@ -409,6 +409,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Logo drawing",
         },
         .{
+            .name = "to_image",
+            .path = "examples/textures/to_image.zig",
+            .desc = "Texture to image conversion",
+        },
+        .{
             .name = "codepoints_loading",
             .path = "examples/text/codepoints_loading.zig",
             .desc = "Renders UTF-8 text",
