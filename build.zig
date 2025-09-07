@@ -374,6 +374,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Textured polygon drawing",
         },
         .{
+            .name = "raw_data",
+            .path = "examples/textures/raw_data.zig",
+            .desc = "Texture from raw data",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
