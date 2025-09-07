@@ -78,65 +78,71 @@ pub fn main() anyerror!void {
         camera1.target = .{ .x = player1.x, .y = player1.y };
         camera2.target = .{ .x = player2.x, .y = player2.y };
 
-        rl.beginTextureMode(screenCamera1);
+        screenCamera1.begin();
+        {
+            defer screenCamera1.end();
 
-        rl.clearBackground(.ray_white);
+            rl.clearBackground(.ray_white);
 
-        rl.beginMode2D(camera1);
+            camera1.begin();
+            {
+                defer camera1.end();
 
-        for (0..@divTrunc(screenWidth, PLAYER_SIZE) + 1) |i|
-            rl.drawLineV(.{ .x = @floatFromInt(PLAYER_SIZE * i), .y = 0.0 }, .{ .x = @floatFromInt(PLAYER_SIZE * i), .y = @floatFromInt(screenHeight) }, .light_gray);
+                for (0..@divTrunc(screenWidth, PLAYER_SIZE) + 1) |i|
+                    rl.drawLineV(.{ .x = @floatFromInt(PLAYER_SIZE * i), .y = 0.0 }, .{ .x = @floatFromInt(PLAYER_SIZE * i), .y = @floatFromInt(screenHeight) }, .light_gray);
 
-        for (0..@divTrunc(screenHeight, PLAYER_SIZE) + 1) |i|
-            rl.drawLineV(.{ .x = 0.0, .y = @floatFromInt(PLAYER_SIZE * i) }, .{ .x = @floatFromInt(screenWidth), .y = @floatFromInt(PLAYER_SIZE * i) }, .light_gray);
+                for (0..@divTrunc(screenHeight, PLAYER_SIZE) + 1) |i|
+                    rl.drawLineV(.{ .x = 0.0, .y = @floatFromInt(PLAYER_SIZE * i) }, .{ .x = @floatFromInt(screenWidth), .y = @floatFromInt(PLAYER_SIZE * i) }, .light_gray);
 
-        for (0..@divTrunc(screenWidth, PLAYER_SIZE)) |i|
-            for (0..@divTrunc(screenHeight, PLAYER_SIZE)) |j|
-                rl.drawText(rl.textFormat("[%i,%i]", .{ i, j }), @intCast(10 + PLAYER_SIZE * i), @intCast(15 + PLAYER_SIZE * j), 10, .light_gray);
+                for (0..@divTrunc(screenWidth, PLAYER_SIZE)) |i|
+                    for (0..@divTrunc(screenHeight, PLAYER_SIZE)) |j|
+                        rl.drawText(rl.textFormat("[%i,%i]", .{ i, j }), @intCast(10 + PLAYER_SIZE * i), @intCast(15 + PLAYER_SIZE * j), 10, .light_gray);
 
-        rl.drawRectangleRec(player1, .red);
-        rl.drawRectangleRec(player2, .blue);
+                rl.drawRectangleRec(player1, .red);
+                rl.drawRectangleRec(player2, .blue);
+            }
 
-        rl.endMode2D();
+            rl.drawRectangle(0, 0, @divTrunc(rl.getScreenWidth(), 2), 30, rl.fade(.ray_white, 0.6));
+            rl.drawText("PLAYER1: W/S/A/D to move", 10, 10, 10, .maroon);
+        }
 
-        rl.drawRectangle(0, 0, @divTrunc(rl.getScreenWidth(), 2), 30, rl.fade(.ray_white, 0.6));
-        rl.drawText("PLAYER1: W/S/A/D to move", 10, 10, 10, .maroon);
+        screenCamera2.begin();
+        {
+            defer screenCamera2.end();
+            rl.clearBackground(.ray_white);
 
-        rl.endTextureMode();
+            camera2.begin();
+            {
+                defer camera2.end();
 
-        rl.beginTextureMode(screenCamera2);
-        rl.clearBackground(.ray_white);
+                for (0..@divTrunc(screenWidth, PLAYER_SIZE) + 1) |i|
+                    rl.drawLineV(.{ .x = @floatFromInt(PLAYER_SIZE * i), .y = 0.0 }, .{ .x = @floatFromInt(PLAYER_SIZE * i), .y = @floatFromInt(screenHeight) }, .light_gray);
 
-        rl.beginMode2D(camera2);
+                for (0..@divTrunc(screenHeight, PLAYER_SIZE) + 1) |i|
+                    rl.drawLineV(.{ .x = 0.0, .y = @floatFromInt(PLAYER_SIZE * i) }, .{ .x = @floatFromInt(screenWidth), .y = @floatFromInt(PLAYER_SIZE * i) }, .light_gray);
 
-        for (0..@divTrunc(screenWidth, PLAYER_SIZE) + 1) |i|
-            rl.drawLineV(.{ .x = @floatFromInt(PLAYER_SIZE * i), .y = 0.0 }, .{ .x = @floatFromInt(PLAYER_SIZE * i), .y = @floatFromInt(screenHeight) }, .light_gray);
+                for (0..@divTrunc(screenWidth, PLAYER_SIZE)) |i|
+                    for (0..@divTrunc(screenHeight, PLAYER_SIZE)) |j|
+                        rl.drawText(rl.textFormat("[%i,%i]", .{ i, j }), @intCast(10 + PLAYER_SIZE * i), @intCast(15 + PLAYER_SIZE * j), 10, .light_gray);
 
-        for (0..@divTrunc(screenHeight, PLAYER_SIZE) + 1) |i|
-            rl.drawLineV(.{ .x = 0.0, .y = @floatFromInt(PLAYER_SIZE * i) }, .{ .x = @floatFromInt(screenWidth), .y = @floatFromInt(PLAYER_SIZE * i) }, .light_gray);
+                rl.drawRectangleRec(player1, .red);
+                rl.drawRectangleRec(player2, .blue);
+            }
 
-        for (0..@divTrunc(screenWidth, PLAYER_SIZE)) |i|
-            for (0..@divTrunc(screenHeight, PLAYER_SIZE)) |j|
-                rl.drawText(rl.textFormat("[%i,%i]", .{ i, j }), @intCast(10 + PLAYER_SIZE * i), @intCast(15 + PLAYER_SIZE * j), 10, .light_gray);
-
-        rl.drawRectangleRec(player1, .red);
-        rl.drawRectangleRec(player2, .blue);
-
-        rl.endMode2D();
-
-        rl.drawRectangle(0, 0, @divTrunc(rl.getScreenWidth(), 2), 30, rl.fade(.ray_white, 0.6));
-        rl.drawText("PLAYER2: UP/DOWN/LEFT/RIGHT", 10, 10, 10, .dark_blue);
-
-        rl.endTextureMode();
+            rl.drawRectangle(0, 0, @divTrunc(rl.getScreenWidth(), 2), 30, rl.fade(.ray_white, 0.6));
+            rl.drawText("PLAYER2: UP/DOWN/LEFT/RIGHT", 10, 10, 10, .dark_blue);
+        }
 
         rl.beginDrawing();
-        rl.clearBackground(.black);
+        {
+            defer rl.endDrawing();
 
-        rl.drawTextureRec(screenCamera1.texture, splitScreenRect, .{ .x = 0.0, .y = 0.0 }, .white);
-        rl.drawTextureRec(screenCamera2.texture, splitScreenRect, .{ .x = @floatFromInt(screenWidth / 2), .y = 0.0 }, .white);
+            rl.clearBackground(.black);
 
-        rl.drawRectangle(@divTrunc(rl.getScreenWidth(), 2) - 2, 0, 4, screenHeight, .light_gray);
+            rl.drawTextureRec(screenCamera1.texture, splitScreenRect, .{ .x = 0.0, .y = 0.0 }, .white);
+            rl.drawTextureRec(screenCamera2.texture, splitScreenRect, .{ .x = @floatFromInt(screenWidth / 2), .y = 0.0 }, .white);
 
-        rl.endDrawing();
+            rl.drawRectangle(@divTrunc(rl.getScreenWidth(), 2) - 2, 0, 4, screenHeight, .light_gray);
+        }
     }
 }

@@ -18,7 +18,6 @@
 const rl = @import("raylib");
 
 const Camera = rl.Camera;
-const CameraProjection = rl.CameraProjection;
 const Vector3 = rl.Vector3;
 
 pub fn main() anyerror!void {
@@ -33,7 +32,7 @@ pub fn main() anyerror!void {
         .target = .{ .x = 0.0, .y = 0.0, .z = 0.0 },
         .up = .{ .x = 0.0, .y = 1.0, .z = 0.0 },
         .fovy = 45.0,
-        .projection = CameraProjection.perspective,
+        .projection = .perspective,
     };
 
     const cubePosition = Vector3{ .x = 0.0, .y = 0.0, .z = 0.0 };
@@ -44,14 +43,17 @@ pub fn main() anyerror!void {
         rl.beginDrawing();
         {
             defer rl.endDrawing();
+
             rl.clearBackground(.ray_white);
-            rl.beginMode3D(camera);
+            camera.begin();
             {
-                defer rl.endMode3D();
+                defer camera.end();
+
                 rl.drawCube(cubePosition, 2.0, 2.0, 2.0, .red);
                 rl.drawCubeWires(cubePosition, 2.0, 2.0, 2.0, .maroon);
                 rl.drawGrid(10, 1.0);
             }
+
             rl.drawText("Welcome to the third dimension!", 10, 40, 20, .dark_gray);
             rl.drawFPS(10, 10);
         }
