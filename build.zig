@@ -389,6 +389,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Sprite button using mouse",
         },
         .{
+            .name = "sprite_explosion",
+            .path = "examples/textures/sprite_explosion.zig",
+            .desc = "Sprite explosion animation (one time)",
+        },
+        .{
             .name = "textures_logo_raylib",
             .path = "examples/textures/textures_logo_raylib.zig",
             .desc = "Logo drawing",
