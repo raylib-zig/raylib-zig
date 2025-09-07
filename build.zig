@@ -369,6 +369,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Particles blending",
         },
         .{
+            .name = "polygon_drawing",
+            .path = "examples/textures/polygon_drawing.zig",
+            .desc = "Textured polygon drawing",
+        },
+        .{
             .name = "sprite_anim",
             .path = "examples/textures/sprite_anim.zig",
             .desc = "Animate a sprite",
