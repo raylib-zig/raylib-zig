@@ -1,4 +1,24 @@
-// raylib-zig (c) 0xdeadbad 2025
+// ********************************************************************************************
+// *
+// *   raylib [core] example - 2d camera split screen
+// *
+// *   Example complexity rating: [★★★★] 4/4
+// *
+// *   Addapted from the core_3d_camera_split_screen example:
+// *       https://github.com/raysan5/raylib/blob/master/examples/core/core_3d_camera_split_screen.c
+// *
+// *   Example originally created with raylib 4.5, last time updated with raylib 4.5
+// *
+// *   Example contributed by Gabriel dos Santos Sanches (@gabrielssanches) and reviewed by Ramon Santamaria (@raysan5)
+// *
+// *   Example ported to Zig (raylib-zig) by Matheus Garcias (0xdeadbad) 2025
+// *
+// *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+// *   BSD-like license that allows static linking with closed source software
+// *
+// *   Copyright (c) 2023-2025 Gabriel dos Santos Sanches (@gabrielssanches)
+// *
+// ********************************************************************************************
 
 const rl = @import("raylib");
 
