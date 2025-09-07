@@ -399,6 +399,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Source and destination rectangles",
         },
         .{
+            .name = "textured_curve",
+            .path = "examples/textures/textured_curve.zig",
+            .desc = "Textured curve drawing",
+        },
+        .{
             .name = "textures_logo_raylib",
             .path = "examples/textures/textures_logo_raylib.zig",
             .desc = "Logo drawing",
