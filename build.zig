@@ -364,6 +364,11 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/models/models_heightmap.zig",
             .desc = "Heightmap loading and drawing",
         },
+        .{
+            .name = "2d_camera_split_screen",
+            .path = "examples/core/2d_camera_split_screen.zig",
+            .desc = "2D camera split screen",
+        },
         // .{
         //     .name = "shaders_basic_lighting",
         //     .path = "examples/shaders/shaders_basic_lighting.zig",
