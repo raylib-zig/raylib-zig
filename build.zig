@@ -369,6 +369,11 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/core/2d_camera_split_screen.zig",
             .desc = "2D camera split screen",
         },
+        .{
+            .name = "3d_camera_mode",
+            .path = "examples/core/3d_camera_mode.zig",
+            .desc = "3D camera mode",
+        },
         // .{
         //     .name = "shaders_basic_lighting",
         //     .path = "examples/shaders/shaders_basic_lighting.zig",
