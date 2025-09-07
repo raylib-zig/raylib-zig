@@ -384,6 +384,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Animate a sprite",
         },
         .{
+            .name = "sprite_button",
+            .path = "examples/textures/sprite_button.zig",
+            .desc = "Sprite button using mouse",
+        },
+        .{
             .name = "textures_logo_raylib",
             .path = "examples/textures/textures_logo_raylib.zig",
             .desc = "Logo drawing",
