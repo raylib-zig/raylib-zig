@@ -394,6 +394,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Sprite explosion animation (one time)",
         },
         .{
+            .name = "srcrec_dstrec",
+            .path = "examples/textures/srcrec_dstrec.zig",
+            .desc = "Source and destination rectangles",
+        },
+        .{
             .name = "textures_logo_raylib",
             .path = "examples/textures/textures_logo_raylib.zig",
             .desc = "Logo drawing",
