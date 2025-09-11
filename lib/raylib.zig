@@ -1877,7 +1877,39 @@ pub const MaterialMapIndex = enum(c_int) {
     brdf = 10,
 };
 
-pub const ShaderLocationIndex = enum(c_int) { vertex_position = 0, vertex_texcoord01 = 1, vertex_texcoord02 = 2, vertex_normal = 3, vertex_tangent = 4, vertex_color = 5, matrix_mvp = 6, matrix_view = 7, matrix_projection = 8, matrix_model = 9, matrix_normal = 10, vector_view = 11, color_diffuse = 12, color_specular = 13, color_ambient = 14, map_albedo = 15, map_metalness = 16, map_normal = 17, map_roughness = 18, map_occlusion = 19, map_emission = 20, map_height = 21, map_cubemap = 22, map_irradiance = 23, map_prefilter = 24, map_brdf = 25, vertex_boneids = 26, vertex_boneweights = 27, bone_matrices = 28, shader_loc_vertex_instance_tx };
+pub const ShaderLocationIndex = enum(c_int) {
+    vertex_position = 0,
+    vertex_texcoord01 = 1,
+    vertex_texcoord02 = 2,
+    vertex_normal = 3,
+    vertex_tangent = 4,
+    vertex_color = 5,
+    matrix_mvp = 6,
+    matrix_view = 7,
+    matrix_projection = 8,
+    matrix_model = 9,
+    matrix_normal = 10,
+    vector_view = 11,
+    color_diffuse = 12,
+    color_specular = 13,
+    color_ambient = 14,
+    map_albedo = 15,
+    map_metalness = 16,
+    map_normal = 17,
+    map_roughness = 18,
+    map_occlusion = 19,
+    map_emission = 20,
+    map_height = 21,
+    map_cubemap = 22,
+    map_irradiance = 23,
+    map_prefilter = 24,
+    map_brdf = 25,
+    vertex_boneids = 26,
+    vertex_boneweights = 27,
+    bone_matrices = 28,
+    shader_loc_vertex_instance_tx = 29,
+    //
+};
 
 pub const ShaderUniformDataType = enum(c_int) {
     float = 0,
