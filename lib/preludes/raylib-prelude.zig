@@ -1998,18 +1998,23 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = enum(c_int) {
-    none = 0,
-    tap = 1,
-    doubletap = 2,
-    hold = 4,
-    drag = 8,
-    swipe_right = 16,
-    swipe_left = 32,
-    swipe_up = 64,
-    swipe_down = 128,
-    pinch_in = 256,
-    pinch_out = 512,
+pub const Gesture = packed struct {
+    tap: bool = false,
+    doubletap: bool = false,
+    hold: bool = false,
+    drag: bool = false,
+    swipe_right: bool = false,
+    swipe_left: bool = false,
+    swipe_up: bool = false,
+    swipe_down: bool = false,
+    pinch_in: bool = false,
+    pinch_out: bool = false,
+    __reserved1: bool = false,
+    __reserved2: bool = false,
+    __reserved3: bool = false,
+    __reserved4: bool = false,
+    __reserved5: bool = false,
+    __reserved6: bool = false,
 };
 
 pub const CameraMode = enum(c_int) {

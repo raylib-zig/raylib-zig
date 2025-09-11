@@ -56,7 +56,7 @@ pub fn main() anyerror!void {
                 // TODO: Update `title` state variables here!
 
                 // Press ENTER to change to `gameplay` state
-                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.tap)) {
+                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.{ .tap = true })) {
                     current_screen = .gameplay;
                 }
             },
@@ -64,7 +64,7 @@ pub fn main() anyerror!void {
                 // TODO: Update `gameplay` state variables here!
 
                 // Press ENTER to change to `ending` state
-                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.tap)) {
+                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.{ .tap = true })) {
                     current_screen = .ending;
                 }
             },
@@ -72,7 +72,7 @@ pub fn main() anyerror!void {
                 // TODO: Update `ending` state variables here!
 
                 // Press ENTER to return to `title` state
-                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.tap)) {
+                if (rl.isKeyPressed(.enter) or rl.isGestureDetected(.{ .tap = true })) {
                     current_screen = .title;
                 }
             },
