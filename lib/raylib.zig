@@ -2287,19 +2287,19 @@ pub fn loadFontFromImage(image: Image, key: Color, firstChar: i32) RaylibError!F
 }
 
 /// Load font data for further use
-pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]i32, ty: FontType) RaylibError![]GlyphInfo {
+pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]const i32, ty: FontType) RaylibError![]GlyphInfo {
     var res: []GlyphInfo = undefined;
 
-    var codePointsFinal = @as([*c]i32, 0);
+    var codePointsFinal = @as([*c]const i32, 0);
     var codePointsLen: i32 = 0;
     if (codePoints) |codePointsSure| {
-        codePointsFinal = @as([*c]i32, @ptrCast(codePointsSure));
+        codePointsFinal = @as([*c]const i32, @ptrCast(codePointsSure));
         codePointsLen = @as(i32, @intCast(codePointsSure.len));
     } else {
         codePointsLen = 95;
     }
 
-    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty);
+    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty, @as([*c]i32, &codePointsLen));
     if (ptr == 0) return RaylibError.LoadFontData;
 
     res.ptr = @as([*]GlyphInfo, @ptrCast(ptr));
@@ -2534,6 +2534,10 @@ pub fn loadTextLines(text: [:0]const u8) RaylibError![][:0]u8 {
     res.len = @as(usize, @intCast(lineCount));
 
     return res;
+}
+
+pub fn unloadTextLines(lines: [][:0]u8) void {
+    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(lines)), @as(c_int, @intCast(lines.len)));
 }
 
 /// Join text strings with delimiter
@@ -3159,6 +3163,36 @@ pub fn saveFileText(fileName: [:0]const u8, text: [:0]const u8) bool {
     return cdef.SaveFileText(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(text)));
 }
 
+/// Rename file (if exists)
+pub fn fileRename(fileName: [:0]const u8, fileRename_: [:0]const u8) i32 {
+    return @as(i32, cdef.FileRename(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(fileRename_))));
+}
+
+/// Remove file (if exists)
+pub fn fileRemove(fileName: [:0]const u8) i32 {
+    return @as(i32, cdef.FileRemove(@as([*c]const u8, @ptrCast(fileName))));
+}
+
+/// Copy file from one path to another, dstPath created if it doesn't exist
+pub fn fileCopy(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
+    return @as(i32, cdef.FileCopy(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
+}
+
+/// Move file from one directory to another, dstPath created if it doesn't exist
+pub fn fileMove(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
+    return @as(i32, cdef.FileMove(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
+}
+
+/// Replace text in an existing file
+pub fn fileTextReplace(fileName: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) i32 {
+    return @as(i32, cdef.FileTextReplace(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Find text in existing file
+pub fn fileTextFindIndex(fileName: [:0]const u8, search: [:0]const u8) i32 {
+    return @as(i32, cdef.FileTextFindIndex(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search))));
+}
+
 /// Check if file exists
 pub fn fileExists(fileName: [:0]const u8) bool {
     return cdef.FileExists(@as([*c]const u8, @ptrCast(fileName)));
@@ -3177,6 +3211,11 @@ pub fn isFileExtension(fileName: [:0]const u8, ext: [:0]const u8) bool {
 /// Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
 pub fn getFileLength(fileName: [:0]const u8) i32 {
     return @as(i32, cdef.GetFileLength(@as([*c]const u8, @ptrCast(fileName))));
+}
+
+/// Get file modification time (last write time)
+pub fn getFileModTime(fileName: [:0]const u8) i64 {
+    return @as(i64, cdef.GetFileModTime(@as([*c]const u8, @ptrCast(fileName))));
 }
 
 /// Get pointer to extension for a filename string (includes dot: '.png')
@@ -3262,11 +3301,6 @@ pub fn loadDroppedFiles() FilePathList {
 /// Unload dropped filepaths
 pub fn unloadDroppedFiles(files: FilePathList) void {
     cdef.UnloadDroppedFiles(files);
-}
-
-/// Get file modification time (last write time)
-pub fn getFileModTime(fileName: [:0]const u8) i64 {
-    return @as(i64, cdef.GetFileModTime(@as([*c]const u8, @ptrCast(fileName))));
 }
 
 /// Compress data (DEFLATE algorithm), memory must be MemFree()
@@ -4495,11 +4529,6 @@ pub fn codepointToUTF8(codepoint: i32, utf8Size: *i32) [:0]const u8 {
     return std.mem.span(cdef.CodepointToUTF8(@as(c_int, codepoint), @as([*c]c_int, @ptrCast(utf8Size))));
 }
 
-/// Unload text lines
-pub fn unloadTextLines(text: [][:0]const u8) void {
-    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(text)));
-}
-
 /// Copy one string to another, returns bytes copied
 pub fn textCopy(dst: *u8, src: [:0]const u8) i32 {
     return @as(i32, cdef.TextCopy(@as([*c]u8, @ptrCast(dst)), @as([*c]const u8, @ptrCast(src))));
@@ -4520,9 +4549,24 @@ pub fn textSubtext(text: [:0]const u8, position: i32, length: i32) [:0]const u8 
     return std.mem.span(cdef.TextSubtext(@as([*c]const u8, @ptrCast(text)), @as(c_int, position), @as(c_int, length)));
 }
 
+/// Remove text spaces, concat words
+pub fn textRemoveSpaces(text: [:0]const u8) [:0]const u8 {
+    return std.mem.span(cdef.TextRemoveSpaces(@as([*c]const u8, @ptrCast(text))));
+}
+
+/// Get text between two strings
+pub fn getTextBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.GetTextBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end))));
+}
+
 /// Replace text string (WARNING: memory must be freed!)
-pub fn textReplace(text: [:0]const u8, replace: [:0]const u8, by: [:0]const u8) [:0]u8 {
-    return std.mem.span(cdef.TextReplace(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(replace)), @as([*c]const u8, @ptrCast(by))));
+pub fn textReplace(text: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplace(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Replace text between two specific strings (WARNING: memory must be freed!)
+pub fn textReplaceBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end)), @as([*c]const u8, @ptrCast(replacement))));
 }
 
 /// Insert text in a position (WARNING: memory must be freed!)
@@ -4538,14 +4582,14 @@ pub fn textSplit(text: []const u8, delimiter: u8) RaylibError![][:0]u8 {
     return @as([*][:0]u8, @ptrCast(_ptr))[0..@as(usize, @intCast(_len))];
 }
 
-/// Append text at specific position and move cursor!
+/// Append text at specific position and move cursor
 pub fn textAppend(text: [:0]u8, append: [:0]const u8, position: *i32) void {
     cdef.TextAppend(@as([*c]u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(append)), @as([*c]c_int, @ptrCast(position)));
 }
 
 /// Find first text occurrence within a string, -1 if not found
-pub fn textFindIndex(text: [:0]const u8, find: [:0]const u8) i32 {
-    return @as(i32, cdef.TextFindIndex(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(find))));
+pub fn textFindIndex(text: [:0]const u8, search: [:0]const u8) i32 {
+    return @as(i32, cdef.TextFindIndex(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search))));
 }
 
 /// Get upper case version of provided string

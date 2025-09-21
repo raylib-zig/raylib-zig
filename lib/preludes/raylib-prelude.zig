@@ -2287,19 +2287,19 @@ pub fn loadFontFromImage(image: Image, key: Color, firstChar: i32) RaylibError!F
 }
 
 /// Load font data for further use
-pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]i32, ty: FontType) RaylibError![]GlyphInfo {
+pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]const i32, ty: FontType) RaylibError![]GlyphInfo {
     var res: []GlyphInfo = undefined;
 
-    var codePointsFinal = @as([*c]i32, 0);
+    var codePointsFinal = @as([*c]const i32, 0);
     var codePointsLen: i32 = 0;
     if (codePoints) |codePointsSure| {
-        codePointsFinal = @as([*c]i32, @ptrCast(codePointsSure));
+        codePointsFinal = @as([*c]const i32, @ptrCast(codePointsSure));
         codePointsLen = @as(i32, @intCast(codePointsSure.len));
     } else {
         codePointsLen = 95;
     }
 
-    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty);
+    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty, @as([*c]i32, &codePointsLen));
     if (ptr == 0) return RaylibError.LoadFontData;
 
     res.ptr = @as([*]GlyphInfo, @ptrCast(ptr));
@@ -2534,6 +2534,10 @@ pub fn loadTextLines(text: [:0]const u8) RaylibError![][:0]u8 {
     res.len = @as(usize, @intCast(lineCount));
 
     return res;
+}
+
+pub fn unloadTextLines(lines: [][:0]u8) void {
+    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(lines)), @as(c_int, @intCast(lines.len)));
 }
 
 /// Join text strings with delimiter

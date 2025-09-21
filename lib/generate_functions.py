@@ -90,6 +90,7 @@ MANUAL = [
     "DrawTextCodepoints",
     "LoadUTF8",
     "LoadTextLines",
+    "UnloadTextLines",
     "TextJoin",
     "DrawLineStrip",
     "DrawTriangleFan",
@@ -142,7 +143,7 @@ def ziggify_type(name: str, t: str, func_name: str) -> str:
         "AutomationEventList", "list", "batch", "glInternalFormat", "glFormat",
         "glType", "mipmaps", "active", "scroll", "view", "checked", "mouseCell",
         "scrollIndex", "focus", "secretViewActive", "color", "alpha", "colorHsv",
-        "translation", "rotation", "scale", "mat"
+        "translation", "rotation", "scale", "mat", "glyphCount"
     ]
     multi = [
         "data", "compData", "points", "fileData", "colors", "pixels",
@@ -365,6 +366,8 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
         if not arguments:
             arguments = "void"
 
+        zig_name = convert_name(func_name)
+
         for arg in arguments.split(", "):
             if arg == "void":
                 break
@@ -382,6 +385,9 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
 
             arg_type = c_to_zig_type(arg_type)
             arg_name, arg_type = fix_pointer(arg_name, arg_type)
+
+            if arg_name == zig_name:
+                arg_name += "_"
 
             single_opt = [
                 ("rlDrawVertexArrayElements", "buffer"),
@@ -417,8 +423,6 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
 
         ext_ret = add_namespace_to_type(return_type)
         ext_heads.append(f"pub extern \"c\" fn {func_name}({zig_c_arguments}) {ext_ret};")
-
-        zig_name = convert_name(func_name)
 
         func_prelude = ""
 
