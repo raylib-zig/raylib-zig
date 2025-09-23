@@ -1,5 +1,4 @@
-// raylib-zig (c) Nikolas Wipper 2020-2024
-
+//! raylib-zig (c) Nikolas Wipper 2025
 const std = @import("std");
 const this = @This();
 const rl = @import("raylib");
@@ -77,6 +76,7 @@ pub fn build(b: *std.Build) !void {
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
 
+    // TODO: Generate this automatically
     const examples = [_]Program{
         .{
             .name = "raw_stream",
@@ -363,6 +363,46 @@ pub fn build(b: *std.Build) !void {
             .name = "models_heightmap",
             .path = "examples/models/models_heightmap.zig",
             .desc = "Heightmap loading and drawing",
+        },
+        .{
+            .name = "vr_simulator",
+            .path = "examples/core/vr_simulator.zig",
+            .desc = "Vr device simulator",
+        },
+        .{
+            .name = "smooth_pixelperfect",
+            .path = "examples/core/smooth_pixelperfect.zig",
+            .desc = "Smooth Pixel-perfect camera",
+        },
+        .{
+            .name = "window_should_close",
+            .path = "examples/core/window_should_close.zig",
+            .desc = "Ask for confirmation before closing the window",
+        },
+        .{
+            .name = "random_values",
+            .path = "examples/core/random_values.zig",
+            .desc = "Generate a random number every 2 seconds",
+        },
+        .{
+            .name = "world_screen",
+            .path = "examples/core/world_screen.zig",
+            .desc = "Mix 2d and 3d elements",
+        },
+        .{
+            .name = "window_letterbox",
+            .path = "examples/core/window_letterbox.zig",
+            .desc = "Render to a scaled texture",
+        },
+        .{
+            .name = "scissor_test",
+            .path = "examples/core/scissor_test.zig",
+            .desc = "Scissor mode test",
+        },
+        .{
+            .name = "2d_camera_split_screen",
+            .path = "examples/core/2d_camera_split_screen.zig",
+            .desc = "Render a split screen using 2D camera's",
         },
         // .{
         //     .name = "shaders_basic_lighting",
