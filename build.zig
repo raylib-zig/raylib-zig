@@ -358,11 +358,15 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/textures/textures_image_loading.zig",
             .desc = "Image loading and texture creation",
         },
-
         .{
             .name = "models_heightmap",
             .path = "examples/models/models_heightmap.zig",
             .desc = "Heightmap loading and drawing",
+        },
+        .{
+            .name = "models_bone_socket",
+            .path = "examples/models/models_bone_socket.zig",
+            .desc = "Bone socket",
         },
         // .{
         //     .name = "shaders_basic_lighting",
