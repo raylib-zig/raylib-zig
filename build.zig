@@ -368,6 +368,11 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/models/models_bone_socket.zig",
             .desc = "Bone socket",
         },
+        .{
+            .name = "models_box_collisions",
+            .path = "examples/models/models_box_collisions.zig",
+            .desc = "Box collisions",
+        },
         // .{
         //     .name = "shaders_basic_lighting",
         //     .path = "examples/shaders/shaders_basic_lighting.zig",
