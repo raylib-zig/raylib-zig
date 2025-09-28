@@ -41,6 +41,7 @@ pub fn main() anyerror!void {
     var animCurrentFrame: i32 = 0;
     const modelAnimations = try rl.loadModelAnimations("examples/models/resources/models/gltf/greenman.glb");
     const animsCount = modelAnimations.len;
+    defer rl.unloadModelAnimations(modelAnimations);
 
     // indices of bones for sockets
     var boneSocketIndex: [BONE_SOCKETS]usize = undefined;
