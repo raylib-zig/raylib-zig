@@ -39,6 +39,7 @@ pub const rlRenderBatch = extern struct {
 };
 
 pub const rlGlVersion = enum(c_int) {
+    rl_opengl_11_software = 0,
     rl_opengl_11 = 1,
     rl_opengl_21 = 2,
     rl_opengl_33 = 3,
@@ -589,6 +590,16 @@ pub fn rlDisablePointMode() void {
     cdef.rlDisablePointMode();
 }
 
+/// Set the point drawing size
+pub fn rlSetPointSize(size: f32) void {
+    cdef.rlSetPointSize(size);
+}
+
+/// Get the point drawing size
+pub fn rlGetPointSize() f32 {
+    return cdef.rlGetPointSize();
+}
+
 /// Enable wire mode
 pub fn rlEnableWireMode() void {
     cdef.rlEnableWireMode();
@@ -897,6 +908,16 @@ pub fn rlFramebufferComplete(id: u32) bool {
 /// Delete framebuffer from GPU
 pub fn rlUnloadFramebuffer(id: u32) void {
     cdef.rlUnloadFramebuffer(@as(c_uint, id));
+}
+
+/// Copy framebuffer pixel data to internal buffer
+pub fn rlCopyFramebuffer(x: i32, y: i32, width: i32, height: i32, format: i32, pixels: *anyopaque) void {
+    cdef.rlCopyFramebuffer(@as(c_int, x), @as(c_int, y), @as(c_int, width), @as(c_int, height), @as(c_int, format), pixels);
+}
+
+/// Resize internal framebuffer
+pub fn rlResizeFramebuffer(width: i32, height: i32) void {
+    cdef.rlResizeFramebuffer(@as(c_int, width), @as(c_int, height));
 }
 
 /// Load shader from code strings

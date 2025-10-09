@@ -226,6 +226,7 @@ pub extern "c" fn DrawLineV(startPos: rl.Vector2, endPos: rl.Vector2, color: rl.
 pub extern "c" fn DrawLineEx(startPos: rl.Vector2, endPos: rl.Vector2, thick: f32, color: rl.Color) void;
 pub extern "c" fn DrawLineStrip(points: [*c]const rl.Vector2, pointCount: c_int, color: rl.Color) void;
 pub extern "c" fn DrawLineBezier(startPos: rl.Vector2, endPos: rl.Vector2, thick: f32, color: rl.Color) void;
+pub extern "c" fn DrawLineDashed(startPos: rl.Vector2, endPos: rl.Vector2, dashSize: c_int, spaceSize: c_int, color: rl.Color) void;
 pub extern "c" fn DrawCircle(centerX: c_int, centerY: c_int, radius: f32, color: rl.Color) void;
 pub extern "c" fn DrawCircleSector(center: rl.Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: c_int, color: rl.Color) void;
 pub extern "c" fn DrawCircleSectorLines(center: rl.Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: c_int, color: rl.Color) void;

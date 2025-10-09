@@ -3665,6 +3665,11 @@ pub fn drawLineBezier(startPos: Vector2, endPos: Vector2, thick: f32, color: Col
     cdef.DrawLineBezier(startPos, endPos, thick, color);
 }
 
+/// Draw a dashed line
+pub fn drawLineDashed(startPos: Vector2, endPos: Vector2, dashSize: i32, spaceSize: i32, color: Color) void {
+    cdef.DrawLineDashed(startPos, endPos, @as(c_int, dashSize), @as(c_int, spaceSize), color);
+}
+
 /// Draw a color-filled circle
 pub fn drawCircle(centerX: i32, centerY: i32, radius: f32, color: Color) void {
     cdef.DrawCircle(@as(c_int, centerX), @as(c_int, centerY), radius, color);

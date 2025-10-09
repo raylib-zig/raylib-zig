@@ -39,6 +39,7 @@ pub const rlRenderBatch = extern struct {
 };
 
 pub const rlGlVersion = enum(c_int) {
+    rl_opengl_11_software = 0,
     rl_opengl_11 = 1,
     rl_opengl_21 = 2,
     rl_opengl_33 = 3,
