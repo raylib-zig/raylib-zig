@@ -373,6 +373,11 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/models/models_box_collisions.zig",
             .desc = "Box collisions",
         },
+        .{
+            .name = "models_rlgl_solar_system",
+            .path = "examples/models/models_rlgl_solar_system.zig",
+            .desc = "Solar System",
+        },
         // .{
         //     .name = "shaders_basic_lighting",
         //     .path = "examples/shaders/shaders_basic_lighting.zig",
