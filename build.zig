@@ -109,6 +109,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Creates a basic window with text",
         },
         .{
+            .name = "monitor_change",
+            .path = "examples/core/monitor_change.zig",
+            .desc = "Simple Monitor Manager",
+        },
+        .{
             .name = "basic_window_web",
             .path = "examples/core/basic_window_web.zig",
             .desc = "Creates a basic window with text (web)",
