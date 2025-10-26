@@ -109,6 +109,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Creates a basic window with text",
         },
         .{
+            .name = "core_monitor_change",
+            .path = "examples/core/core_monitor_change.zig",
+            .desc = "Simple Monitor Manager",
+        },
+        .{
             .name = "basic_window_web",
             .path = "examples/core/basic_window_web.zig",
             .desc = "Creates a basic window with text (web)",
@@ -182,6 +187,11 @@ pub fn build(b: *std.Build) !void {
             .name = "raymarching",
             .path = "examples/shaders/raymarching.zig",
             .desc = "Uses a raymarching in a shader to render shapes",
+        },
+        .{
+            .name = "shaders_ascii_rendering",
+            .path = "examples/shaders/shaders_ascii_rendering.zig",
+            .desc = "Post-processing to render in ASCII",
         },
         .{
             .name = "shaders_basic_pbr",
