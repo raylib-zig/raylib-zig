@@ -77,6 +77,8 @@ pub fn build(b: *std.Build) !void {
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
 
+    raylib.linkLibrary(raylib_artifact);
+
     const examples = [_]Program{
         .{
             .name = "raw_stream",
@@ -426,7 +428,6 @@ pub fn build(b: *std.Build) !void {
             });
             wasm.root_module.addImport("raylib", raylib);
             wasm.root_module.addImport("raygui", raygui);
-            wasm.linkLibrary(raylib_artifact);
 
             const install_dir: std.Build.InstallDir = .{ .custom = "web" };
             const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
@@ -462,7 +463,6 @@ pub fn build(b: *std.Build) !void {
                 .name = ex.name,
                 .root_module = mod,
             });
-            exe.linkLibrary(raylib_artifact);
             exe.root_module.addImport("raylib", raylib);
             exe.root_module.addImport("raygui", raygui);
 

@@ -34,7 +34,6 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     exe_mod.addImport("raylib", raylib);
-    exe_mod.linkLibrary(raylib_artifact);
 
     const run_step = b.step("run", "Run the app");
 
