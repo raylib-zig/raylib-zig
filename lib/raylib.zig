@@ -51,6 +51,10 @@ pub const Vector2 = extern struct {
         return Vector2{ .x = x, .y = y };
     }
 
+    pub fn initVec(vec: @Vector(2, f32)) Vector2 {
+        return Vector2{ .x = vec[0], .y = vec[1] };
+    }
+
     /// Vector with components value 0.0
     pub fn zero() Vector2 {
         return math.vector2Zero();
@@ -213,6 +217,10 @@ pub const Vector3 = extern struct {
 
     pub fn init(x: f32, y: f32, z: f32) Vector3 {
         return Vector3{ .x = x, .y = y, .z = z };
+    }
+
+    pub fn initVec(vec: @Vector(3, f32)) Vector3 {
+        return Vector3{ .x = vec[0], .y = vec[1], .z = vec[2] };
     }
 
     // Vector with components value 0.0
@@ -427,6 +435,10 @@ pub const Vector4 = extern struct {
 
     pub fn init(x: f32, y: f32, z: f32, w: f32) Vector4 {
         return Vector4{ .x = x, .y = y, .z = z, .w = w };
+    }
+
+    pub fn initVec(vec: @Vector(4, f32)) Vector4 {
+        return Vector4{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
     }
 
     /// Vector with components value 0.0
