@@ -54,6 +54,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .root_source_file = b.path("lib/raylib.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
 }
 
@@ -65,6 +66,7 @@ const gui = struct {
             .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         });
     }
 };
@@ -400,13 +402,11 @@ pub fn build(b: *std.Build) !void {
     const raylib_test = b.addTest(.{
         .root_module = raylib,
     });
-    raylib_test.linkLibC();
 
     const raygui_test = b.addTest(.{
         .root_module = raygui,
     });
     raygui_test.root_module.addImport("raylib-zig", raylib);
-    raygui_test.linkLibC();
 
     const test_step = b.step("test", "Check for library compilation errors");
     test_step.dependOn(&raylib_test.step);
