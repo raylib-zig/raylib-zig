@@ -81,6 +81,7 @@ pub const ControlProperty = enum(c_int) {
     border_width,
     text_padding,
     text_alignment,
+    _,
 };
 
 pub const DefaultProperty = enum(c_int) {
