@@ -400,13 +400,13 @@ pub fn build(b: *std.Build) !void {
     const raylib_test = b.addTest(.{
         .root_module = raylib,
     });
-    raylib_test.linkLibC();
+    raylib_test.root_module.link_libc = true;
 
     const raygui_test = b.addTest(.{
         .root_module = raygui,
     });
     raygui_test.root_module.addImport("raylib-zig", raylib);
-    raygui_test.linkLibC();
+    raygui_test.root_module.link_libc = true;
 
     const test_step = b.step("test", "Check for library compilation errors");
     test_step.dependOn(&raylib_test.step);
