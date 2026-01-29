@@ -113,6 +113,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Creates a basic window with text",
         },
         .{
+            .name = "delta_time",
+            .path = "examples/core/delta_time.zig",
+            .desc = "Show how to use frame time (delta time)",
+        },
+        .{
             .name = "core_monitor_change",
             .path = "examples/core/core_monitor_change.zig",
             .desc = "Simple Monitor Manager",
@@ -408,9 +413,7 @@ pub fn build(b: *std.Build) !void {
         .root_module = raylib,
     });
 
-    const raygui_test = b.addTest(.{
-        .root_module = raygui,
-    });
+    const raygui_test = b.addTest(.{ .root_module = raygui });
     raygui_test.root_module.addImport("raylib-zig", raylib);
 
     const test_step = b.step("test", "Check for library compilation errors");
