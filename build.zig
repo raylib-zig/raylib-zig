@@ -188,6 +188,11 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates showing and hiding a message box",
         },
         .{
+            .name = "floating_window",
+            .path = "examples/gui/floating_window.zig",
+            .desc = "Demonstrates a floating window",
+        },
+        .{
             .name = "raymarching",
             .path = "examples/shaders/raymarching.zig",
             .desc = "Uses a raymarching in a shader to render shapes",
