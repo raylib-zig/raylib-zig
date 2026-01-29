@@ -83,7 +83,7 @@ const raylib_artifact = raylib_dep.artifact("raylib"); // raylib C library
 Now add the modules and artifact to your target as you would normally:
 
 ```zig
-exe.linkLibrary(raylib_artifact);
+exe.root_module.linkLibrary(raylib_artifact);
 exe.root_module.addImport("raylib", raylib);
 exe.root_module.addImport("raygui", raygui);
 ```
