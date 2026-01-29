@@ -41,10 +41,7 @@ const Light = extern struct {
     type: Type = .directional,
     enabled: bool = false,
     _enabled_pad1: u8 = 0,
-    _enabled_pad2: @Type(.{.int = .{
-        .signedness = .unsigned,
-        .bits = @bitSizeOf(c_uint) - 16,
-    }}) = 0,
+    _enabled_pad2: @Int(.unsigned, @bitSizeOf(c_uint) - 16) = 0,
     position: rl.Vector3 = .init(0, 0, 0),
     target: rl.Vector3 = .init(0, 0, 0),
     color: [4]f32 = .{ 0, 0, 0, 0 },
@@ -96,12 +93,12 @@ const Light = extern struct {
 
             // NOTE: Shader parameters names for lights must match the requested ones
             .loc = .{
-                .type = rl.getShaderLocation(shader, rl.textFormat("lights[%i].type", .{ light_count })),
-                .enabled = rl.getShaderLocation(shader, rl.textFormat("lights[%i].enabled", .{ light_count })),
-                .position = rl.getShaderLocation(shader, rl.textFormat("lights[%i].position", .{ light_count })),
-                .target = rl.getShaderLocation(shader, rl.textFormat("lights[%i].target", .{ light_count })),
-                .color = rl.getShaderLocation(shader, rl.textFormat("lights[%i].color", .{ light_count })),
-                .intensity = rl.getShaderLocation(shader, rl.textFormat("lights[%i].intensity", .{ light_count })),
+                .type = rl.getShaderLocation(shader, rl.textFormat("lights[%i].type", .{light_count})),
+                .enabled = rl.getShaderLocation(shader, rl.textFormat("lights[%i].enabled", .{light_count})),
+                .position = rl.getShaderLocation(shader, rl.textFormat("lights[%i].position", .{light_count})),
+                .target = rl.getShaderLocation(shader, rl.textFormat("lights[%i].target", .{light_count})),
+                .color = rl.getShaderLocation(shader, rl.textFormat("lights[%i].color", .{light_count})),
+                .intensity = rl.getShaderLocation(shader, rl.textFormat("lights[%i].intensity", .{light_count})),
             },
         };
         light.update(shader);
@@ -140,15 +137,15 @@ pub fn main() anyerror!void {
 
     rl.setConfigFlags(.{ .msaa_4x_hint = true });
     rl.initWindow(screen_width, screen_height, "raylib [shaders] example - basic pbr");
-    defer rl.closeWindow();      // Close window and OpenGL context
+    defer rl.closeWindow(); // Close window and OpenGL context
 
     // Define the camera to look into our 3d world
     var camera: rl.Camera = .{
-        .position = .init(2, 2, 6),    // Camera position
-        .target = .init(0, 0.5, 0),    // Camera looking at point
-        .up = .init(0, 1, 0),          // Camera up vector (rotation towards target)
-        .fovy = 45,                    // Camera field-of-view Y
-        .projection = .perspective,    // Camera projection type
+        .position = .init(2, 2, 6), // Camera position
+        .target = .init(0, 0.5, 0), // Camera looking at point
+        .up = .init(0, 1, 0), // Camera up vector (rotation towards target)
+        .fovy = 45, // Camera field-of-view Y
+        .projection = .perspective, // Camera projection type
     };
 
     // Load PBR shader and setup all required locations
@@ -272,11 +269,11 @@ pub fn main() anyerror!void {
     rl.setShaderValue(shader, rl.getShaderLocation(shader, "useTexMRA"), &usage, .int);
     rl.setShaderValue(shader, rl.getShaderLocation(shader, "useTexEmissive"), &usage, .int);
 
-    rl.setTargetFPS(60);                   // Set our game to run at 60 frames-per-second
+    rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
     //---------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!rl.windowShouldClose())    // Detect window close button or ESC key
+    while (!rl.windowShouldClose()) // Detect window close button or ESC key
     {
         // Update
         //----------------------------------------------------------------------------------
@@ -325,7 +322,7 @@ pub fn main() anyerror!void {
             rl.setShaderValue(shader, loc_metallic_value, &floor.materials[0].maps[uMmi(.metalness)].value, .float);
             rl.setShaderValue(shader, loc_roughness_value, &floor.materials[0].maps[uMmi(.roughness)].value, .float);
 
-            floor.draw(.init(0, 0, 0), 5, .white);   // Draw floor model
+            floor.draw(.init(0, 0, 0), 5, .white); // Draw floor model
 
             // Set old car model texture tiling, emissive color and emissive intensity parameters on shader
             rl.setShaderValue(shader, loc_texture_tiling, &car_texture_tiling, .vec2);
@@ -338,7 +335,7 @@ pub fn main() anyerror!void {
             rl.setShaderValue(shader, loc_metallic_value, &car.materials[0].maps[uMmi(.metalness)].value, .float);
             rl.setShaderValue(shader, loc_roughness_value, &car.materials[0].maps[uMmi(.roughness)].value, .float);
 
-            car.draw(.init(0, 0, 0), 0.25, .white);   // Draw car model
+            car.draw(.init(0, 0, 0), 0.25, .white); // Draw car model
 
             // Draw spheres to show the lights positions
             for (&lights) |*l| {
@@ -358,8 +355,7 @@ pub fn main() anyerror!void {
         }
         rl.drawText("Toggle lights: [1][2][3][4]", 10, 40, 20, .light_gray);
 
-        rl.drawText("(c) Old Rusty Car model by Renafox (https://skfb.ly/LxRy)",
-            screen_width - 320, screen_height - 20, 10, .light_gray);
+        rl.drawText("(c) Old Rusty Car model by Renafox (https://skfb.ly/LxRy)", screen_width - 320, screen_height - 20, 10, .light_gray);
 
         rl.drawFPS(10, 10);
     }
