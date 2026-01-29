@@ -665,17 +665,17 @@ pub fn valueBoxFloat(bounds: Rectangle, text: [:0]const u8, textValue: [:0]u8, v
 }
 
 /// Slider control
-pub fn slider(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn slider(bounds: Rectangle, textLeft: ?[:0]const u8, textRight: ?[:0]const u8, value: ?*f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSlider(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
 /// Slider Bar control
-pub fn sliderBar(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn sliderBar(bounds: Rectangle, textLeft: ?[:0]const u8, textRight: ?[:0]const u8, value: ?*f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiSliderBar(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
 /// Progress Bar control
-pub fn progressBar(bounds: Rectangle, textLeft: [:0]const u8, textRight: [:0]const u8, value: *f32, minValue: f32, maxValue: f32) i32 {
+pub fn progressBar(bounds: Rectangle, textLeft: ?[:0]const u8, textRight: ?[:0]const u8, value: ?*f32, minValue: f32, maxValue: f32) i32 {
     return @as(i32, cdef.GuiProgressBar(bounds, @as([*c]const u8, @ptrCast(textLeft)), @as([*c]const u8, @ptrCast(textRight)), @as([*c]f32, @ptrCast(value)), minValue, maxValue));
 }
 
