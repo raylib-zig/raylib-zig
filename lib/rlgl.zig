@@ -921,7 +921,7 @@ pub fn rlResizeFramebuffer(width: i32, height: i32) void {
 }
 
 /// Load shader from code strings
-pub fn rlLoadShaderCode(vsCode: [:0]const u8, fsCode: [:0]const u8) u32 {
+pub fn rlLoadShaderCode(vsCode: ?[:0]const u8, fsCode: ?[:0]const u8) u32 {
     return @as(u32, cdef.rlLoadShaderCode(@as([*c]const u8, @ptrCast(vsCode)), @as([*c]const u8, @ptrCast(fsCode))));
 }
 

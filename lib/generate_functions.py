@@ -404,7 +404,7 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
 
             zig_type = ziggify_type(arg_name, arg_type, func_name)
 
-            if zig_type.startswith("*") and (func_name, arg_name) in single_opt:
+            if (func_name, arg_name) in single_opt:
                 if not arg_type.startswith("[*c]"):
                     arg_type = "?" + arg_type
                 zig_type = "?" + zig_type
