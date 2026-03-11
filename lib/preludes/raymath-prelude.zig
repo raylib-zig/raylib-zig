@@ -6,7 +6,8 @@ const std = @import("std");
 pub const cdef = @import("raymath-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    _ = rl;
+    _ = cdef;
 }
 
 const Matrix = rl.Matrix;

@@ -4,7 +4,8 @@ const std = @import("std");
 pub const cdef = @import("raygui-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    _ = rl;
+    _ = cdef;
 }
 
 pub const RayguiError = error{GetIcons};

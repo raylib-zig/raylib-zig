@@ -5,3 +5,4 @@ zig-out/
 Project/*
 libraylib.a
 **/.DS_Store
+zig-pkg/
