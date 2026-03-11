@@ -11,7 +11,6 @@ pub const math = @import("raymath.zig");
 const C = std.builtin.CallingConvention.c;
 
 test {
-    _ = rl;
     _ = cdef;
     _ = gl;
     _ = math;

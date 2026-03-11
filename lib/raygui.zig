@@ -4,7 +4,6 @@ const std = @import("std");
 pub const cdef = @import("raygui-ext.zig");
 
 test {
-    _ = rl;
     _ = cdef;
 }
 
