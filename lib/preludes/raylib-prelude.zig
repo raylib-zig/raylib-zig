@@ -1664,7 +1664,7 @@ pub const AutomationEventList = extern struct {
     }
 };
 
-pub const ConfigFlags = packed struct {
+pub const ConfigFlags = packed struct(u32) {
     __reserved: bool = false,
     fullscreen_mode: bool = false,
     window_resizable: bool = false,
@@ -2012,7 +2012,7 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = packed struct {
+pub const Gesture = packed struct(u16) {
     tap: bool = false,
     doubletap: bool = false,
     hold: bool = false,
