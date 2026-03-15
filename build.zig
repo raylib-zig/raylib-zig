@@ -31,6 +31,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .opengl_version = options.opengl_version,
         .android_api_version = options.android_api_version,
         .android_ndk = options.android_ndk,
+        .config = options.config,
     });
 
     const raylib = raylib_dep.artifact("raylib");
