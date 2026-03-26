@@ -615,7 +615,145 @@ pub const Vector4 = extern struct {
         return math.quaternionTransform(self, mat);
     }
 };
-pub const Quaternion = Vector4;
+
+pub const Quaternion = extern struct {
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32,
+
+    pub fn init(x: f32, y: f32, z: f32, w: f32) Quaternion {
+        return Quaternion{ .x = x, .y = y, .z = z, .w = w };
+    }
+
+    pub fn initVec(vec: @Vector(4, f32)) Quaternion {
+        return Quaternion{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
+    }
+
+    /// Get identity quaternion
+    pub fn identity() Quaternion {
+        return math.quaternionIdentity();
+    }
+
+    /// Add two quaternions
+    pub fn add(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionAdd(self, q);
+    }
+
+    /// Add quaternion and float value
+    pub fn addValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionAddValue(self, add_);
+    }
+
+    /// Subtract two quaternions
+    pub fn subtract(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionSubtract(self, q);
+    }
+
+    /// Subtract quaternion and float value
+    pub fn subtractValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionSubtractValue(self, add_);
+    }
+
+    /// Computes the length of a quaternion
+    pub fn length(self: Quaternion) f32 {
+        return math.quaternionLength(self);
+    }
+
+    /// Scale quaternion by float value
+    pub fn scale(self: Quaternion, scale_: f32) Quaternion {
+        return math.quaternionScale(self, scale_);
+    }
+
+    /// Multiply quaternion by quaternion
+    pub fn multiply(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionMultiply(self, q);
+    }
+
+    /// Divide two quaternions
+    pub fn divide(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionDivide(self, q);
+    }
+
+    /// Normalize quaternion
+    pub fn normalize(self: Quaternion) Quaternion {
+        return math.quaternionNormalize(self);
+    }
+
+    /// Calculate linear interpolation between two quaternions
+    pub fn lerp(self: Quaternion, q: Quaternion, amount: f32) Quaternion {
+        return math.quaternionLerp(self, q, amount);
+    }
+
+    /// Invert provided quaternion
+    pub fn invert(self: Quaternion) Quaternion {
+        return math.quaternionInvert(self);
+    }
+
+    /// Check whether two given quaternions are almost equal
+    pub fn equals(p: Quaternion, q: Quaternion) i32 {
+        return math.quaternionEquals(p, q);
+    }
+
+    /// Calculate slerp-optimized interpolation between two quaternions
+    pub fn nlerp(self: Quaternion, q: Quaternion, amount: f32) Quaternion {
+        return math.quaternionNlerp(self, q, amount);
+    }
+
+    /// Calculates spherical linear interpolation between two quaternions
+    pub fn slerp(self: Quaternion, q: Quaternion, amount: f32) Quaternion {
+        return math.quaternionSlerp(self, q, amount);
+    }
+
+    /// Calculate quaternion cubic spline interpolation using Cubic Hermite Spline
+    /// algorithm as described in the GLTF 2.0 specification
+    pub fn cubicHermiteSpline(self: Quaternion, outTangent1: Quaternion, q: Quaternion, inTangent2: Quaternion, t: f32) Quaternion {
+        return math.quaternionCubicHermiteSpline(self, outTangent1, q, inTangent2, t);
+    }
+
+    // Calculate quaternion based on the rotation from one vector to another
+    pub fn fromVector3ToVector3(from: Vector3, to: Vector3) Quaternion {
+        return math.quaternionFromVector3ToVector3(from, to);
+    }
+
+    /// Get a quaternion for a given rotation matrix
+    pub fn fromMatrix(mat: Matrix) Quaternion {
+        return math.quaternionFromMatrix(mat);
+    }
+
+    /// Get a matrix for a given quaternion
+    pub fn toMatrix(self: Quaternion) Matrix {
+        return math.quaternionToMatrix(self);
+    }
+
+    /// Get rotation quaternion for an angle and axis
+    /// NOTE: Angle must be provided in radians
+    pub fn fromAxisAngle(axis: Vector3, angle: f32) Quaternion {
+        return math.quaternionFromAxisAngle(axis, angle);
+    }
+
+    /// Get the rotation angle and axis for a given quaternion
+    pub fn toAxisAngle(self: Quaternion, outAxis: *Vector3, outAngle: *f32) void {
+        math.quaternionToAxisAngle(self, outAxis, outAngle);
+    }
+
+    /// Get the quaternion equivalent to Euler angles
+    /// NOTE: Rotation order is ZYX
+    pub fn fromEuler(pitch: f32, yaw: f32, roll: f32) Quaternion {
+        return math.quaternionFromEuler(pitch, yaw, roll);
+    }
+
+    /// Get the Euler angles equivalent to quaternion (roll, pitch, yaw)
+    /// NOTE: Angles are returned in a Vector3 struct in radians
+    pub fn toEuler(self: Quaternion) Vector3 {
+        return math.quaternionToEuler(self);
+    }
+
+    /// Transform a quaternion given a transformation matrix
+    pub fn transform(self: Quaternion, mat: Matrix) Quaternion {
+        return math.quaternionTransform(self, mat);
+    }
+};
 
 pub const Matrix = extern struct {
     m0: f32,
