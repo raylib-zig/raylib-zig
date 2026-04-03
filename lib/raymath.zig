@@ -7,6 +7,7 @@ pub const cdef = @import("raymath-ext.zig");
 
 test {
     std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
 }
 
 const Matrix = rl.Matrix;

@@ -5,6 +5,8 @@ pub const cdef = @import("raygui-ext.zig");
 
 test {
     std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
+    std.testing.refAllDecls(rl);
 }
 
 pub const RayguiError = error{GetIcons};

@@ -12,6 +12,9 @@ const C = std.builtin.CallingConvention.c;
 
 test {
     std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
+    std.testing.refAllDecls(gl);
+    std.testing.refAllDecls(math);
 }
 
 pub const RaylibError = error{

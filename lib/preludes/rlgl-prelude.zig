@@ -7,6 +7,7 @@ pub const cdef = @import("rlgl-ext.zig");
 
 test {
     std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
 }
 
 const Matrix = rl.Matrix;
