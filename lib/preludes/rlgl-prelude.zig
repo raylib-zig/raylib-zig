@@ -6,7 +6,7 @@ const std = @import("std");
 pub const cdef = @import("rlgl-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 const Matrix = rl.Matrix;
@@ -39,7 +39,7 @@ pub const rlRenderBatch = extern struct {
 };
 
 pub const rlGlVersion = enum(c_int) {
-    rl_opengl_11_software = 0,
+    rl_opengl_software = 0,
     rl_opengl_11 = 1,
     rl_opengl_21 = 2,
     rl_opengl_33 = 3,
@@ -268,6 +268,6 @@ pub const rl_default_shader_attrib_location_color = @as(i32, 3);
 pub const rl_default_shader_attrib_location_tangent = @as(i32, 4);
 pub const rl_default_shader_attrib_location_texcoord2 = @as(i32, 5);
 pub const rl_default_shader_attrib_location_indices = @as(i32, 6);
-pub const rl_default_shader_attrib_location_boneids = @as(i32, 7);
-pub const rl_default_shader_attrib_location_boneweights = @as(i32, 5);
-pub const rl_default_shader_attrib_location_instance_tx = @as(i32, 9);
+pub const rl_default_shader_attrib_location_boneindices = @as(i32, 7);
+pub const rl_default_shader_attrib_location_boneweights = @as(i32, 8);
+pub const rl_default_shader_attrib_location_instancetransform = @as(i32, 9);

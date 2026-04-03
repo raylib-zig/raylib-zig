@@ -109,6 +109,7 @@ pub extern "c" fn MatrixIdentity() rl.Matrix;
 pub extern "c" fn MatrixAdd(left: rl.Matrix, right: rl.Matrix) rl.Matrix;
 pub extern "c" fn MatrixSubtract(left: rl.Matrix, right: rl.Matrix) rl.Matrix;
 pub extern "c" fn MatrixMultiply(left: rl.Matrix, right: rl.Matrix) rl.Matrix;
+pub extern "c" fn MatrixMultiplyValue(left: rl.Matrix, value: f32) rl.Matrix;
 pub extern "c" fn MatrixTranslate(x: f32, y: f32, z: f32) rl.Matrix;
 pub extern "c" fn MatrixRotate(axis: rl.Vector3, angle: f32) rl.Matrix;
 pub extern "c" fn MatrixRotateX(angle: f32) rl.Matrix;
@@ -146,4 +147,5 @@ pub extern "c" fn QuaternionFromEuler(pitch: f32, yaw: f32, roll: f32) rl.Quater
 pub extern "c" fn QuaternionToEuler(q: rl.Quaternion) rl.Vector3;
 pub extern "c" fn QuaternionTransform(q: rl.Quaternion, mat: rl.Matrix) rl.Quaternion;
 pub extern "c" fn QuaternionEquals(p: rl.Quaternion, q: rl.Quaternion) c_int;
+pub extern "c" fn MatrixCompose(translation: rl.Vector3, rotation: rl.Quaternion, scale: rl.Vector3) rl.Matrix;
 pub extern "c" fn MatrixDecompose(mat: rl.Matrix, translation: [*c]rl.Vector3, rotation: [*c]rl.Quaternion, scale: [*c]rl.Vector3) void;

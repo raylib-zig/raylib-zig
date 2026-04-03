@@ -75,6 +75,7 @@ MANUAL = [
     "ComputeCRC32",
     "ComputeMD5",
     "ComputeSHA1",
+    "ComputeSHA256",
     "SetWindowIcons",
     "CheckCollisionPointPoly",
     "ColorToInt",

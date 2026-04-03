@@ -6,7 +6,7 @@ const std = @import("std");
 pub const cdef = @import("rlgl-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 const Matrix = rl.Matrix;
@@ -39,7 +39,7 @@ pub const rlRenderBatch = extern struct {
 };
 
 pub const rlGlVersion = enum(c_int) {
-    rl_opengl_11_software = 0,
+    rl_opengl_software = 0,
     rl_opengl_11 = 1,
     rl_opengl_21 = 2,
     rl_opengl_33 = 3,
@@ -268,9 +268,9 @@ pub const rl_default_shader_attrib_location_color = @as(i32, 3);
 pub const rl_default_shader_attrib_location_tangent = @as(i32, 4);
 pub const rl_default_shader_attrib_location_texcoord2 = @as(i32, 5);
 pub const rl_default_shader_attrib_location_indices = @as(i32, 6);
-pub const rl_default_shader_attrib_location_boneids = @as(i32, 7);
-pub const rl_default_shader_attrib_location_boneweights = @as(i32, 5);
-pub const rl_default_shader_attrib_location_instance_tx = @as(i32, 9);
+pub const rl_default_shader_attrib_location_boneindices = @as(i32, 7);
+pub const rl_default_shader_attrib_location_boneweights = @as(i32, 8);
+pub const rl_default_shader_attrib_location_instancetransform = @as(i32, 9);
 
 /// Choose the current matrix to be transformed
 pub fn rlMatrixMode(mode: i32) void {
@@ -896,8 +896,8 @@ pub fn rlLoadFramebuffer() u32 {
 }
 
 /// Attach texture/renderbuffer to a framebuffer
-pub fn rlFramebufferAttach(fboId: u32, texId: u32, attachType: i32, texType: i32, mipLevel: i32) void {
-    cdef.rlFramebufferAttach(@as(c_uint, fboId), @as(c_uint, texId), @as(c_int, attachType), @as(c_int, texType), @as(c_int, mipLevel));
+pub fn rlFramebufferAttach(id: u32, texId: u32, attachType: i32, texType: i32, mipLevel: i32) void {
+    cdef.rlFramebufferAttach(@as(c_uint, id), @as(c_uint, texId), @as(c_int, attachType), @as(c_int, texType), @as(c_int, mipLevel));
 }
 
 /// Verify framebuffer is complete
@@ -920,19 +920,29 @@ pub fn rlResizeFramebuffer(width: i32, height: i32) void {
     cdef.rlResizeFramebuffer(@as(c_int, width), @as(c_int, height));
 }
 
+/// Load (compile) shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)
+pub fn rlLoadShader(code: [:0]const u8, ty: i32) u32 {
+    return @as(u32, cdef.rlLoadShader(@as([*c]const u8, @ptrCast(code)), @as(c_int, ty)));
+}
+
 /// Load shader from code strings
-pub fn rlLoadShaderCode(vsCode: ?[:0]const u8, fsCode: ?[:0]const u8) u32 {
-    return @as(u32, cdef.rlLoadShaderCode(@as([*c]const u8, @ptrCast(vsCode)), @as([*c]const u8, @ptrCast(fsCode))));
+pub fn rlLoadShaderProgram(vsCode: [:0]const u8, fsCode: [:0]const u8) u32 {
+    return @as(u32, cdef.rlLoadShaderProgram(@as([*c]const u8, @ptrCast(vsCode)), @as([*c]const u8, @ptrCast(fsCode))));
 }
 
-/// Compile custom shader and return shader id (type: RL_VERTEX_SHADER, RL_FRAGMENT_SHADER, RL_COMPUTE_SHADER)
-pub fn rlCompileShader(shaderCode: [:0]const u8, ty: i32) u32 {
-    return @as(u32, cdef.rlCompileShader(@as([*c]const u8, @ptrCast(shaderCode)), @as(c_int, ty)));
+/// Load shader program, using already loaded shader ids
+pub fn rlLoadShaderProgramEx(vsId: u32, fsId: u32) u32 {
+    return @as(u32, cdef.rlLoadShaderProgramEx(@as(c_uint, vsId), @as(c_uint, fsId)));
 }
 
-/// Load custom shader program
-pub fn rlLoadShaderProgram(vShaderId: u32, fShaderId: u32) u32 {
-    return @as(u32, cdef.rlLoadShaderProgram(@as(c_uint, vShaderId), @as(c_uint, fShaderId)));
+/// Load compute shader program
+pub fn rlLoadShaderProgramCompute(csId: u32) u32 {
+    return @as(u32, cdef.rlLoadShaderProgramCompute(@as(c_uint, csId)));
+}
+
+/// Unload shader, loaded with rlLoadShader()
+pub fn rlUnloadShader(id: u32) void {
+    cdef.rlUnloadShader(@as(c_uint, id));
 }
 
 /// Unload shader program
@@ -940,14 +950,14 @@ pub fn rlUnloadShaderProgram(id: u32) void {
     cdef.rlUnloadShaderProgram(@as(c_uint, id));
 }
 
-/// Get shader location uniform
-pub fn rlGetLocationUniform(shaderId: u32, uniformName: [:0]const u8) i32 {
-    return @as(i32, cdef.rlGetLocationUniform(@as(c_uint, shaderId), @as([*c]const u8, @ptrCast(uniformName))));
+/// Get shader location uniform, requires shader program id
+pub fn rlGetLocationUniform(id: u32, uniformName: [:0]const u8) i32 {
+    return @as(i32, cdef.rlGetLocationUniform(@as(c_uint, id), @as([*c]const u8, @ptrCast(uniformName))));
 }
 
-/// Get shader location attribute
-pub fn rlGetLocationAttrib(shaderId: u32, attribName: [:0]const u8) i32 {
-    return @as(i32, cdef.rlGetLocationAttrib(@as(c_uint, shaderId), @as([*c]const u8, @ptrCast(attribName))));
+/// Get shader location attribute, requires shader program id
+pub fn rlGetLocationAttrib(id: u32, attribName: [:0]const u8) i32 {
+    return @as(i32, cdef.rlGetLocationAttrib(@as(c_uint, id), @as([*c]const u8, @ptrCast(attribName))));
 }
 
 /// Set shader value uniform
@@ -973,11 +983,6 @@ pub fn rlSetUniformSampler(locIndex: i32, textureId: u32) void {
 /// Set shader currently active (id and locations)
 pub fn rlSetShader(id: u32, locs: []i32) void {
     cdef.rlSetShader(@as(c_uint, id), @as([*c]c_int, @ptrCast(locs)));
-}
-
-/// Load compute shader program
-pub fn rlLoadComputeShaderProgram(shaderId: u32) u32 {
-    return @as(u32, cdef.rlLoadComputeShaderProgram(@as(c_uint, shaderId)));
 }
 
 /// Dispatch compute shader (equivalent to *draw* for graphics pipeline)

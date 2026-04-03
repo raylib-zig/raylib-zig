@@ -39,6 +39,7 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     const raygui_dep = b.dependency("raygui", .{
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
 
     rl.addRaygui(b, raylib, raygui_dep, options);
@@ -55,6 +56,7 @@ fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .root_source_file = b.path("lib/raylib.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
     });
 }
 
@@ -66,6 +68,7 @@ const gui = struct {
             .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
             .target = target,
             .optimize = optimize,
+            .link_libc = true,
         });
     }
 };

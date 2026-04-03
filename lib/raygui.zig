@@ -4,7 +4,7 @@ const std = @import("std");
 pub const cdef = @import("raygui-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 pub const RayguiError = error{GetIcons};
@@ -120,6 +120,7 @@ pub const SliderProperty = enum(c_int) {
 
 pub const ProgressBarProperty = enum(c_int) {
     progress_padding = 16,
+    progress_side,
 };
 
 pub const ScrollBarProperty = enum(c_int) {
@@ -411,22 +412,22 @@ pub const IconName = enum(c_int) {
     slicing = 231,
     manual_control = 232,
     collision = 233,
-    icon_234 = 234,
-    icon_235 = 235,
-    icon_236 = 236,
-    icon_237 = 237,
-    icon_238 = 238,
-    icon_239 = 239,
-    icon_240 = 240,
-    icon_241 = 241,
-    icon_242 = 242,
-    icon_243 = 243,
-    icon_244 = 244,
-    icon_245 = 245,
-    icon_246 = 246,
-    icon_247 = 247,
-    icon_248 = 248,
-    icon_249 = 249,
+    circle_add = 234,
+    circle_add_fill = 235,
+    circle_warning = 236,
+    circle_warning_fill = 237,
+    box_more = 238,
+    box_more_fill = 239,
+    box_minus = 240,
+    box_minus_fill = 241,
+    union_ = 242,
+    intersection = 243,
+    difference = 244,
+    sphere = 245,
+    cylinder = 246,
+    cone = 247,
+    ellipsoid = 248,
+    capsule = 249,
     icon_250 = 250,
     icon_251 = 251,
     icon_252 = 252,
@@ -472,13 +473,13 @@ pub fn loadIcons(fileName: [*c]const u8, loadIconsName: bool) [*c][*c]u8 {
 }
 
 /// Tab Bar control, returns TAB to be closed or -1
-pub fn tabBar(bounds: Rectangle, text: [][*:0]const u8, active: *i32) i32 {
-    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]const u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
+pub fn tabBar(bounds: Rectangle, text: [][*:0]u8, active: *i32) i32 {
+    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// List View with extended parameters
-pub fn listViewEx(bounds: Rectangle, text: [][*:0]const u8, scrollIndex: *i32, active: *i32, focus: *i32) i32 {
-    return @as(i32, cdef.GuiListViewEx(bounds, @as([*c][*c]const u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active)), @as([*c]c_int, @ptrCast(focus))));
+pub fn listViewEx(bounds: Rectangle, text: [][*:0]u8, scrollIndex: *i32, active: *i32, focus: *i32) i32 {
+    return @as(i32, cdef.GuiListViewEx(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active)), @as([*c]c_int, @ptrCast(focus))));
 }
 
 /// Panel control, useful to group controls

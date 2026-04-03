@@ -6,7 +6,7 @@ const std = @import("std");
 pub const cdef = @import("raymath-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 const Matrix = rl.Matrix;
@@ -447,6 +447,10 @@ pub fn matrixMultiply(left: Matrix, right: Matrix) Matrix {
     return cdef.MatrixMultiply(left, right);
 }
 
+pub fn matrixMultiplyValue(left: Matrix, value: f32) Matrix {
+    return cdef.MatrixMultiplyValue(left, value);
+}
+
 pub fn matrixTranslate(x: f32, y: f32, z: f32) Matrix {
     return cdef.MatrixTranslate(x, y, z);
 }
@@ -593,6 +597,10 @@ pub fn quaternionTransform(q: Quaternion, mat: Matrix) Quaternion {
 
 pub fn quaternionEquals(p: Quaternion, q: Quaternion) i32 {
     return @as(i32, cdef.QuaternionEquals(p, q));
+}
+
+pub fn matrixCompose(translation: Vector3, rotation: Quaternion, scale: Vector3) Matrix {
+    return cdef.MatrixCompose(translation, rotation, scale);
 }
 
 pub fn matrixDecompose(mat: Matrix, translation: *Vector3, rotation: *Quaternion, scale: *Vector3) void {

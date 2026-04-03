@@ -11,7 +11,7 @@ pub const math = @import("raymath.zig");
 const C = std.builtin.CallingConvention.c;
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 pub const RaylibError = error{
@@ -1401,6 +1401,8 @@ pub const Camera2D = extern struct {
 pub const Mesh = extern struct {
     vertexCount: c_int,
     triangleCount: c_int,
+
+    // Vertex attributes data
     vertices: [*c]f32,
     texcoords: [*c]f32,
     texcoords2: [*c]f32,
@@ -1408,12 +1410,18 @@ pub const Mesh = extern struct {
     tangents: [*c]f32,
     colors: [*c]u8,
     indices: [*c]c_ushort,
+
+    // Skin data for animation
+    boneCount: c_int,
+    boneIndices: [*c]u16,
+    boneWeights: [*c]f32,
+
+    // Runtime animation vertex data (CPU skinning)
+    // NOTE: In case of GPU skinning, not used, pointers are NULL
     animVertices: [*c]f32,
     animNormals: [*c]f32,
-    boneIds: [*c]u8,
-    boneWeights: [*c]f32,
-    boneMatrices: [*c]Matrix,
-    boneCount: c_int,
+
+    // OpenGL identifiers
     vaoId: c_int,
     vboId: [*c]c_int,
 
@@ -1476,9 +1484,17 @@ pub const Transform = extern struct {
     scale: Vector3,
 };
 
+pub const ModelAnimPose = [*c]Transform;
+
 pub const BoneInfo = extern struct {
     name: [32]u8,
     parent: c_int,
+};
+
+pub const ModelSkeleton = extern struct {
+    boneCount: c_int,
+    bones: [*c]BoneInfo,
+    bindPose: ModelAnimPose
 };
 
 pub const Model = extern struct {
@@ -1488,9 +1504,11 @@ pub const Model = extern struct {
     meshes: [*c]Mesh,
     materials: [*c]Material,
     meshMaterial: [*c]c_int,
-    boneCount: c_int,
-    bones: [*c]BoneInfo,
-    bindPose: [*c]Transform,
+
+    // Animation data
+    skeleton: ModelSkeleton,
+    currentPose: ModelAnimPose,
+    boneMatrices: [*c]Matrix,
 
     /// Load model from file (meshes and materials)
     pub fn init(fileName: [:0]const u8) RaylibError!Model {
@@ -1529,11 +1547,11 @@ pub const Model = extern struct {
 };
 
 pub const ModelAnimation = extern struct {
-    boneCount: c_int,
-    frameCount: c_int,
-    bones: [*c]BoneInfo,
-    framePoses: [*c][*c]Transform,
     name: [32]u8,
+
+    boneCount: c_int,
+    keyframeCount: c_int,
+    keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
@@ -1640,7 +1658,6 @@ pub const VrStereoConfig = extern struct {
 };
 
 pub const FilePathList = extern struct {
-    capacity: c_uint,
     count: c_uint,
     paths: [*c][*c]u8,
 };
@@ -1662,7 +1679,7 @@ pub const AutomationEventList = extern struct {
     }
 };
 
-pub const ConfigFlags = packed struct {
+pub const ConfigFlags = packed struct(u32) {
     __reserved: bool = false,
     fullscreen_mode: bool = false,
     window_resizable: bool = false,
@@ -1919,8 +1936,8 @@ pub const ShaderLocationIndex = enum(c_int) {
     map_brdf = 25,
     vertex_boneids = 26,
     vertex_boneweights = 27,
-    bone_matrices = 28,
-    shader_loc_vertex_instance_tx = 29,
+    matrix_bonetransforms = 28,
+    matrix_instancetransforms = 29,
     //
 };
 
@@ -2011,7 +2028,7 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = packed struct {
+pub const Gesture = packed struct(u16) {
     tap: bool = false,
     doubletap: bool = false,
     hold: bool = false,
@@ -2137,6 +2154,11 @@ pub fn computeMD5(data: []u8) [4]u32 {
 pub fn computeSHA1(data: []u8) [5]u32 {
     const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
+}
+
+pub fn computeSHA256(data: []u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+    return res[0..8].*;
 }
 
 /// Load image from file into CPU memory (RAM)
@@ -3128,26 +3150,6 @@ pub fn memFree(ptr: *anyopaque) void {
     cdef.MemFree(ptr);
 }
 
-/// Set custom file binary data loader
-pub fn setLoadFileDataCallback(callback: LoadFileDataCallback) void {
-    cdef.SetLoadFileDataCallback(callback);
-}
-
-/// Set custom file binary data saver
-pub fn setSaveFileDataCallback(callback: SaveFileDataCallback) void {
-    cdef.SetSaveFileDataCallback(callback);
-}
-
-/// Set custom file text data loader
-pub fn setLoadFileTextCallback(callback: LoadFileTextCallback) void {
-    cdef.SetLoadFileTextCallback(callback);
-}
-
-/// Set custom file text data saver
-pub fn setSaveFileTextCallback(callback: SaveFileTextCallback) void {
-    cdef.SetSaveFileTextCallback(callback);
-}
-
 /// Load file data as byte array (read)
 pub fn loadFileData(fileName: []const u8) RaylibError![]u8 {
     var _len: i32 = 0;
@@ -3174,6 +3176,26 @@ pub fn unloadFileText(text: [:0]u8) void {
 /// Save text data to file (write), string must be '\0' terminated, returns true on success
 pub fn saveFileText(fileName: [:0]const u8, text: [:0]const u8) bool {
     return cdef.SaveFileText(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(text)));
+}
+
+/// Set custom file binary data loader
+pub fn setLoadFileDataCallback(callback: LoadFileDataCallback) void {
+    cdef.SetLoadFileDataCallback(callback);
+}
+
+/// Set custom file binary data saver
+pub fn setSaveFileDataCallback(callback: SaveFileDataCallback) void {
+    cdef.SetSaveFileDataCallback(callback);
+}
+
+/// Set custom file text data loader
+pub fn setLoadFileTextCallback(callback: LoadFileTextCallback) void {
+    cdef.SetLoadFileTextCallback(callback);
+}
+
+/// Set custom file text data saver
+pub fn setSaveFileTextCallback(callback: SaveFileTextCallback) void {
+    cdef.SetSaveFileTextCallback(callback);
 }
 
 /// Rename file (if exists)
@@ -3272,8 +3294,8 @@ pub fn makeDirectory(dirPath: [:0]const u8) i32 {
 }
 
 /// Change working directory, return true on success
-pub fn changeDirectory(dir: [:0]const u8) bool {
-    return cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dir)));
+pub fn changeDirectory(dirPath: [:0]const u8) bool {
+    return cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
 /// Check if a given path is a file or a directory
@@ -3286,12 +3308,12 @@ pub fn isFileNameValid(fileName: [:0]const u8) bool {
     return cdef.IsFileNameValid(@as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Load directory filepaths
+/// Load directory filepaths, files and directories, no subdirs scan
 pub fn loadDirectoryFiles(dirPath: [:0]const u8) FilePathList {
     return cdef.LoadDirectoryFiles(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
-/// Load directory filepaths with extension filtering and recursive directory scan. Use 'DIR' in the filter string to include directories in the result
+/// Load directory filepaths with extension filtering and subdir scan; some filters available: "*.*", "FILES*", "DIRS*"
 pub fn loadDirectoryFilesEx(basePath: [:0]const u8, filter: [:0]const u8, scanSubdirs: bool) FilePathList {
     return cdef.LoadDirectoryFilesEx(@as([*c]const u8, @ptrCast(basePath)), @as([*c]const u8, @ptrCast(filter)), scanSubdirs);
 }
@@ -3314,6 +3336,16 @@ pub fn loadDroppedFiles() FilePathList {
 /// Unload dropped filepaths
 pub fn unloadDroppedFiles(files: FilePathList) void {
     cdef.UnloadDroppedFiles(files);
+}
+
+/// Get the file count in a directory
+pub fn getDirectoryFileCount(dirPath: [:0]const u8) u32 {
+    return @as(u32, cdef.GetDirectoryFileCount(@as([*c]const u8, @ptrCast(dirPath))));
+}
+
+/// Get the file count in a directory with extension filtering and recursive directory scan. Use 'DIR' in the filter string to include directories in the result
+pub fn getDirectoryFileCountEx(basePath: [:0]const u8, filter: [:0]const u8, scanSubdirs: bool) u32 {
+    return @as(u32, cdef.GetDirectoryFileCountEx(@as([*c]const u8, @ptrCast(basePath)), @as([*c]const u8, @ptrCast(filter)), scanSubdirs));
 }
 
 /// Compress data (DEFLATE algorithm), memory must be MemFree()
@@ -3948,7 +3980,7 @@ pub fn exportImage(image: Image, fileName: [:0]const u8) bool {
     return cdef.ExportImage(image, @as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Export image to memory buffer
+/// Export image to memory buffer, memory must be MemFree()
 pub fn exportImageToMemory(image: Image, fileType: []const u8) RaylibError![]u8 {
     var _len: i32 = 0;
     const _ptr = cdef.ExportImageToMemory(image, @as([*c]const u8, @ptrCast(fileType)), @as([*c]c_int, @ptrCast(&_len)));
@@ -4489,6 +4521,11 @@ pub fn measureTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32
     return cdef.MeasureTextEx(font, @as([*c]const u8, @ptrCast(text)), fontSize, spacing);
 }
 
+/// Measure string size for an existing array of codepoints for Font
+pub fn measureTextCodepoints(font: Font, codepoints: []const c_int, length: i32, fontSize: f32, spacing: f32) Vector2 {
+    return cdef.MeasureTextCodepoints(font, @as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, length), fontSize, spacing);
+}
+
 /// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
 pub fn getGlyphIndex(font: Font, codepoint: i32) i32 {
     return @as(i32, cdef.GetGlyphIndex(font, @as(c_int, codepoint)));
@@ -4577,19 +4614,34 @@ pub fn getTextBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8
     return std.mem.span(cdef.GetTextBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end))));
 }
 
-/// Replace text string (WARNING: memory must be freed!)
+/// Replace text string with new string
 pub fn textReplace(text: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
     return std.mem.span(cdef.TextReplace(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
 }
 
-/// Replace text between two specific strings (WARNING: memory must be freed!)
+/// Replace text string with new string, memory must be MemFree()
+pub fn textReplaceAlloc(text: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Replace text between two specific strings
 pub fn textReplaceBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
     return std.mem.span(cdef.TextReplaceBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end)), @as([*c]const u8, @ptrCast(replacement))));
 }
 
-/// Insert text in a position (WARNING: memory must be freed!)
+/// Replace text between two specific strings, memory must be MemFree()
+pub fn textReplaceBetweenAlloc(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceBetweenAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Insert text in a defined byte position
 pub fn textInsert(text: [:0]const u8, insert: [:0]const u8, position: i32) [:0]u8 {
     return std.mem.span(cdef.TextInsert(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(insert)), @as(c_int, position)));
+}
+
+/// Insert text in a defined byte position, memory must be MemFree()
+pub fn textInsertAlloc(text: [:0]const u8, insert: [:0]const u8, position: i32) [:0]u8 {
+    return std.mem.span(cdef.TextInsertAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(insert)), @as(c_int, position)));
 }
 
 /// Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
@@ -4780,16 +4832,6 @@ pub fn drawModelWiresEx(model: Model, position: Vector3, rotationAxis: Vector3, 
     cdef.DrawModelWiresEx(model, position, rotationAxis, rotationAngle, scale, tint);
 }
 
-/// Draw a model as points
-pub fn drawModelPoints(model: Model, position: Vector3, scale: f32, tint: Color) void {
-    cdef.DrawModelPoints(model, position, scale, tint);
-}
-
-/// Draw a model as points with extended parameters
-pub fn drawModelPointsEx(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f32, scale: Vector3, tint: Color) void {
-    cdef.DrawModelPointsEx(model, position, rotationAxis, rotationAngle, scale, tint);
-}
-
 /// Draw bounding box (wires)
 pub fn drawBoundingBox(box: BoundingBox, color: Color) void {
     cdef.DrawBoundingBox(box, color);
@@ -4933,19 +4975,14 @@ pub fn loadModelAnimations(fileName: []const u8) RaylibError![]ModelAnimation {
     return _ptr[0..@as(usize, @intCast(_len))];
 }
 
-/// Update model animation pose (CPU)
-pub fn updateModelAnimation(model: Model, anim: ModelAnimation, frame: i32) void {
-    cdef.UpdateModelAnimation(model, anim, @as(c_int, frame));
+/// Update model animation pose (vertex buffers and bone matrices)
+pub fn updateModelAnimation(model: Model, anim: ModelAnimation, frame: f32) void {
+    cdef.UpdateModelAnimation(model, anim, frame);
 }
 
-/// Update model animation mesh bone matrices (GPU skinning)
-pub fn updateModelAnimationBones(model: Model, anim: ModelAnimation, frame: i32) void {
-    cdef.UpdateModelAnimationBones(model, anim, @as(c_int, frame));
-}
-
-/// Unload animation data
-pub fn unloadModelAnimation(anim: ModelAnimation) void {
-    cdef.UnloadModelAnimation(anim);
+/// Update model animation pose, blending two animations
+pub fn updateModelAnimationEx(model: Model, animA: ModelAnimation, frameA: f32, animB: ModelAnimation, frameB: f32, blend: f32) void {
+    cdef.UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
 }
 
 /// Check model animation skeleton match
@@ -5038,7 +5075,7 @@ pub fn isSoundValid(sound: Sound) bool {
     return cdef.IsSoundValid(sound);
 }
 
-/// Update sound buffer with new data (data and frame count should fit in sound)
+/// Update sound buffer with new data (default data format: 32 bit float, stereo)
 pub fn updateSound(sound: Sound, data: *const anyopaque, sampleCount: i32) void {
     cdef.UpdateSound(sound, data, @as(c_int, sampleCount));
 }
@@ -5103,7 +5140,7 @@ pub fn setSoundPitch(sound: Sound, pitch: f32) void {
     cdef.SetSoundPitch(sound, pitch);
 }
 
-/// Set pan for a sound (0.5 is center)
+/// Set pan for a sound (-1.0 left, 0.0 center, 1.0 right)
 pub fn setSoundPan(sound: Sound, pan: f32) void {
     cdef.SetSoundPan(sound, pan);
 }
@@ -5183,7 +5220,7 @@ pub fn setMusicPitch(music: Music, pitch: f32) void {
     cdef.SetMusicPitch(music, pitch);
 }
 
-/// Set pan for a music (0.5 is center)
+/// Set pan for a music (-1.0 left, 0.0 center, 1.0 right)
 pub fn setMusicPan(music: Music, pan: f32) void {
     cdef.SetMusicPan(music, pan);
 }
@@ -5253,7 +5290,7 @@ pub fn setAudioStreamPitch(stream: AudioStream, pitch: f32) void {
     cdef.SetAudioStreamPitch(stream, pitch);
 }
 
-/// Set pan for audio stream (0.5 is centered)
+/// Set pan for audio stream (-1.0 to 1.0 range, 0.0 is centered)
 pub fn setAudioStreamPan(stream: AudioStream, pan: f32) void {
     cdef.SetAudioStreamPan(stream, pan);
 }

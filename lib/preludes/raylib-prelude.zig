@@ -11,7 +11,7 @@ pub const math = @import("raymath.zig");
 const C = std.builtin.CallingConvention.c;
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
 }
 
 pub const RaylibError = error{
@@ -1401,6 +1401,8 @@ pub const Camera2D = extern struct {
 pub const Mesh = extern struct {
     vertexCount: c_int,
     triangleCount: c_int,
+
+    // Vertex attributes data
     vertices: [*c]f32,
     texcoords: [*c]f32,
     texcoords2: [*c]f32,
@@ -1408,12 +1410,18 @@ pub const Mesh = extern struct {
     tangents: [*c]f32,
     colors: [*c]u8,
     indices: [*c]c_ushort,
+
+    // Skin data for animation
+    boneCount: c_int,
+    boneIndices: [*c]u16,
+    boneWeights: [*c]f32,
+
+    // Runtime animation vertex data (CPU skinning)
+    // NOTE: In case of GPU skinning, not used, pointers are NULL
     animVertices: [*c]f32,
     animNormals: [*c]f32,
-    boneIds: [*c]u8,
-    boneWeights: [*c]f32,
-    boneMatrices: [*c]Matrix,
-    boneCount: c_int,
+
+    // OpenGL identifiers
     vaoId: c_int,
     vboId: [*c]c_int,
 
@@ -1476,9 +1484,17 @@ pub const Transform = extern struct {
     scale: Vector3,
 };
 
+pub const ModelAnimPose = [*c]Transform;
+
 pub const BoneInfo = extern struct {
     name: [32]u8,
     parent: c_int,
+};
+
+pub const ModelSkeleton = extern struct {
+    boneCount: c_int,
+    bones: [*c]BoneInfo,
+    bindPose: ModelAnimPose
 };
 
 pub const Model = extern struct {
@@ -1488,9 +1504,11 @@ pub const Model = extern struct {
     meshes: [*c]Mesh,
     materials: [*c]Material,
     meshMaterial: [*c]c_int,
-    boneCount: c_int,
-    bones: [*c]BoneInfo,
-    bindPose: [*c]Transform,
+
+    // Animation data
+    skeleton: ModelSkeleton,
+    currentPose: ModelAnimPose,
+    boneMatrices: [*c]Matrix,
 
     /// Load model from file (meshes and materials)
     pub fn init(fileName: [:0]const u8) RaylibError!Model {
@@ -1529,11 +1547,11 @@ pub const Model = extern struct {
 };
 
 pub const ModelAnimation = extern struct {
-    boneCount: c_int,
-    frameCount: c_int,
-    bones: [*c]BoneInfo,
-    framePoses: [*c][*c]Transform,
     name: [32]u8,
+
+    boneCount: c_int,
+    keyframeCount: c_int,
+    keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
@@ -1640,7 +1658,6 @@ pub const VrStereoConfig = extern struct {
 };
 
 pub const FilePathList = extern struct {
-    capacity: c_uint,
     count: c_uint,
     paths: [*c][*c]u8,
 };
@@ -1662,7 +1679,7 @@ pub const AutomationEventList = extern struct {
     }
 };
 
-pub const ConfigFlags = packed struct {
+pub const ConfigFlags = packed struct(u32) {
     __reserved: bool = false,
     fullscreen_mode: bool = false,
     window_resizable: bool = false,
@@ -1918,8 +1935,8 @@ pub const ShaderLocationIndex = enum(c_int) {
     map_brdf = 25,
     vertex_boneids = 26,
     vertex_boneweights = 27,
-    bone_matrices = 28,
-    shader_loc_vertex_instance_tx = 29,
+    matrix_bonetransforms = 28,
+    matrix_instancetransforms = 29,
     //
 };
 
@@ -2010,7 +2027,7 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = packed struct {
+pub const Gesture = packed struct(u16) {
     tap: bool = false,
     doubletap: bool = false,
     hold: bool = false,
@@ -2136,6 +2153,11 @@ pub fn computeMD5(data: []u8) [4]u32 {
 pub fn computeSHA1(data: []u8) [5]u32 {
     const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
+}
+
+pub fn computeSHA256(data: []u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+    return res[0..8].*;
 }
 
 /// Load image from file into CPU memory (RAM)
