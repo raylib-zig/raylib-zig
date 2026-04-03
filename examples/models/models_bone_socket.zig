@@ -38,7 +38,7 @@ pub fn main() anyerror!void {
 
     // Load gltf model animations
     var animIndex: usize = 0;
-    var animCurrentFrame: i32 = 0;
+    var animCurrentFrame: f32 = 0;
     const modelAnimations = try rl.loadModelAnimations("examples/models/resources/models/gltf/greenman.glb");
     const animsCount = modelAnimations.len;
     defer rl.unloadModelAnimations(modelAnimations);
@@ -47,8 +47,8 @@ pub fn main() anyerror!void {
     var boneSocketIndex: [BONE_SOCKETS]usize = undefined;
 
     // search bones for sockets
-    for (0..@as(usize, @intCast(characterModel.boneCount))) |i| {
-        const boneName: [:0]const u8 = @ptrCast(&characterModel.bones[i].name);
+    for (0..@as(usize, @intCast(characterModel.skeleton.boneCount))) |i| {
+        const boneName: [:0]const u8 = @ptrCast(&characterModel.skeleton.bones[i].name);
         if (rl.textIsEqual(boneName, "socket_hat")) {
             boneSocketIndex[BONE_SOCKET_HAT] = i;
             continue;
@@ -96,7 +96,7 @@ pub fn main() anyerror!void {
 
         // Update model animation
         const anim = modelAnimations[animIndex];
-        animCurrentFrame = @mod(animCurrentFrame + 1, anim.frameCount);
+        animCurrentFrame = @mod(animCurrentFrame + 1, @as(f32, @floatFromInt(anim.keyframeCount)));
         rl.updateModelAnimation(characterModel, anim, animCurrentFrame);
         //----------------------------------------------------------------------------------
 
@@ -120,8 +120,8 @@ pub fn main() anyerror!void {
                 for (0..BONE_SOCKETS) |i| {
                     if (!showEquip[i]) continue;
 
-                    const transform = &anim.framePoses[@intCast(animCurrentFrame)][boneSocketIndex[i]];
-                    const inRotation = characterModel.bindPose[boneSocketIndex[i]].rotation;
+                    const transform = &anim.keyframePoses[@as(usize, @intFromFloat(animCurrentFrame))][boneSocketIndex[i]];
+                    const inRotation = characterModel.skeleton.bindPose[boneSocketIndex[i]].rotation;
                     const outRotation = transform.rotation;
 
                     // Calculate socket rotation (angle between bone in initial pose and same bone in current animation frame)
