@@ -1819,6 +1819,7 @@ pub const KeyboardKey = enum(c_int) {
     //menu = 82,
     volume_up = 24,
     volume_down = 25,
+    _,
 };
 
 pub const MouseButton = enum(c_int) {
