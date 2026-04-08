@@ -87,7 +87,7 @@ pub extern "c" fn rlSetBlendFactorsSeparate(glSrcRGB: c_int, glDstRGB: c_int, gl
 pub extern "c" fn rlglInit(width: c_int, height: c_int) void;
 pub extern "c" fn rlglClose() void;
 pub extern "c" fn rlLoadExtensions(loader: *anyopaque) void;
-pub extern "c" fn rlGetProcAddress(procName: [*c]const u8) *anyopaque;
+pub extern "c" fn rlGetProcAddress(procName: [*c]const u8) ?*const anyopaque;
 pub extern "c" fn rlGetVersion() c_int;
 pub extern "c" fn rlSetFramebufferWidth(width: c_int) void;
 pub extern "c" fn rlGetFramebufferWidth() c_int;

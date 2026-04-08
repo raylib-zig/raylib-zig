@@ -247,6 +247,9 @@ def fix_pointer(name: str, t: str):
         t = "*anyopaque"
     elif len(pre) == 0:
         t = t.replace("const ", "")
+
+    if name == "rlGetProcAddress":
+        t = "?*const anyopaque"
     return name, t
 
 
