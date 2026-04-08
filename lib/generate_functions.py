@@ -133,6 +133,10 @@ def c_to_zig_type(c: str) -> str:
 def ziggify_type(name: str, t: str, func_name: str) -> str:
     if func_name in IGNORE_C_TYPE:
         return t
+
+    if func_name.endswith("Equals") and t == "c_int":
+        return "bool"
+
     NO_STRINGS = ["data", "fileData", "compData"]
 
     single = [
@@ -218,6 +222,8 @@ def make_return_cast(func_name: str, source_type: str, dest_type: str, inner: st
         inner = f"@as([*][:0]{source_type[8:]}, @ptrCast({inner}))"
     if func_name in TRIVIAL_SIZE:
         return f"{inner}[0..@as(usize, @intCast(_len))]"
+    if func_name.endswith("Equals"):
+        return f"{inner} == 1"
     if source_type in ["[*c]const u8", "[*c]u8"]:
         return f"std.mem.span({inner})"
 
