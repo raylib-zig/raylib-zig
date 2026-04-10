@@ -19,23 +19,30 @@ pub fn main() anyerror!void {
     // -------------------------------------------------------------------------
 
     // Possible window flags
-    // flag_vsync_hint
-    // flag_fullscreen_mode    -> not working properly -> wrong scaling!
-    // flag_window_resizable
-    // flag_window_undecorated
-    // flag_window_transparent
-    // flag_window_hidden
-    // flag_window_minimized   -> Not supported on window creation
-    // flag_window_maximized   -> Not supported on window creation
-    // flag_window_unfocused
-    // flag_window_topmost
-    // flag_window_highdpi     -> errors after minimize-resize, fb size is recalculated
-    // flag_window_always_run
-    // flag_msaa_4x_hint
+    // fullscreen_mode  -> not working properly -> wrong scaling!
+    // window_resizable 
+    // window_undecorated 
+    // window_transparent 
+    // msaa_4x_hint 
+    // vsync_hint 
+    // window_hidden 
+    // window_always_run 
+    // window_minimized  -> Not supported on window creation
+    // window_maximized  -> Not supported on window creation
+    // window_unfocused 
+    // window_topmost 
+    // window_highdpi   -> errors after minimize-resize, fb size is recalculated
+    // window_mouse_passthrough 
+    // borderless_windowed_mode 
+    // interlaced_hint 
 
     // Set configuration flags for window creation
     // rl.setConfigFlags(
-    //     @enumFromInt(@intFromEnum(rl.ConfigFlags.flag_vsync_hint) | @intFromEnum(rl.ConfigFlags.flag_msaa_4x_hint) | @intFromEnum(rl.ConfigFlags.flag_window_highdpi)),
+    //    .{
+    //        .flag_vsync_hint = true,
+    //        .flag_msaa_4x_hint = true,
+    //        .flag_window_highdpi = true,
+    //    },
     // );
     rl.initWindow(
         screen_width,
