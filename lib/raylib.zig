@@ -199,7 +199,7 @@ pub const Vector2 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(self: Vector2, q: Vector2) i32 {
+    pub fn equals(self: Vector2, q: Vector2) bool {
         return math.vector2Equals(self, q);
     }
 
@@ -416,7 +416,7 @@ pub const Vector3 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(p: Vector3, q: Vector3) i32 {
+    pub fn equals(p: Vector3, q: Vector3) bool {
         return math.vector3Equals(p, q);
     }
 
@@ -550,7 +550,7 @@ pub const Vector4 = extern struct {
     }
 
     /// Check whether two given quaternions are almost equal
-    pub fn equals(p: Vector4, q: Vector4) i32 {
+    pub fn equals(p: Vector4, q: Vector4) bool {
         return math.vector4Equals(p, q);
     }
 };
@@ -634,7 +634,7 @@ pub const Quaternion = extern struct {
     }
 
     /// Check whether two given quaternions are almost equal
-    pub fn equals(p: Quaternion, q: Quaternion) i32 {
+    pub fn equals(p: Quaternion, q: Quaternion) bool {
         return math.quaternionEquals(p, q);
     }
 
