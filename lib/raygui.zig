@@ -519,8 +519,8 @@ pub fn checkBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) bool {
 
 /// Text Box control, updates input text
 /// Returns true on ENTER pressed (useful for data validation)
-pub fn textBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) bool {
-    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode)) > 0;
+pub fn textBox(bounds: Rectangle, text: [:0]u8, editMode: bool) bool {
+    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), editMode)) > 0;
 }
 
 /// Enable gui controls (global state)
