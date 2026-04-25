@@ -231,10 +231,10 @@ pub extern "c" fn DrawLineStrip(points: [*c]const rl.Vector2, pointCount: c_int,
 pub extern "c" fn DrawLineBezier(startPos: rl.Vector2, endPos: rl.Vector2, thick: f32, color: rl.Color) void;
 pub extern "c" fn DrawLineDashed(startPos: rl.Vector2, endPos: rl.Vector2, dashSize: c_int, spaceSize: c_int, color: rl.Color) void;
 pub extern "c" fn DrawCircle(centerX: c_int, centerY: c_int, radius: f32, color: rl.Color) void;
+pub extern "c" fn DrawCircleV(center: rl.Vector2, radius: f32, color: rl.Color) void;
+pub extern "c" fn DrawCircleGradient(center: rl.Vector2, radius: f32, inner: rl.Color, outer: rl.Color) void;
 pub extern "c" fn DrawCircleSector(center: rl.Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: c_int, color: rl.Color) void;
 pub extern "c" fn DrawCircleSectorLines(center: rl.Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: c_int, color: rl.Color) void;
-pub extern "c" fn DrawCircleGradient(centerX: c_int, centerY: c_int, radius: f32, inner: rl.Color, outer: rl.Color) void;
-pub extern "c" fn DrawCircleV(center: rl.Vector2, radius: f32, color: rl.Color) void;
 pub extern "c" fn DrawCircleLines(centerX: c_int, centerY: c_int, radius: f32, color: rl.Color) void;
 pub extern "c" fn DrawCircleLinesV(center: rl.Vector2, radius: f32, color: rl.Color) void;
 pub extern "c" fn DrawEllipse(centerX: c_int, centerY: c_int, radiusH: f32, radiusV: f32, color: rl.Color) void;

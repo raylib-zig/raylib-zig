@@ -3801,6 +3801,16 @@ pub fn drawCircle(centerX: i32, centerY: i32, radius: f32, color: Color) void {
     cdef.DrawCircle(@as(c_int, centerX), @as(c_int, centerY), radius, color);
 }
 
+/// Draw a color-filled circle (Vector version)
+pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
+    cdef.DrawCircleV(center, radius, color);
+}
+
+/// Draw a gradient-filled circle
+pub fn drawCircleGradient(center: Vector2, radius: f32, inner: Color, outer: Color) void {
+    cdef.DrawCircleGradient(center, radius, inner, outer);
+}
+
 /// Draw a piece of a circle
 pub fn drawCircleSector(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
     cdef.DrawCircleSector(center, radius, startAngle, endAngle, @as(c_int, segments), color);
@@ -3809,16 +3819,6 @@ pub fn drawCircleSector(center: Vector2, radius: f32, startAngle: f32, endAngle:
 /// Draw circle sector outline
 pub fn drawCircleSectorLines(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
     cdef.DrawCircleSectorLines(center, radius, startAngle, endAngle, @as(c_int, segments), color);
-}
-
-/// Draw a gradient-filled circle
-pub fn drawCircleGradient(centerX: i32, centerY: i32, radius: f32, inner: Color, outer: Color) void {
-    cdef.DrawCircleGradient(@as(c_int, centerX), @as(c_int, centerY), radius, inner, outer);
-}
-
-/// Draw a color-filled circle (Vector version)
-pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
-    cdef.DrawCircleV(center, radius, color);
 }
 
 /// Draw circle outline

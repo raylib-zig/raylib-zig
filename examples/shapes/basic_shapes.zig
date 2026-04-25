@@ -32,7 +32,7 @@ pub fn main() anyerror!void {
 
         // Circle shapes and lines
         rl.drawCircle(screenWidth / 5, 120, 35, .dark_blue);
-        rl.drawCircleGradient(screenWidth / 5, 220, 60, .green, .sky_blue);
+        rl.drawCircleGradient(rl.Vector2.init(screenWidth / 5, 220), 60, .green, .sky_blue);
         rl.drawCircleLines(screenWidth / 5, 340, 80, .dark_blue);
 
         // Rectangle shapes and lines

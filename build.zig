@@ -16,38 +16,6 @@ const Program = struct {
     desc: []const u8,
 };
 
-fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode, options: Options) *std.Build.Step.Compile {
-    const raylib_dep = b.dependency("raylib", .{
-        .target = target,
-        .optimize = optimize,
-        .raudio = options.raudio,
-        .rmodels = options.rmodels,
-        .rshapes = options.rshapes,
-        .rtext = options.rtext,
-        .rtextures = options.rtextures,
-        .platform = options.platform,
-        .linkage = options.linkage,
-        .linux_display_backend = options.linux_display_backend,
-        .opengl_version = options.opengl_version,
-        .android_api_version = options.android_api_version,
-        .android_ndk = options.android_ndk,
-        .config = options.config,
-    });
-
-    const raylib = raylib_dep.artifact("raylib");
-
-    const raygui_dep = b.dependency("raygui", .{
-        .target = target,
-        .optimize = optimize,
-        .link_libc = true,
-    });
-
-    rl.addRaygui(b, raylib, raygui_dep, options);
-
-    b.installArtifact(raylib);
-    return raylib;
-}
-
 fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
     if (b.modules.contains("raylib")) {
         return b.modules.get("raylib").?;
@@ -77,7 +45,29 @@ pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const raylib_artifact = this.getRaylib(b, target, optimize, Options.getOptions(b));
+    const options = Options.getOptions(b);
+    const raylib_dep = b.dependency("raylib", .{
+        .target = target,
+        .optimize = optimize,
+        .raudio = options.raudio,
+        .rmodels = options.rmodels,
+        .rshapes = options.rshapes,
+        .rtext = options.rtext,
+        .rtextures = options.rtextures,
+        .platform = options.platform,
+        .linkage = options.linkage,
+        .linux_display_backend = options.linux_display_backend,
+        .opengl_version = options.opengl_version,
+        .android_api_version = options.android_api_version,
+        .android_ndk = options.android_ndk,
+        .config = options.config,
+        .raygui = true,
+    });
+
+    const raylib_artifact = raylib_dep.artifact("raylib");
+
+    b.installArtifact(raylib_artifact);
+
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
 
@@ -456,7 +446,7 @@ pub fn build(b: *std.Build) !void {
                 .optimize = optimize,
                 .flags = emcc_flags,
                 .settings = emcc_settings,
-                .shell_file_path = emsdk.shell(b),
+                .shell_file_path = emsdk.shell(raylib_dep),
                 .install_dir = install_dir,
                 .embed_paths = &.{.{ .src_path = "resources/" }},
             });
