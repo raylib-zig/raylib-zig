@@ -17,7 +17,7 @@ approach was abandoned.
 
 ## Updates to the binding files
 
-raylib-zig is built mostly through the `generate_functions.py` script. It creates the definitions to access the raw C
+raylib-zig is built mostly through the `generate_code.zig` script. It creates the definitions to access the raw C
 functions, and creates aliases with proper Zig argument and return types, Zig style names and errors. The raylib types,
 however, are created manually and should only be updated in their respective preludes:
  - `lib/preludes/raylib-prelude.zig` for raylib types
@@ -25,7 +25,7 @@ however, are created manually and should only be updated in their respective pre
  - `lib/preludes/rlgl-prelude.zig` for rlgl types
  - `lib/preludes/raygui-prelude.zig` for raygui types
 
-Before any commit you make, you should always run `generate_functions.py` to ensure your changes are persistent
+Before any commit you make, you should always run `zig build code` to ensure your changes are persistent
 throughout other updates.
 
 ## Updates to the build files
