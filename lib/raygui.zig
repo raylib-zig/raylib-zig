@@ -457,11 +457,11 @@ pub fn getStyle(control: Control, comptime property: Property) i32 {
 }
 
 /// Get raygui icons data pointer
-pub fn getIcons() RayguiError![]u32 {
+pub fn getIcons() error{GetIcons}![]u32 {
     var res: []u32 = undefined;
 
     const ptr = cdef.GuiGetIcons();
-    if (ptr == 0) return RayguiError.GetIcons;
+    if (ptr == 0) return error.GetIcons;
 
     res.ptr = @as([*]u32, @ptrCast(ptr));
     res.len = @as(usize, @intCast(256 * 256)); // RAYGUI_ICON_MAX_ICONS * RAYGUI_ICON_MAX_ICONS

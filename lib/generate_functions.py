@@ -187,7 +187,7 @@ def ziggify_type(name: str, t: str, func_name: str) -> str:
 
     error = ""
     if name in HAS_ERROR:
-        error = "RaylibError!"
+        error = f"error{{{name}}}!"
 
     return error + pre + t
 
@@ -459,7 +459,7 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
         inner = f"cdef.{func_name}({zig_call_args})"
 
         if func_name in TRIVIAL_SIZE:
-            func_prelude += f"const _ptr = {inner};\n    if (_ptr == 0) return RaylibError.{func_name};\n    "
+            func_prelude += f"const _ptr = {inner};\n    if (_ptr == 0) return error.{func_name};\n    "
             inner = "_ptr"
 
         zig_return = ziggify_type(func_name, return_type, func_name)
