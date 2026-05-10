@@ -11,7 +11,10 @@ pub const math = @import("raymath.zig");
 const C = std.builtin.CallingConvention.c;
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
+    std.testing.refAllDecls(gl);
+    std.testing.refAllDecls(math);
 }
 
 pub const RaylibError = error{
@@ -51,14 +54,18 @@ pub const Vector2 = extern struct {
         return Vector2{ .x = x, .y = y };
     }
 
+    pub fn initVec(vec: @Vector(2, f32)) Vector2 {
+        return Vector2{ .x = vec[0], .y = vec[1] };
+    }
+
     /// Vector with components value 0.0
     pub fn zero() Vector2 {
-        return math.vector2Zero();
+        return Vector2{ .x = 0.0, .y = 0.0 };
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector2 {
-        return math.vector2One();
+        return Vector2{ .x = 1.0, .y = 1.0 };
     }
 
     /// Add two vectors (v1 + v2)
@@ -192,7 +199,7 @@ pub const Vector2 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(self: Vector2, q: Vector2) i32 {
+    pub fn equals(self: Vector2, q: Vector2) bool {
         return math.vector2Equals(self, q);
     }
 
@@ -215,14 +222,18 @@ pub const Vector3 = extern struct {
         return Vector3{ .x = x, .y = y, .z = z };
     }
 
+    pub fn initVec(vec: @Vector(3, f32)) Vector3 {
+        return Vector3{ .x = vec[0], .y = vec[1], .z = vec[2] };
+    }
+
     // Vector with components value 0.0
     pub fn zero() Vector3 {
-        return math.vector3Zero();
+        return Vector3{ .x = 0.0, .y = 0.0, .z = 0.0};
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector3 {
-        return math.vector3One();
+        return Vector3{ .x = 1.0, .y = 1.0, .z = 1.0};
     }
 
     /// Add two vectors
@@ -405,7 +416,7 @@ pub const Vector3 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(p: Vector3, q: Vector3) i32 {
+    pub fn equals(p: Vector3, q: Vector3) bool {
         return math.vector3Equals(p, q);
     }
 
@@ -429,14 +440,18 @@ pub const Vector4 = extern struct {
         return Vector4{ .x = x, .y = y, .z = z, .w = w };
     }
 
+    pub fn initVec(vec: @Vector(4, f32)) Vector4 {
+        return Vector4{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
+    }
+
     /// Vector with components value 0.0
     pub fn zero() Vector4 {
-        return math.vector4Zero();
+        return Vector4{.x = 0.0, .y = 0.0, .z = 0.0, .w = 0.0};
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector4 {
-        return math.vector4One();
+        return Vector4{.x = 1.0, .y = 1.0, .z = 1.0, .w = 1.0};
     }
 
     /// Add two vectors
@@ -535,13 +550,92 @@ pub const Vector4 = extern struct {
     }
 
     /// Check whether two given quaternions are almost equal
-    pub fn equals(p: Vector4, q: Vector4) i32 {
+    pub fn equals(p: Vector4, q: Vector4) bool {
         return math.vector4Equals(p, q);
+    }
+};
+
+pub const Quaternion = extern struct {
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32,
+
+    pub fn init(x: f32, y: f32, z: f32, w: f32) Quaternion {
+        return Quaternion{ .x = x, .y = y, .z = z, .w = w };
+    }
+
+    pub fn initVec(vec: @Vector(4, f32)) Quaternion {
+        return Quaternion{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
+    }
+
+    pub fn initVector4(vec: Vector4) Quaternion {
+        return Quaternion{ .x = vec.x, .y = vec.y, .z = vec.z, .w = vec.w };
     }
 
     /// Get identity quaternion
     pub fn identity() Quaternion {
         return math.quaternionIdentity();
+    }
+
+    /// Add two quaternions
+    pub fn add(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionAdd(self, q);
+    }
+
+    /// Add quaternion and float value
+    pub fn addValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionAddValue(self, add_);
+    }
+
+    /// Subtract two quaternions
+    pub fn subtract(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionSubtract(self, q);
+    }
+
+    /// Subtract quaternion and float value
+    pub fn subtractValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionSubtractValue(self, add_);
+    }
+
+    /// Computes the length of a quaternion
+    pub fn length(self: Quaternion) f32 {
+        return math.quaternionLength(self);
+    }
+
+    /// Scale quaternion by float value
+    pub fn scale(self: Quaternion, scale_: f32) Quaternion {
+        return math.quaternionScale(self, scale_);
+    }
+
+    /// Multiply quaternion by quaternion
+    pub fn multiply(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionMultiply(self, q);
+    }
+
+    /// Divide two quaternions
+    pub fn divide(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionDivide(self, q);
+    }
+
+    /// Normalize quaternion
+    pub fn normalize(self: Quaternion) Quaternion {
+        return math.quaternionNormalize(self);
+    }
+
+    /// Calculate linear interpolation between two quaternions
+    pub fn lerp(self: Quaternion, q: Quaternion, amount: f32) Quaternion {
+        return math.quaternionLerp(self, q, amount);
+    }
+
+    /// Invert provided quaternion
+    pub fn invert(self: Quaternion) Quaternion {
+        return math.quaternionInvert(self);
+    }
+
+    /// Check whether two given quaternions are almost equal
+    pub fn equals(p: Quaternion, q: Quaternion) bool {
+        return math.quaternionEquals(p, q);
     }
 
     /// Calculate slerp-optimized interpolation between two quaternions
@@ -603,7 +697,6 @@ pub const Vector4 = extern struct {
         return math.quaternionTransform(self, mat);
     }
 };
-pub const Quaternion = Vector4;
 
 pub const Matrix = extern struct {
     m0: f32,
@@ -1389,6 +1482,8 @@ pub const Camera2D = extern struct {
 pub const Mesh = extern struct {
     vertexCount: c_int,
     triangleCount: c_int,
+
+    // Vertex attributes data
     vertices: [*c]f32,
     texcoords: [*c]f32,
     texcoords2: [*c]f32,
@@ -1396,12 +1491,18 @@ pub const Mesh = extern struct {
     tangents: [*c]f32,
     colors: [*c]u8,
     indices: [*c]c_ushort,
+
+    // Skin data for animation
+    boneCount: c_int,
+    boneIndices: [*c]u16,
+    boneWeights: [*c]f32,
+
+    // Runtime animation vertex data (CPU skinning)
+    // NOTE: In case of GPU skinning, not used, pointers are NULL
     animVertices: [*c]f32,
     animNormals: [*c]f32,
-    boneIds: [*c]u8,
-    boneWeights: [*c]f32,
-    boneMatrices: [*c]Matrix,
-    boneCount: c_int,
+
+    // OpenGL identifiers
     vaoId: c_int,
     vboId: [*c]c_int,
 
@@ -1464,9 +1565,17 @@ pub const Transform = extern struct {
     scale: Vector3,
 };
 
+pub const ModelAnimPose = [*c]Transform;
+
 pub const BoneInfo = extern struct {
     name: [32]u8,
     parent: c_int,
+};
+
+pub const ModelSkeleton = extern struct {
+    boneCount: c_int,
+    bones: [*c]BoneInfo,
+    bindPose: ModelAnimPose
 };
 
 pub const Model = extern struct {
@@ -1476,9 +1585,11 @@ pub const Model = extern struct {
     meshes: [*c]Mesh,
     materials: [*c]Material,
     meshMaterial: [*c]c_int,
-    boneCount: c_int,
-    bones: [*c]BoneInfo,
-    bindPose: [*c]Transform,
+
+    // Animation data
+    skeleton: ModelSkeleton,
+    currentPose: ModelAnimPose,
+    boneMatrices: [*c]Matrix,
 
     /// Load model from file (meshes and materials)
     pub fn init(fileName: [:0]const u8) RaylibError!Model {
@@ -1517,11 +1628,11 @@ pub const Model = extern struct {
 };
 
 pub const ModelAnimation = extern struct {
-    boneCount: c_int,
-    frameCount: c_int,
-    bones: [*c]BoneInfo,
-    framePoses: [*c][*c]Transform,
     name: [32]u8,
+
+    boneCount: c_int,
+    keyframeCount: c_int,
+    keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
@@ -1628,7 +1739,6 @@ pub const VrStereoConfig = extern struct {
 };
 
 pub const FilePathList = extern struct {
-    capacity: c_uint,
     count: c_uint,
     paths: [*c][*c]u8,
 };
@@ -1650,7 +1760,7 @@ pub const AutomationEventList = extern struct {
     }
 };
 
-pub const ConfigFlags = packed struct {
+pub const ConfigFlags = packed struct(u32) {
     __reserved: bool = false,
     fullscreen_mode: bool = false,
     window_resizable: bool = false,
@@ -1807,6 +1917,7 @@ pub const KeyboardKey = enum(c_int) {
     //menu = 82,
     volume_up = 24,
     volume_down = 25,
+    _,
 };
 
 pub const MouseButton = enum(c_int) {
@@ -1877,7 +1988,39 @@ pub const MaterialMapIndex = enum(c_int) {
     brdf = 10,
 };
 
-pub const ShaderLocationIndex = enum(c_int) { vertex_position = 0, vertex_texcoord01 = 1, vertex_texcoord02 = 2, vertex_normal = 3, vertex_tangent = 4, vertex_color = 5, matrix_mvp = 6, matrix_view = 7, matrix_projection = 8, matrix_model = 9, matrix_normal = 10, vector_view = 11, color_diffuse = 12, color_specular = 13, color_ambient = 14, map_albedo = 15, map_metalness = 16, map_normal = 17, map_roughness = 18, map_occlusion = 19, map_emission = 20, map_height = 21, map_cubemap = 22, map_irradiance = 23, map_prefilter = 24, map_brdf = 25, vertex_boneids = 26, vertex_boneweights = 27, bone_matrices = 28, shader_loc_vertex_instance_tx };
+pub const ShaderLocationIndex = enum(c_int) {
+    vertex_position = 0,
+    vertex_texcoord01 = 1,
+    vertex_texcoord02 = 2,
+    vertex_normal = 3,
+    vertex_tangent = 4,
+    vertex_color = 5,
+    matrix_mvp = 6,
+    matrix_view = 7,
+    matrix_projection = 8,
+    matrix_model = 9,
+    matrix_normal = 10,
+    vector_view = 11,
+    color_diffuse = 12,
+    color_specular = 13,
+    color_ambient = 14,
+    map_albedo = 15,
+    map_metalness = 16,
+    map_normal = 17,
+    map_roughness = 18,
+    map_occlusion = 19,
+    map_emission = 20,
+    map_height = 21,
+    map_cubemap = 22,
+    map_irradiance = 23,
+    map_prefilter = 24,
+    map_brdf = 25,
+    vertex_boneids = 26,
+    vertex_boneweights = 27,
+    matrix_bonetransforms = 28,
+    matrix_instancetransforms = 29,
+    //
+};
 
 pub const ShaderUniformDataType = enum(c_int) {
     float = 0,
@@ -1966,18 +2109,23 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = enum(c_int) {
-    none = 0,
-    tap = 1,
-    doubletap = 2,
-    hold = 4,
-    drag = 8,
-    swipe_right = 16,
-    swipe_left = 32,
-    swipe_up = 64,
-    swipe_down = 128,
-    pinch_in = 256,
-    pinch_out = 512,
+pub const Gesture = packed struct(u16) {
+    tap: bool = false,
+    doubletap: bool = false,
+    hold: bool = false,
+    drag: bool = false,
+    swipe_right: bool = false,
+    swipe_left: bool = false,
+    swipe_up: bool = false,
+    swipe_down: bool = false,
+    pinch_in: bool = false,
+    pinch_out: bool = false,
+    __reserved1: bool = false,
+    __reserved2: bool = false,
+    __reserved3: bool = false,
+    __reserved4: bool = false,
+    __reserved5: bool = false,
+    __reserved6: bool = false,
 };
 
 pub const CameraMode = enum(c_int) {
@@ -2087,6 +2235,11 @@ pub fn computeMD5(data: []u8) [4]u32 {
 pub fn computeSHA1(data: []u8) [5]u32 {
     const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
+}
+
+pub fn computeSHA256(data: []u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+    return res[0..8].*;
 }
 
 /// Load image from file into CPU memory (RAM)
@@ -2250,19 +2403,19 @@ pub fn loadFontFromImage(image: Image, key: Color, firstChar: i32) RaylibError!F
 }
 
 /// Load font data for further use
-pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]i32, ty: FontType) RaylibError![]GlyphInfo {
+pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]const i32, ty: FontType) RaylibError![]GlyphInfo {
     var res: []GlyphInfo = undefined;
 
-    var codePointsFinal = @as([*c]i32, 0);
+    var codePointsFinal = @as([*c]const i32, 0);
     var codePointsLen: i32 = 0;
     if (codePoints) |codePointsSure| {
-        codePointsFinal = @as([*c]i32, @ptrCast(codePointsSure));
+        codePointsFinal = @as([*c]const i32, @ptrCast(codePointsSure));
         codePointsLen = @as(i32, @intCast(codePointsSure.len));
     } else {
         codePointsLen = 95;
     }
 
-    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty);
+    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty, @as([*c]i32, &codePointsLen));
     if (ptr == 0) return RaylibError.LoadFontData;
 
     res.ptr = @as([*]GlyphInfo, @ptrCast(ptr));
@@ -2497,6 +2650,10 @@ pub fn loadTextLines(text: [:0]const u8) RaylibError![][:0]u8 {
     res.len = @as(usize, @intCast(lineCount));
 
     return res;
+}
+
+pub fn unloadTextLines(lines: [][:0]u8) void {
+    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(lines)), @as(c_int, @intCast(lines.len)));
 }
 
 /// Join text strings with delimiter

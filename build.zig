@@ -16,7 +16,36 @@ const Program = struct {
     desc: []const u8,
 };
 
-fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode, options: Options) *std.Build.Step.Compile {
+fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
+    if (b.modules.contains("raylib")) {
+        return b.modules.get("raylib").?;
+    }
+    return b.addModule("raylib", .{
+        .root_source_file = b.path("lib/raylib.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+}
+
+const gui = struct {
+    fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
+        const raylib = this.getModule(b, target, optimize);
+        return b.addModule("raygui", .{
+            .root_source_file = b.path("lib/raygui.zig"),
+            .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+    }
+};
+
+pub fn build(b: *std.Build) !void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const options = Options.getOptions(b);
     const raylib_dep = b.dependency("raylib", .{
         .target = target,
         .optimize = optimize,
@@ -31,51 +60,18 @@ fn getRaylib(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         .opengl_version = options.opengl_version,
         .android_api_version = options.android_api_version,
         .android_ndk = options.android_ndk,
+        .config = options.config,
+        .raygui = true,
     });
 
-    const raylib = raylib_dep.artifact("raylib");
+    const raylib_artifact = raylib_dep.artifact("raylib");
 
-    const raygui_dep = b.dependency("raygui", .{
-        .target = target,
-        .optimize = optimize,
-    });
+    b.installArtifact(raylib_artifact);
 
-    rl.addRaygui(b, raylib, raygui_dep, options);
-
-    b.installArtifact(raylib);
-    return raylib;
-}
-
-fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
-    if (b.modules.contains("raylib")) {
-        return b.modules.get("raylib").?;
-    }
-    return b.addModule("raylib", .{
-        .root_source_file = b.path("lib/raylib.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-}
-
-const gui = struct {
-    fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
-        const raylib = this.getModule(b, target, optimize);
-        return b.addModule("raygui", .{
-            .root_source_file = b.path("lib/raygui.zig"),
-            .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
-            .target = target,
-            .optimize = optimize,
-        });
-    }
-};
-
-pub fn build(b: *std.Build) !void {
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
-
-    const raylib_artifact = this.getRaylib(b, target, optimize, Options.getOptions(b));
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
+
+    raylib.linkLibrary(raylib_artifact);
 
     const examples = [_]Program{
         .{
@@ -107,6 +103,16 @@ pub fn build(b: *std.Build) !void {
             .name = "basic_window",
             .path = "examples/core/basic_window.zig",
             .desc = "Creates a basic window with text",
+        },
+        .{
+            .name = "delta_time",
+            .path = "examples/core/delta_time.zig",
+            .desc = "Show how to use frame time (delta time)",
+        },
+        .{
+            .name = "core_monitor_change",
+            .path = "examples/core/core_monitor_change.zig",
+            .desc = "Simple Monitor Manager",
         },
         .{
             .name = "basic_window_web",
@@ -179,9 +185,19 @@ pub fn build(b: *std.Build) !void {
             .desc = "Demonstrates showing and hiding a message box",
         },
         .{
+            .name = "floating_window",
+            .path = "examples/gui/floating_window.zig",
+            .desc = "Demonstrates a floating window",
+        },
+        .{
             .name = "raymarching",
             .path = "examples/shaders/raymarching.zig",
             .desc = "Uses a raymarching in a shader to render shapes",
+        },
+        .{
+            .name = "shaders_ascii_rendering",
+            .path = "examples/shaders/shaders_ascii_rendering.zig",
+            .desc = "Post-processing to render in ASCII",
         },
         .{
             .name = "shaders_basic_pbr",
@@ -473,11 +489,30 @@ pub fn build(b: *std.Build) !void {
             .path = "examples/text/writing_anim.zig",
             .desc = "Simple text animation",
         },
-
+        .{
+            .name = "textures_image_loading",
+            .path = "examples/textures/textures_image_loading.zig",
+            .desc = "Image loading and texture creation",
+        },
         .{
             .name = "models_heightmap",
             .path = "examples/models/models_heightmap.zig",
             .desc = "Heightmap loading and drawing",
+        },
+        .{
+            .name = "models_bone_socket",
+            .path = "examples/models/models_bone_socket.zig",
+            .desc = "Bone socket",
+        },
+        .{
+            .name = "models_box_collisions",
+            .path = "examples/models/models_box_collisions.zig",
+            .desc = "Box collisions",
+        },
+        .{
+            .name = "models_rlgl_solar_system",
+            .path = "examples/models/models_rlgl_solar_system.zig",
+            .desc = "Solar System",
         },
         // .{
         //     .name = "shaders_basic_lighting",
@@ -489,13 +524,13 @@ pub fn build(b: *std.Build) !void {
     const raylib_test = b.addTest(.{
         .root_module = raylib,
     });
-    raylib_test.linkLibC();
+    raylib_test.root_module.link_libc = true;
 
     const raygui_test = b.addTest(.{
         .root_module = raygui,
     });
     raygui_test.root_module.addImport("raylib-zig", raylib);
-    raygui_test.linkLibC();
+    raygui_test.root_module.link_libc = true;
 
     const test_step = b.step("test", "Check for library compilation errors");
     test_step.dependOn(&raylib_test.step);
@@ -517,7 +552,6 @@ pub fn build(b: *std.Build) !void {
             });
             wasm.root_module.addImport("raylib", raylib);
             wasm.root_module.addImport("raygui", raygui);
-            wasm.linkLibrary(raylib_artifact);
 
             const install_dir: std.Build.InstallDir = .{ .custom = "web" };
             const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
@@ -532,7 +566,7 @@ pub fn build(b: *std.Build) !void {
                 .optimize = optimize,
                 .flags = emcc_flags,
                 .settings = emcc_settings,
-                .shell_file_path = emsdk.shell(b),
+                .shell_file_path = emsdk.shell(raylib_dep),
                 .install_dir = install_dir,
                 .embed_paths = &.{.{ .src_path = "resources/" }},
             });
@@ -553,7 +587,6 @@ pub fn build(b: *std.Build) !void {
                 .name = ex.name,
                 .root_module = mod,
             });
-            exe.linkLibrary(raylib_artifact);
             exe.root_module.addImport("raylib", raylib);
             exe.root_module.addImport("raygui", raygui);
 

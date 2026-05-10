@@ -119,8 +119,8 @@ pub fn main() anyerror!void {
 
     // Set the text (using markdown!)
     var text = [_:0]u8{0} ** 64;
-    var fbs = std.io.fixedBufferStream(text[0..]);
-    _ = try fbs.write("Hello ~~World~~ In 3D!");
+    var fw = std.Io.Writer.fixed(text[0..]);
+    _ = try fw.writeAll("Hello ~~World~~ In 3D!");
 
     rl.disableCursor(); // Limit cursor to relative movement inside the window
     rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second

@@ -6,7 +6,8 @@ const std = @import("std");
 pub const cdef = @import("raymath-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
 }
 
 const Matrix = rl.Matrix;
@@ -43,8 +44,8 @@ pub fn wrap(value: f32, min: f32, max: f32) f32 {
     return cdef.Wrap(value, min, max);
 }
 
-pub fn floatEquals(x: f32, y: f32) i32 {
-    return @as(i32, cdef.FloatEquals(x, y));
+pub fn floatEquals(x: f32, y: f32) bool {
+    return cdef.FloatEquals(x, y) == 1;
 }
 
 pub fn vector2Zero() Vector2 {
@@ -163,8 +164,8 @@ pub fn vector2ClampValue(v: Vector2, min: f32, max: f32) Vector2 {
     return cdef.Vector2ClampValue(v, min, max);
 }
 
-pub fn vector2Equals(p: Vector2, q: Vector2) i32 {
-    return @as(i32, cdef.Vector2Equals(p, q));
+pub fn vector2Equals(p: Vector2, q: Vector2) bool {
+    return cdef.Vector2Equals(p, q) == 1;
 }
 
 pub fn vector2Refract(v: Vector2, n: Vector2, r: f32) Vector2 {
@@ -319,8 +320,8 @@ pub fn vector3ClampValue(v: Vector3, min: f32, max: f32) Vector3 {
     return cdef.Vector3ClampValue(v, min, max);
 }
 
-pub fn vector3Equals(p: Vector3, q: Vector3) i32 {
-    return @as(i32, cdef.Vector3Equals(p, q));
+pub fn vector3Equals(p: Vector3, q: Vector3) bool {
+    return cdef.Vector3Equals(p, q) == 1;
 }
 
 pub fn vector3Refract(v: Vector3, n: Vector3, r: f32) Vector3 {
@@ -411,8 +412,8 @@ pub fn vector4Invert(v: Vector4) Vector4 {
     return cdef.Vector4Invert(v);
 }
 
-pub fn vector4Equals(p: Vector4, q: Vector4) i32 {
-    return @as(i32, cdef.Vector4Equals(p, q));
+pub fn vector4Equals(p: Vector4, q: Vector4) bool {
+    return cdef.Vector4Equals(p, q) == 1;
 }
 
 pub fn matrixDeterminant(mat: Matrix) f32 {
@@ -445,6 +446,10 @@ pub fn matrixSubtract(left: Matrix, right: Matrix) Matrix {
 
 pub fn matrixMultiply(left: Matrix, right: Matrix) Matrix {
     return cdef.MatrixMultiply(left, right);
+}
+
+pub fn matrixMultiplyValue(left: Matrix, value: f32) Matrix {
+    return cdef.MatrixMultiplyValue(left, value);
 }
 
 pub fn matrixTranslate(x: f32, y: f32, z: f32) Matrix {
@@ -591,8 +596,12 @@ pub fn quaternionTransform(q: Quaternion, mat: Matrix) Quaternion {
     return cdef.QuaternionTransform(q, mat);
 }
 
-pub fn quaternionEquals(p: Quaternion, q: Quaternion) i32 {
-    return @as(i32, cdef.QuaternionEquals(p, q));
+pub fn quaternionEquals(p: Quaternion, q: Quaternion) bool {
+    return cdef.QuaternionEquals(p, q) == 1;
+}
+
+pub fn matrixCompose(translation: Vector3, rotation: Quaternion, scale: Vector3) Matrix {
+    return cdef.MatrixCompose(translation, rotation, scale);
 }
 
 pub fn matrixDecompose(mat: Matrix, translation: *Vector3, rotation: *Quaternion, scale: *Vector3) void {

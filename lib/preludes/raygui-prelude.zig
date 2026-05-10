@@ -4,7 +4,9 @@ const std = @import("std");
 pub const cdef = @import("raygui-ext.zig");
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
+    std.testing.refAllDecls(rl);
 }
 
 pub const RayguiError = error{GetIcons};
@@ -93,9 +95,20 @@ pub const DefaultProperty = enum(c_int) {
     text_wrap_mode,
 };
 
-pub const ControlOrDefaultProperty = union(enum) {
+pub const Property = union(enum) {
     control: ControlProperty,
     default: DefaultProperty,
+    toggle: ToggleProperty,
+    slider: SliderProperty,
+    progressBar: ProgressBarProperty,
+    scrollBar: ScrollBarProperty,
+    checkBox: CheckBoxProperty,
+    comboBox: ComboBoxProperty,
+    dropdownBox: DropdownBoxProperty,
+    textBox: TextBoxProperty,
+    valueBox: ValueBoxProperty,
+    listView: ListViewProperty,
+    colorPicker: ColorPickerProperty,
 };
 
 pub const ToggleProperty = enum(c_int) {
@@ -109,6 +122,7 @@ pub const SliderProperty = enum(c_int) {
 
 pub const ProgressBarProperty = enum(c_int) {
     progress_padding = 16,
+    progress_side,
 };
 
 pub const ScrollBarProperty = enum(c_int) {
@@ -400,22 +414,22 @@ pub const IconName = enum(c_int) {
     slicing = 231,
     manual_control = 232,
     collision = 233,
-    icon_234 = 234,
-    icon_235 = 235,
-    icon_236 = 236,
-    icon_237 = 237,
-    icon_238 = 238,
-    icon_239 = 239,
-    icon_240 = 240,
-    icon_241 = 241,
-    icon_242 = 242,
-    icon_243 = 243,
-    icon_244 = 244,
-    icon_245 = 245,
-    icon_246 = 246,
-    icon_247 = 247,
-    icon_248 = 248,
-    icon_249 = 249,
+    circle_add = 234,
+    circle_add_fill = 235,
+    circle_warning = 236,
+    circle_warning_fill = 237,
+    box_more = 238,
+    box_more_fill = 239,
+    box_minus = 240,
+    box_minus_fill = 241,
+    union_ = 242,
+    intersection = 243,
+    difference = 244,
+    sphere = 245,
+    cylinder = 246,
+    cone = 247,
+    ellipsoid = 248,
+    capsule = 249,
     icon_250 = 250,
     icon_251 = 251,
     icon_252 = 252,
@@ -425,7 +439,7 @@ pub const IconName = enum(c_int) {
 };
 
 /// Set one style property
-pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, value: i32) void {
+pub fn setStyle(control: Control, comptime property: Property, value: i32) void {
     const property_int: c_int = switch (property) {
         inline else => |val| @intCast(@intFromEnum(val)),
     };
@@ -434,7 +448,7 @@ pub fn setStyle(control: Control, comptime property: ControlOrDefaultProperty, v
 }
 
 /// Get one style property
-pub fn getStyle(control: Control, comptime property: ControlOrDefaultProperty) i32 {
+pub fn getStyle(control: Control, comptime property: Property) i32 {
     const property_int: c_int = switch (property) {
         inline else => |val| @intCast(@intFromEnum(val)),
     };
@@ -461,13 +475,13 @@ pub fn loadIcons(fileName: [*c]const u8, loadIconsName: bool) [*c][*c]u8 {
 }
 
 /// Tab Bar control, returns TAB to be closed or -1
-pub fn tabBar(bounds: Rectangle, text: [][*:0]const u8, active: *i32) i32 {
-    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]const u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
+pub fn tabBar(bounds: Rectangle, text: [][*:0]u8, active: *i32) i32 {
+    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// List View with extended parameters
-pub fn listViewEx(bounds: Rectangle, text: [][*:0]const u8, scrollIndex: *i32, active: *i32, focus: *i32) i32 {
-    return @as(i32, cdef.GuiListViewEx(bounds, @as([*c][*c]const u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active)), @as([*c]c_int, @ptrCast(focus))));
+pub fn listViewEx(bounds: Rectangle, text: [][*:0]u8, scrollIndex: *i32, active: *i32, focus: *i32) i32 {
+    return @as(i32, cdef.GuiListViewEx(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active)), @as([*c]c_int, @ptrCast(focus))));
 }
 
 /// Panel control, useful to group controls
@@ -505,6 +519,6 @@ pub fn checkBox(bounds: Rectangle, text: [:0]const u8, checked: *bool) bool {
 
 /// Text Box control, updates input text
 /// Returns true on ENTER pressed (useful for data validation)
-pub fn textBox(bounds: Rectangle, text: [:0]u8, textSize: i32, editMode: bool) bool {
-    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), editMode)) > 0;
+pub fn textBox(bounds: Rectangle, text: [:0]u8, editMode: bool) bool {
+    return @as(i32, cdef.GuiTextBox(bounds, @as([*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)) + 1, editMode)) > 0;
 }

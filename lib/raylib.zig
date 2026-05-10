@@ -11,7 +11,10 @@ pub const math = @import("raymath.zig");
 const C = std.builtin.CallingConvention.c;
 
 test {
-    std.testing.refAllDeclsRecursive(@This());
+    std.testing.refAllDecls(@This());
+    std.testing.refAllDecls(cdef);
+    std.testing.refAllDecls(gl);
+    std.testing.refAllDecls(math);
 }
 
 pub const RaylibError = error{
@@ -51,14 +54,18 @@ pub const Vector2 = extern struct {
         return Vector2{ .x = x, .y = y };
     }
 
+    pub fn initVec(vec: @Vector(2, f32)) Vector2 {
+        return Vector2{ .x = vec[0], .y = vec[1] };
+    }
+
     /// Vector with components value 0.0
     pub fn zero() Vector2 {
-        return math.vector2Zero();
+        return Vector2{ .x = 0.0, .y = 0.0 };
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector2 {
-        return math.vector2One();
+        return Vector2{ .x = 1.0, .y = 1.0 };
     }
 
     /// Add two vectors (v1 + v2)
@@ -192,7 +199,7 @@ pub const Vector2 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(self: Vector2, q: Vector2) i32 {
+    pub fn equals(self: Vector2, q: Vector2) bool {
         return math.vector2Equals(self, q);
     }
 
@@ -215,14 +222,18 @@ pub const Vector3 = extern struct {
         return Vector3{ .x = x, .y = y, .z = z };
     }
 
+    pub fn initVec(vec: @Vector(3, f32)) Vector3 {
+        return Vector3{ .x = vec[0], .y = vec[1], .z = vec[2] };
+    }
+
     // Vector with components value 0.0
     pub fn zero() Vector3 {
-        return math.vector3Zero();
+        return Vector3{ .x = 0.0, .y = 0.0, .z = 0.0};
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector3 {
-        return math.vector3One();
+        return Vector3{ .x = 1.0, .y = 1.0, .z = 1.0};
     }
 
     /// Add two vectors
@@ -405,7 +416,7 @@ pub const Vector3 = extern struct {
     }
 
     /// Check whether two given vectors are almost equal
-    pub fn equals(p: Vector3, q: Vector3) i32 {
+    pub fn equals(p: Vector3, q: Vector3) bool {
         return math.vector3Equals(p, q);
     }
 
@@ -429,14 +440,18 @@ pub const Vector4 = extern struct {
         return Vector4{ .x = x, .y = y, .z = z, .w = w };
     }
 
+    pub fn initVec(vec: @Vector(4, f32)) Vector4 {
+        return Vector4{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
+    }
+
     /// Vector with components value 0.0
     pub fn zero() Vector4 {
-        return math.vector4Zero();
+        return Vector4{.x = 0.0, .y = 0.0, .z = 0.0, .w = 0.0};
     }
 
     /// Vector with components value 1.0
     pub fn one() Vector4 {
-        return math.vector4One();
+        return Vector4{.x = 1.0, .y = 1.0, .z = 1.0, .w = 1.0};
     }
 
     /// Add two vectors
@@ -535,13 +550,92 @@ pub const Vector4 = extern struct {
     }
 
     /// Check whether two given quaternions are almost equal
-    pub fn equals(p: Vector4, q: Vector4) i32 {
+    pub fn equals(p: Vector4, q: Vector4) bool {
         return math.vector4Equals(p, q);
+    }
+};
+
+pub const Quaternion = extern struct {
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32,
+
+    pub fn init(x: f32, y: f32, z: f32, w: f32) Quaternion {
+        return Quaternion{ .x = x, .y = y, .z = z, .w = w };
+    }
+
+    pub fn initVec(vec: @Vector(4, f32)) Quaternion {
+        return Quaternion{ .x = vec[0], .y = vec[1], .z = vec[2], .w = vec[2] };
+    }
+
+    pub fn initVector4(vec: Vector4) Quaternion {
+        return Quaternion{ .x = vec.x, .y = vec.y, .z = vec.z, .w = vec.w };
     }
 
     /// Get identity quaternion
     pub fn identity() Quaternion {
         return math.quaternionIdentity();
+    }
+
+    /// Add two quaternions
+    pub fn add(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionAdd(self, q);
+    }
+
+    /// Add quaternion and float value
+    pub fn addValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionAddValue(self, add_);
+    }
+
+    /// Subtract two quaternions
+    pub fn subtract(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionSubtract(self, q);
+    }
+
+    /// Subtract quaternion and float value
+    pub fn subtractValue(self: Quaternion, add_: f32) Quaternion {
+        return math.quaternionSubtractValue(self, add_);
+    }
+
+    /// Computes the length of a quaternion
+    pub fn length(self: Quaternion) f32 {
+        return math.quaternionLength(self);
+    }
+
+    /// Scale quaternion by float value
+    pub fn scale(self: Quaternion, scale_: f32) Quaternion {
+        return math.quaternionScale(self, scale_);
+    }
+
+    /// Multiply quaternion by quaternion
+    pub fn multiply(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionMultiply(self, q);
+    }
+
+    /// Divide two quaternions
+    pub fn divide(self: Quaternion, q: Quaternion) Quaternion {
+        return math.quaternionDivide(self, q);
+    }
+
+    /// Normalize quaternion
+    pub fn normalize(self: Quaternion) Quaternion {
+        return math.quaternionNormalize(self);
+    }
+
+    /// Calculate linear interpolation between two quaternions
+    pub fn lerp(self: Quaternion, q: Quaternion, amount: f32) Quaternion {
+        return math.quaternionLerp(self, q, amount);
+    }
+
+    /// Invert provided quaternion
+    pub fn invert(self: Quaternion) Quaternion {
+        return math.quaternionInvert(self);
+    }
+
+    /// Check whether two given quaternions are almost equal
+    pub fn equals(p: Quaternion, q: Quaternion) bool {
+        return math.quaternionEquals(p, q);
     }
 
     /// Calculate slerp-optimized interpolation between two quaternions
@@ -603,7 +697,6 @@ pub const Vector4 = extern struct {
         return math.quaternionTransform(self, mat);
     }
 };
-pub const Quaternion = Vector4;
 
 pub const Matrix = extern struct {
     m0: f32,
@@ -1389,6 +1482,8 @@ pub const Camera2D = extern struct {
 pub const Mesh = extern struct {
     vertexCount: c_int,
     triangleCount: c_int,
+
+    // Vertex attributes data
     vertices: [*c]f32,
     texcoords: [*c]f32,
     texcoords2: [*c]f32,
@@ -1396,12 +1491,18 @@ pub const Mesh = extern struct {
     tangents: [*c]f32,
     colors: [*c]u8,
     indices: [*c]c_ushort,
+
+    // Skin data for animation
+    boneCount: c_int,
+    boneIndices: [*c]u16,
+    boneWeights: [*c]f32,
+
+    // Runtime animation vertex data (CPU skinning)
+    // NOTE: In case of GPU skinning, not used, pointers are NULL
     animVertices: [*c]f32,
     animNormals: [*c]f32,
-    boneIds: [*c]u8,
-    boneWeights: [*c]f32,
-    boneMatrices: [*c]Matrix,
-    boneCount: c_int,
+
+    // OpenGL identifiers
     vaoId: c_int,
     vboId: [*c]c_int,
 
@@ -1464,9 +1565,17 @@ pub const Transform = extern struct {
     scale: Vector3,
 };
 
+pub const ModelAnimPose = [*c]Transform;
+
 pub const BoneInfo = extern struct {
     name: [32]u8,
     parent: c_int,
+};
+
+pub const ModelSkeleton = extern struct {
+    boneCount: c_int,
+    bones: [*c]BoneInfo,
+    bindPose: ModelAnimPose
 };
 
 pub const Model = extern struct {
@@ -1476,9 +1585,11 @@ pub const Model = extern struct {
     meshes: [*c]Mesh,
     materials: [*c]Material,
     meshMaterial: [*c]c_int,
-    boneCount: c_int,
-    bones: [*c]BoneInfo,
-    bindPose: [*c]Transform,
+
+    // Animation data
+    skeleton: ModelSkeleton,
+    currentPose: ModelAnimPose,
+    boneMatrices: [*c]Matrix,
 
     /// Load model from file (meshes and materials)
     pub fn init(fileName: [:0]const u8) RaylibError!Model {
@@ -1517,11 +1628,11 @@ pub const Model = extern struct {
 };
 
 pub const ModelAnimation = extern struct {
-    boneCount: c_int,
-    frameCount: c_int,
-    bones: [*c]BoneInfo,
-    framePoses: [*c][*c]Transform,
     name: [32]u8,
+
+    boneCount: c_int,
+    keyframeCount: c_int,
+    keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
@@ -1628,7 +1739,6 @@ pub const VrStereoConfig = extern struct {
 };
 
 pub const FilePathList = extern struct {
-    capacity: c_uint,
     count: c_uint,
     paths: [*c][*c]u8,
 };
@@ -1650,7 +1760,7 @@ pub const AutomationEventList = extern struct {
     }
 };
 
-pub const ConfigFlags = packed struct {
+pub const ConfigFlags = packed struct(u32) {
     __reserved: bool = false,
     fullscreen_mode: bool = false,
     window_resizable: bool = false,
@@ -1807,6 +1917,7 @@ pub const KeyboardKey = enum(c_int) {
     //menu = 82,
     volume_up = 24,
     volume_down = 25,
+    _,
 };
 
 pub const MouseButton = enum(c_int) {
@@ -1877,7 +1988,39 @@ pub const MaterialMapIndex = enum(c_int) {
     brdf = 10,
 };
 
-pub const ShaderLocationIndex = enum(c_int) { vertex_position = 0, vertex_texcoord01 = 1, vertex_texcoord02 = 2, vertex_normal = 3, vertex_tangent = 4, vertex_color = 5, matrix_mvp = 6, matrix_view = 7, matrix_projection = 8, matrix_model = 9, matrix_normal = 10, vector_view = 11, color_diffuse = 12, color_specular = 13, color_ambient = 14, map_albedo = 15, map_metalness = 16, map_normal = 17, map_roughness = 18, map_occlusion = 19, map_emission = 20, map_height = 21, map_cubemap = 22, map_irradiance = 23, map_prefilter = 24, map_brdf = 25, vertex_boneids = 26, vertex_boneweights = 27, bone_matrices = 28, shader_loc_vertex_instance_tx };
+pub const ShaderLocationIndex = enum(c_int) {
+    vertex_position = 0,
+    vertex_texcoord01 = 1,
+    vertex_texcoord02 = 2,
+    vertex_normal = 3,
+    vertex_tangent = 4,
+    vertex_color = 5,
+    matrix_mvp = 6,
+    matrix_view = 7,
+    matrix_projection = 8,
+    matrix_model = 9,
+    matrix_normal = 10,
+    vector_view = 11,
+    color_diffuse = 12,
+    color_specular = 13,
+    color_ambient = 14,
+    map_albedo = 15,
+    map_metalness = 16,
+    map_normal = 17,
+    map_roughness = 18,
+    map_occlusion = 19,
+    map_emission = 20,
+    map_height = 21,
+    map_cubemap = 22,
+    map_irradiance = 23,
+    map_prefilter = 24,
+    map_brdf = 25,
+    vertex_boneids = 26,
+    vertex_boneweights = 27,
+    matrix_bonetransforms = 28,
+    matrix_instancetransforms = 29,
+    //
+};
 
 pub const ShaderUniformDataType = enum(c_int) {
     float = 0,
@@ -1966,18 +2109,23 @@ pub const BlendMode = enum(c_int) {
     custom_separate = 7,
 };
 
-pub const Gesture = enum(c_int) {
-    none = 0,
-    tap = 1,
-    doubletap = 2,
-    hold = 4,
-    drag = 8,
-    swipe_right = 16,
-    swipe_left = 32,
-    swipe_up = 64,
-    swipe_down = 128,
-    pinch_in = 256,
-    pinch_out = 512,
+pub const Gesture = packed struct(u16) {
+    tap: bool = false,
+    doubletap: bool = false,
+    hold: bool = false,
+    drag: bool = false,
+    swipe_right: bool = false,
+    swipe_left: bool = false,
+    swipe_up: bool = false,
+    swipe_down: bool = false,
+    pinch_in: bool = false,
+    pinch_out: bool = false,
+    __reserved1: bool = false,
+    __reserved2: bool = false,
+    __reserved3: bool = false,
+    __reserved4: bool = false,
+    __reserved5: bool = false,
+    __reserved6: bool = false,
 };
 
 pub const CameraMode = enum(c_int) {
@@ -2087,6 +2235,11 @@ pub fn computeMD5(data: []u8) [4]u32 {
 pub fn computeSHA1(data: []u8) [5]u32 {
     const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
+}
+
+pub fn computeSHA256(data: []u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+    return res[0..8].*;
 }
 
 /// Load image from file into CPU memory (RAM)
@@ -2250,19 +2403,19 @@ pub fn loadFontFromImage(image: Image, key: Color, firstChar: i32) RaylibError!F
 }
 
 /// Load font data for further use
-pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]i32, ty: FontType) RaylibError![]GlyphInfo {
+pub fn loadFontData(fileData: []const u8, fontSize: i32, codePoints: ?[]const i32, ty: FontType) RaylibError![]GlyphInfo {
     var res: []GlyphInfo = undefined;
 
-    var codePointsFinal = @as([*c]i32, 0);
+    var codePointsFinal = @as([*c]const i32, 0);
     var codePointsLen: i32 = 0;
     if (codePoints) |codePointsSure| {
-        codePointsFinal = @as([*c]i32, @ptrCast(codePointsSure));
+        codePointsFinal = @as([*c]const i32, @ptrCast(codePointsSure));
         codePointsLen = @as(i32, @intCast(codePointsSure.len));
     } else {
         codePointsLen = 95;
     }
 
-    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty);
+    const ptr = cdef.LoadFontData(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), @as(c_int, fontSize), codePointsFinal, @as(c_int, @intCast(codePointsLen)), ty, @as([*c]i32, &codePointsLen));
     if (ptr == 0) return RaylibError.LoadFontData;
 
     res.ptr = @as([*]GlyphInfo, @ptrCast(ptr));
@@ -2497,6 +2650,10 @@ pub fn loadTextLines(text: [:0]const u8) RaylibError![][:0]u8 {
     res.len = @as(usize, @intCast(lineCount));
 
     return res;
+}
+
+pub fn unloadTextLines(lines: [][:0]u8) void {
+    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(lines)), @as(c_int, @intCast(lines.len)));
 }
 
 /// Join text strings with delimiter
@@ -3074,26 +3231,6 @@ pub fn memFree(ptr: *anyopaque) void {
     cdef.MemFree(ptr);
 }
 
-/// Set custom file binary data loader
-pub fn setLoadFileDataCallback(callback: LoadFileDataCallback) void {
-    cdef.SetLoadFileDataCallback(callback);
-}
-
-/// Set custom file binary data saver
-pub fn setSaveFileDataCallback(callback: SaveFileDataCallback) void {
-    cdef.SetSaveFileDataCallback(callback);
-}
-
-/// Set custom file text data loader
-pub fn setLoadFileTextCallback(callback: LoadFileTextCallback) void {
-    cdef.SetLoadFileTextCallback(callback);
-}
-
-/// Set custom file text data saver
-pub fn setSaveFileTextCallback(callback: SaveFileTextCallback) void {
-    cdef.SetSaveFileTextCallback(callback);
-}
-
 /// Load file data as byte array (read)
 pub fn loadFileData(fileName: []const u8) RaylibError![]u8 {
     var _len: i32 = 0;
@@ -3122,6 +3259,56 @@ pub fn saveFileText(fileName: [:0]const u8, text: [:0]const u8) bool {
     return cdef.SaveFileText(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(text)));
 }
 
+/// Set custom file binary data loader
+pub fn setLoadFileDataCallback(callback: LoadFileDataCallback) void {
+    cdef.SetLoadFileDataCallback(callback);
+}
+
+/// Set custom file binary data saver
+pub fn setSaveFileDataCallback(callback: SaveFileDataCallback) void {
+    cdef.SetSaveFileDataCallback(callback);
+}
+
+/// Set custom file text data loader
+pub fn setLoadFileTextCallback(callback: LoadFileTextCallback) void {
+    cdef.SetLoadFileTextCallback(callback);
+}
+
+/// Set custom file text data saver
+pub fn setSaveFileTextCallback(callback: SaveFileTextCallback) void {
+    cdef.SetSaveFileTextCallback(callback);
+}
+
+/// Rename file (if exists)
+pub fn fileRename(fileName: [:0]const u8, fileRename_: [:0]const u8) i32 {
+    return @as(i32, cdef.FileRename(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(fileRename_))));
+}
+
+/// Remove file (if exists)
+pub fn fileRemove(fileName: [:0]const u8) i32 {
+    return @as(i32, cdef.FileRemove(@as([*c]const u8, @ptrCast(fileName))));
+}
+
+/// Copy file from one path to another, dstPath created if it doesn't exist
+pub fn fileCopy(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
+    return @as(i32, cdef.FileCopy(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
+}
+
+/// Move file from one directory to another, dstPath created if it doesn't exist
+pub fn fileMove(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
+    return @as(i32, cdef.FileMove(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
+}
+
+/// Replace text in an existing file
+pub fn fileTextReplace(fileName: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) i32 {
+    return @as(i32, cdef.FileTextReplace(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Find text in existing file
+pub fn fileTextFindIndex(fileName: [:0]const u8, search: [:0]const u8) i32 {
+    return @as(i32, cdef.FileTextFindIndex(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search))));
+}
+
 /// Check if file exists
 pub fn fileExists(fileName: [:0]const u8) bool {
     return cdef.FileExists(@as([*c]const u8, @ptrCast(fileName)));
@@ -3140,6 +3327,11 @@ pub fn isFileExtension(fileName: [:0]const u8, ext: [:0]const u8) bool {
 /// Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
 pub fn getFileLength(fileName: [:0]const u8) i32 {
     return @as(i32, cdef.GetFileLength(@as([*c]const u8, @ptrCast(fileName))));
+}
+
+/// Get file modification time (last write time)
+pub fn getFileModTime(fileName: [:0]const u8) i64 {
+    return @as(i64, cdef.GetFileModTime(@as([*c]const u8, @ptrCast(fileName))));
 }
 
 /// Get pointer to extension for a filename string (includes dot: '.png')
@@ -3183,8 +3375,8 @@ pub fn makeDirectory(dirPath: [:0]const u8) i32 {
 }
 
 /// Change working directory, return true on success
-pub fn changeDirectory(dir: [:0]const u8) bool {
-    return cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dir)));
+pub fn changeDirectory(dirPath: [:0]const u8) bool {
+    return cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
 /// Check if a given path is a file or a directory
@@ -3197,12 +3389,12 @@ pub fn isFileNameValid(fileName: [:0]const u8) bool {
     return cdef.IsFileNameValid(@as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Load directory filepaths
+/// Load directory filepaths, files and directories, no subdirs scan
 pub fn loadDirectoryFiles(dirPath: [:0]const u8) FilePathList {
     return cdef.LoadDirectoryFiles(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
-/// Load directory filepaths with extension filtering and recursive directory scan. Use 'DIR' in the filter string to include directories in the result
+/// Load directory filepaths with extension filtering and subdir scan; some filters available: "*.*", "FILES*", "DIRS*"
 pub fn loadDirectoryFilesEx(basePath: [:0]const u8, filter: [:0]const u8, scanSubdirs: bool) FilePathList {
     return cdef.LoadDirectoryFilesEx(@as([*c]const u8, @ptrCast(basePath)), @as([*c]const u8, @ptrCast(filter)), scanSubdirs);
 }
@@ -3227,9 +3419,14 @@ pub fn unloadDroppedFiles(files: FilePathList) void {
     cdef.UnloadDroppedFiles(files);
 }
 
-/// Get file modification time (last write time)
-pub fn getFileModTime(fileName: [:0]const u8) i64 {
-    return @as(i64, cdef.GetFileModTime(@as([*c]const u8, @ptrCast(fileName))));
+/// Get the file count in a directory
+pub fn getDirectoryFileCount(dirPath: [:0]const u8) u32 {
+    return @as(u32, cdef.GetDirectoryFileCount(@as([*c]const u8, @ptrCast(dirPath))));
+}
+
+/// Get the file count in a directory with extension filtering and recursive directory scan. Use 'DIR' in the filter string to include directories in the result
+pub fn getDirectoryFileCountEx(basePath: [:0]const u8, filter: [:0]const u8, scanSubdirs: bool) u32 {
+    return @as(u32, cdef.GetDirectoryFileCountEx(@as([*c]const u8, @ptrCast(basePath)), @as([*c]const u8, @ptrCast(filter)), scanSubdirs));
 }
 
 /// Compress data (DEFLATE algorithm), memory must be MemFree()
@@ -3594,9 +3791,24 @@ pub fn drawLineBezier(startPos: Vector2, endPos: Vector2, thick: f32, color: Col
     cdef.DrawLineBezier(startPos, endPos, thick, color);
 }
 
+/// Draw a dashed line
+pub fn drawLineDashed(startPos: Vector2, endPos: Vector2, dashSize: i32, spaceSize: i32, color: Color) void {
+    cdef.DrawLineDashed(startPos, endPos, @as(c_int, dashSize), @as(c_int, spaceSize), color);
+}
+
 /// Draw a color-filled circle
 pub fn drawCircle(centerX: i32, centerY: i32, radius: f32, color: Color) void {
     cdef.DrawCircle(@as(c_int, centerX), @as(c_int, centerY), radius, color);
+}
+
+/// Draw a color-filled circle (Vector version)
+pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
+    cdef.DrawCircleV(center, radius, color);
+}
+
+/// Draw a gradient-filled circle
+pub fn drawCircleGradient(center: Vector2, radius: f32, inner: Color, outer: Color) void {
+    cdef.DrawCircleGradient(center, radius, inner, outer);
 }
 
 /// Draw a piece of a circle
@@ -3607,16 +3819,6 @@ pub fn drawCircleSector(center: Vector2, radius: f32, startAngle: f32, endAngle:
 /// Draw circle sector outline
 pub fn drawCircleSectorLines(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
     cdef.DrawCircleSectorLines(center, radius, startAngle, endAngle, @as(c_int, segments), color);
-}
-
-/// Draw a gradient-filled circle
-pub fn drawCircleGradient(centerX: i32, centerY: i32, radius: f32, inner: Color, outer: Color) void {
-    cdef.DrawCircleGradient(@as(c_int, centerX), @as(c_int, centerY), radius, inner, outer);
-}
-
-/// Draw a color-filled circle (Vector version)
-pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
-    cdef.DrawCircleV(center, radius, color);
 }
 
 /// Draw circle outline
@@ -3859,7 +4061,7 @@ pub fn exportImage(image: Image, fileName: [:0]const u8) bool {
     return cdef.ExportImage(image, @as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Export image to memory buffer
+/// Export image to memory buffer, memory must be MemFree()
 pub fn exportImageToMemory(image: Image, fileType: []const u8) RaylibError![]u8 {
     var _len: i32 = 0;
     const _ptr = cdef.ExportImageToMemory(image, @as([*c]const u8, @ptrCast(fileType)), @as([*c]c_int, @ptrCast(&_len)));
@@ -4400,6 +4602,11 @@ pub fn measureTextEx(font: Font, text: [:0]const u8, fontSize: f32, spacing: f32
     return cdef.MeasureTextEx(font, @as([*c]const u8, @ptrCast(text)), fontSize, spacing);
 }
 
+/// Measure string size for an existing array of codepoints for Font
+pub fn measureTextCodepoints(font: Font, codepoints: []const c_int, length: i32, fontSize: f32, spacing: f32) Vector2 {
+    return cdef.MeasureTextCodepoints(font, @as([*c]const c_int, @ptrCast(codepoints)), @as(c_int, length), fontSize, spacing);
+}
+
 /// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
 pub fn getGlyphIndex(font: Font, codepoint: i32) i32 {
     return @as(i32, cdef.GetGlyphIndex(font, @as(c_int, codepoint)));
@@ -4458,11 +4665,6 @@ pub fn codepointToUTF8(codepoint: i32, utf8Size: *i32) [:0]const u8 {
     return std.mem.span(cdef.CodepointToUTF8(@as(c_int, codepoint), @as([*c]c_int, @ptrCast(utf8Size))));
 }
 
-/// Unload text lines
-pub fn unloadTextLines(text: [][:0]const u8) void {
-    cdef.UnloadTextLines(@as([*c][*c]u8, @ptrCast(text)));
-}
-
 /// Copy one string to another, returns bytes copied
 pub fn textCopy(dst: *u8, src: [:0]const u8) i32 {
     return @as(i32, cdef.TextCopy(@as([*c]u8, @ptrCast(dst)), @as([*c]const u8, @ptrCast(src))));
@@ -4483,14 +4685,44 @@ pub fn textSubtext(text: [:0]const u8, position: i32, length: i32) [:0]const u8 
     return std.mem.span(cdef.TextSubtext(@as([*c]const u8, @ptrCast(text)), @as(c_int, position), @as(c_int, length)));
 }
 
-/// Replace text string (WARNING: memory must be freed!)
-pub fn textReplace(text: [:0]const u8, replace: [:0]const u8, by: [:0]const u8) [:0]u8 {
-    return std.mem.span(cdef.TextReplace(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(replace)), @as([*c]const u8, @ptrCast(by))));
+/// Remove text spaces, concat words
+pub fn textRemoveSpaces(text: [:0]const u8) [:0]const u8 {
+    return std.mem.span(cdef.TextRemoveSpaces(@as([*c]const u8, @ptrCast(text))));
 }
 
-/// Insert text in a position (WARNING: memory must be freed!)
+/// Get text between two strings
+pub fn getTextBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.GetTextBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end))));
+}
+
+/// Replace text string with new string
+pub fn textReplace(text: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplace(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Replace text string with new string, memory must be MemFree()
+pub fn textReplaceAlloc(text: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Replace text between two specific strings
+pub fn textReplaceBetween(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceBetween(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Replace text between two specific strings, memory must be MemFree()
+pub fn textReplaceBetweenAlloc(text: [:0]const u8, begin: [:0]const u8, end: [:0]const u8, replacement: [:0]const u8) [:0]u8 {
+    return std.mem.span(cdef.TextReplaceBetweenAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(begin)), @as([*c]const u8, @ptrCast(end)), @as([*c]const u8, @ptrCast(replacement))));
+}
+
+/// Insert text in a defined byte position
 pub fn textInsert(text: [:0]const u8, insert: [:0]const u8, position: i32) [:0]u8 {
     return std.mem.span(cdef.TextInsert(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(insert)), @as(c_int, position)));
+}
+
+/// Insert text in a defined byte position, memory must be MemFree()
+pub fn textInsertAlloc(text: [:0]const u8, insert: [:0]const u8, position: i32) [:0]u8 {
+    return std.mem.span(cdef.TextInsertAlloc(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(insert)), @as(c_int, position)));
 }
 
 /// Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
@@ -4501,14 +4733,14 @@ pub fn textSplit(text: []const u8, delimiter: u8) RaylibError![][:0]u8 {
     return @as([*][:0]u8, @ptrCast(_ptr))[0..@as(usize, @intCast(_len))];
 }
 
-/// Append text at specific position and move cursor!
+/// Append text at specific position and move cursor
 pub fn textAppend(text: [:0]u8, append: [:0]const u8, position: *i32) void {
     cdef.TextAppend(@as([*c]u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(append)), @as([*c]c_int, @ptrCast(position)));
 }
 
 /// Find first text occurrence within a string, -1 if not found
-pub fn textFindIndex(text: [:0]const u8, find: [:0]const u8) i32 {
-    return @as(i32, cdef.TextFindIndex(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(find))));
+pub fn textFindIndex(text: [:0]const u8, search: [:0]const u8) i32 {
+    return @as(i32, cdef.TextFindIndex(@as([*c]const u8, @ptrCast(text)), @as([*c]const u8, @ptrCast(search))));
 }
 
 /// Get upper case version of provided string
@@ -4681,16 +4913,6 @@ pub fn drawModelWiresEx(model: Model, position: Vector3, rotationAxis: Vector3, 
     cdef.DrawModelWiresEx(model, position, rotationAxis, rotationAngle, scale, tint);
 }
 
-/// Draw a model as points
-pub fn drawModelPoints(model: Model, position: Vector3, scale: f32, tint: Color) void {
-    cdef.DrawModelPoints(model, position, scale, tint);
-}
-
-/// Draw a model as points with extended parameters
-pub fn drawModelPointsEx(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f32, scale: Vector3, tint: Color) void {
-    cdef.DrawModelPointsEx(model, position, rotationAxis, rotationAngle, scale, tint);
-}
-
 /// Draw bounding box (wires)
 pub fn drawBoundingBox(box: BoundingBox, color: Color) void {
     cdef.DrawBoundingBox(box, color);
@@ -4834,19 +5056,14 @@ pub fn loadModelAnimations(fileName: []const u8) RaylibError![]ModelAnimation {
     return _ptr[0..@as(usize, @intCast(_len))];
 }
 
-/// Update model animation pose (CPU)
-pub fn updateModelAnimation(model: Model, anim: ModelAnimation, frame: i32) void {
-    cdef.UpdateModelAnimation(model, anim, @as(c_int, frame));
+/// Update model animation pose (vertex buffers and bone matrices)
+pub fn updateModelAnimation(model: Model, anim: ModelAnimation, frame: f32) void {
+    cdef.UpdateModelAnimation(model, anim, frame);
 }
 
-/// Update model animation mesh bone matrices (GPU skinning)
-pub fn updateModelAnimationBones(model: Model, anim: ModelAnimation, frame: i32) void {
-    cdef.UpdateModelAnimationBones(model, anim, @as(c_int, frame));
-}
-
-/// Unload animation data
-pub fn unloadModelAnimation(anim: ModelAnimation) void {
-    cdef.UnloadModelAnimation(anim);
+/// Update model animation pose, blending two animations
+pub fn updateModelAnimationEx(model: Model, animA: ModelAnimation, frameA: f32, animB: ModelAnimation, frameB: f32, blend: f32) void {
+    cdef.UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
 }
 
 /// Check model animation skeleton match
@@ -4939,7 +5156,7 @@ pub fn isSoundValid(sound: Sound) bool {
     return cdef.IsSoundValid(sound);
 }
 
-/// Update sound buffer with new data (data and frame count should fit in sound)
+/// Update sound buffer with new data (default data format: 32 bit float, stereo)
 pub fn updateSound(sound: Sound, data: *const anyopaque, sampleCount: i32) void {
     cdef.UpdateSound(sound, data, @as(c_int, sampleCount));
 }
@@ -5004,7 +5221,7 @@ pub fn setSoundPitch(sound: Sound, pitch: f32) void {
     cdef.SetSoundPitch(sound, pitch);
 }
 
-/// Set pan for a sound (0.5 is center)
+/// Set pan for a sound (-1.0 left, 0.0 center, 1.0 right)
 pub fn setSoundPan(sound: Sound, pan: f32) void {
     cdef.SetSoundPan(sound, pan);
 }
@@ -5084,7 +5301,7 @@ pub fn setMusicPitch(music: Music, pitch: f32) void {
     cdef.SetMusicPitch(music, pitch);
 }
 
-/// Set pan for a music (0.5 is center)
+/// Set pan for a music (-1.0 left, 0.0 center, 1.0 right)
 pub fn setMusicPan(music: Music, pan: f32) void {
     cdef.SetMusicPan(music, pan);
 }
@@ -5154,7 +5371,7 @@ pub fn setAudioStreamPitch(stream: AudioStream, pitch: f32) void {
     cdef.SetAudioStreamPitch(stream, pitch);
 }
 
-/// Set pan for audio stream (0.5 is centered)
+/// Set pan for audio stream (-1.0 to 1.0 range, 0.0 is centered)
 pub fn setAudioStreamPan(stream: AudioStream, pan: f32) void {
     cdef.SetAudioStreamPan(stream, pan);
 }

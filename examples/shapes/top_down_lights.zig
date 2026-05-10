@@ -87,7 +87,7 @@ fn drawLightMask(slot: usize) void {
     defer rl.gl.rlSetBlendMode(@intFromEnum(rl.gl.rlBlendMode.rl_blend_alpha));
 
     // If we are valid, then draw the light radius to the alpha mask
-    if (lights[slot].valid) rl.drawCircleGradient(@intFromFloat(lights[slot].position.x), @intFromFloat(lights[slot].position.y), lights[slot].outerRadius, rl.colorAlpha(.white, 0), .white);
+    if (lights[slot].valid) rl.drawCircleGradient(lights[slot].position, lights[slot].outerRadius, rl.colorAlpha(.white, 0), .white);
 
     rl.gl.rlDrawRenderBatchActive();
 
