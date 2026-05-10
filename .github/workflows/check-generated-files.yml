@@ -1,0 +1,37 @@
+name: Check Generated Files
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-generated-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Verify generated files are up to date
+        run: |
+          set -euo pipefail
+
+          rm -rf /tmp/lib
+          cp -r lib /tmp/lib
+
+          rm -f lib/*.h
+          rm -f lib/r*.zig
+
+          zig build code
+
+          if ! diff -ru lib /tmp/lib; then
+            echo ""
+            echo "Generated files are out of date."
+            echo "Run: zig build code"
+            exit 1
+          fi
