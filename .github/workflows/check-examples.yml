@@ -1,0 +1,24 @@
+name: Check examples
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-examples:
+    runs-on: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Verify generated files are up to date
+        run: |
+          set -euo pipefail
+
+          zig build examples
