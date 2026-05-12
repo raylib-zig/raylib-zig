@@ -25,7 +25,7 @@ however, are created manually and should only be updated in their respective pre
  - `lib/preludes/rlgl-prelude.zig` for rlgl types
  - `lib/preludes/raygui-prelude.zig` for raygui types
 
-Before any commit you make, you should always run `generate_functions.py` to ensure your changes are persistent
+Before any commit you make, you should always run `zig build binding` to ensure your changes are persistent
 throughout other updates.
 
 ## Updates to the build files

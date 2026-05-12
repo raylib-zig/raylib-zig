@@ -66,6 +66,13 @@ pub fn build(b: *std.Build) !void {
 
     const raylib_artifact = raylib_dep.artifact("raylib");
 
+    var raylib_headers: std.StringHashMap(std.Build.LazyPath) = .init(b.allocator);
+    defer raylib_headers.deinit();
+
+    for (raylib_artifact.installed_headers.items) |item| {
+        try raylib_headers.put(item.file.dest_rel_path, item.file.source);
+    }
+
     b.installArtifact(raylib_artifact);
 
     const raylib = this.getModule(b, target, optimize);
@@ -535,6 +542,21 @@ pub fn build(b: *std.Build) !void {
     const test_step = b.step("test", "Check for library compilation errors");
     test_step.dependOn(&raylib_test.step);
     test_step.dependOn(&raygui_test.step);
+
+    const generate_binding_step = b.step("binding", "Generate the binding");
+
+    const usf_dependency = b.addUpdateSourceFiles();
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raylib.h").?, "lib/raylib.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h").?, "lib/raymath.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h").?, "lib/rlgl.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h").?, "lib/raygui.h");
+
+    const bind_step = b.addSystemCommand(&.{"python3"});
+    bind_step.addFileArg(b.path("lib/generate_functions.py"));
+    bind_step.setCwd(b.path("lib"));
+    bind_step.step.dependOn(&usf_dependency.step);
+
+    generate_binding_step.dependOn(&bind_step.step);
 
     const examples_step = b.step("examples", "Builds all the examples");
 
