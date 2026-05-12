@@ -16,17 +16,6 @@ const Program = struct {
     desc: []const u8,
 };
 
-const Code = struct {
-    header_dependency_file: std.Build.LazyPath,
-    header_file: []const u8,
-    prelude_file: []const u8,
-    ext_prelude_file: []const u8,
-    output_file: []const u8,
-    ext_output_file: []const u8,
-    prefix: []const u8,
-    skip_after: ?[]const u8 = null,
-};
-
 fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
     if (b.modules.contains("raylib")) {
         return b.modules.get("raylib").?;
@@ -539,47 +528,6 @@ pub fn build(b: *std.Build) !void {
         // },
     };
 
-    const codes = [_]Code{
-        .{
-            .header_dependency_file = raylib_headers.get("raylib.h").?,
-            .header_file = "lib/raylib.h",
-            .prelude_file = "lib/preludes/raylib-prelude.zig",
-            .ext_prelude_file = "lib/preludes/raylib-ext-prelude.zig",
-            .output_file = "lib/raylib.zig",
-            .ext_output_file = "lib/raylib-ext.zig",
-            .prefix = "RLAPI ",
-        },
-        .{
-            .header_dependency_file = raylib_headers.get("raymath.h").?,
-            .header_file = "lib/raymath.h",
-            .prelude_file = "lib/preludes/raymath-prelude.zig",
-            .ext_prelude_file = "lib/preludes/raymath-ext-prelude.zig",
-            .output_file = "lib/raymath.zig",
-            .ext_output_file = "lib/raymath-ext.zig",
-            .prefix = "RMAPI ",
-        },
-        .{
-            .header_dependency_file = raylib_headers.get("rlgl.h").?,
-            .header_file = "lib/rlgl.h",
-            .prelude_file = "lib/preludes/rlgl-prelude.zig",
-            .ext_prelude_file = "lib/preludes/rlgl-ext-prelude.zig",
-            .output_file = "lib/rlgl.zig",
-            .ext_output_file = "lib/rlgl-ext.zig",
-            .prefix = "RLAPI ",
-            .skip_after = "#if defined(RLGL_IMPLEMENTATION)",
-        },
-        .{
-            .header_dependency_file = raylib_headers.get("raygui.h").?,
-            .header_file = "lib/raygui.h",
-            .prelude_file = "lib/preludes/raygui-prelude.zig",
-            .ext_prelude_file = "lib/preludes/raygui-ext-prelude.zig",
-            .output_file = "lib/raygui.zig",
-            .ext_output_file = "lib/raygui-ext.zig",
-            .prefix = "RAYGUIAPI ",
-            .skip_after = "#if defined(RAYGUI_IMPLEMENTATION)",
-        },
-    };
-
     const raylib_test = b.addTest(.{
         .root_module = raylib,
     });
@@ -595,46 +543,20 @@ pub fn build(b: *std.Build) !void {
     test_step.dependOn(&raylib_test.step);
     test_step.dependOn(&raygui_test.step);
 
-    const generate_code_step = b.step("code", "Generate the code");
+    const generate_binding_step = b.step("binding", "Generate the binding");
 
-    for (codes) |code| {
-        const usf_dependency = b.addUpdateSourceFiles();
-        usf_dependency.addCopyFileToSource(code.header_dependency_file, code.header_file);
+    const usf_dependency = b.addUpdateSourceFiles();
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raylib.h").?, "lib/raylib.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h").?, "lib/raymath.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h").?, "lib/rlgl.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h").?, "lib/raygui.h");
 
-        const code_step = b.addSystemCommand(&.{"python"});
-        code_step.addFileArg(b.path("lib/generate_functions.py"));
+    const bind_step = b.addSystemCommand(&.{"python3"});
+    bind_step.addFileArg(b.path("lib/generate_functions.py"));
+    bind_step.setCwd(b.path("lib"));
+    bind_step.step.dependOn(&usf_dependency.step);
 
-        code_step.addArg("--header-file");
-        code_step.addFileArg(b.path(code.header_file));
-
-        code_step.addArg("--prelude-file");
-        code_step.addFileArg(b.path(code.prelude_file));
-
-        code_step.addArg("--ext-prelude-file");
-        code_step.addFileArg(b.path(code.ext_prelude_file));
-
-        code_step.addArg("--output-file");
-        const output_file = code_step.addOutputFileArg(code.output_file);
-
-        code_step.addArg("--ext-output-file");
-        const ext_output_file = code_step.addOutputFileArg(code.ext_output_file);
-
-        code_step.addArg("--prefix");
-        code_step.addArg(code.prefix);
-
-        if (code.skip_after) |skip_after| {
-            code_step.addArg("--skip-after");
-            code_step.addArg(skip_after);
-        }
-
-        code_step.step.dependOn(&usf_dependency.step);
-
-        const usf = b.addUpdateSourceFiles();
-        usf.addCopyFileToSource(output_file, code.output_file);
-        usf.addCopyFileToSource(ext_output_file, code.ext_output_file);
-
-        generate_code_step.dependOn(&usf.step);
-    }
+    generate_binding_step.dependOn(&bind_step.step);
 
     const examples_step = b.step("examples", "Builds all the examples");
 

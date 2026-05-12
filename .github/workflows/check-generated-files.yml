@@ -27,11 +27,11 @@ jobs:
           rm -f lib/*.h
           rm -f lib/r*.zig
 
-          zig build code
+          zig build binding
 
           if ! diff -ru lib /tmp/lib; then
             echo ""
             echo "Generated files are out of date."
-            echo "Run: zig build code"
+            echo "Run: zig build binding"
             exit 1
           fi

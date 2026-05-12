@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re
-import argparse
 
 """
 Automatic utility for generating raylib function headers.
@@ -490,24 +489,37 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Automatic utility for generating raylib function headers.")
-
-    parser.add_argument("--header-file", required=True)
-    parser.add_argument("--prelude-file", required=True)
-    parser.add_argument("--ext-prelude-file", required=True)
-    parser.add_argument("--output-file", required=True)
-    parser.add_argument("--ext-output-file", required=True)
-    parser.add_argument("--prefix", required=True)
-    parser.add_argument("--skip-after", default="#/never\\#")
-
-    args = parser.parse_args()
-
     parse_header(
-        args.header_file,
-        args.output_file,
-        args.ext_output_file,
-        args.prefix,
-        args.prelude_file,
-        args.ext_prelude_file,
-        args.skip_after,
+        "raylib.h",
+        "raylib.zig",
+        "raylib-ext.zig",
+        "RLAPI ",
+        "preludes/raylib-prelude.zig",
+        "preludes/raylib-ext-prelude.zig"
+    )
+    parse_header(
+        "raymath.h",
+        "raymath.zig",
+        "raymath-ext.zig",
+        "RMAPI ",
+        "preludes/raymath-prelude.zig",
+        "preludes/raymath-ext-prelude.zig"
+    )
+    parse_header(
+        "rlgl.h",
+        "rlgl.zig",
+        "rlgl-ext.zig",
+        "RLAPI ",
+        "preludes/rlgl-prelude.zig",
+        "preludes/rlgl-ext-prelude.zig",
+        "#if defined(RLGL_IMPLEMENTATION)\n"
+    )
+    parse_header(
+        "raygui.h",
+        "raygui.zig",
+        "raygui-ext.zig",
+        "RAYGUIAPI ",
+        "preludes/raygui-prelude.zig",
+        "preludes/raygui-ext-prelude.zig",
+        "#if defined(RAYGUI_IMPLEMENTATION)\n"
     )
