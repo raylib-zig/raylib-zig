@@ -4,9 +4,16 @@ on:
   push:
   pull_request:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   check-examples:
-    runs-on: [ubuntu-latest, windows-latest, macos-latest]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -18,7 +25,4 @@ jobs:
           version: 0.16.0
 
       - name: Verify generated files are up to date
-        run: |
-          set -euo pipefail
-
-          zig build examples
+        run: zig build examples
