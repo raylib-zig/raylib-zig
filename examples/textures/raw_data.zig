@@ -46,7 +46,7 @@ pub fn main() anyerror!void {
     // note the use of the raw c allocator here, since we will be passing this pointer to raylib
     // and raylib expects to be able to free() it when we unload the image.
     // Other allocators may use different memory management strategies that are incompatible with this.
-    const c_alloc = std.heap.raw_c_allocator;
+    const c_alloc = std.heap.c_allocator;
     var pixels = try c_alloc.alloc(rl.Color, width * height);
 
     for (0..height) |y| {

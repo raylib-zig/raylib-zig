@@ -121,7 +121,7 @@ pub fn main() anyerror!void {
             rl.clearBackground(colors[0]);
         }
 
-        if (rl.isMouseButtonDown(.left) or (rl.getGestureDetected() == .drag)) {
+        if (rl.isMouseButtonDown(.left) or (rl.getGestureDetected() == rl.Gesture { .drag = true })) {
             // Paint circle into render texture
             // NOTE: To avoid discontinuous circles, we could store
             // previous-next mouse points and just draw a line using brush size

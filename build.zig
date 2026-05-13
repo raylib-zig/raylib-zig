@@ -497,11 +497,6 @@ pub fn build(b: *std.Build) !void {
             .desc = "Simple text animation",
         },
         .{
-            .name = "textures_image_loading",
-            .path = "examples/textures/textures_image_loading.zig",
-            .desc = "Image loading and texture creation",
-        },
-        .{
             .name = "models_heightmap",
             .path = "examples/models/models_heightmap.zig",
             .desc = "Heightmap loading and drawing",
