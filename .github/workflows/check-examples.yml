@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Set up ubuntu packages
-        if: matrix.os == 'ubuntu'
+        if: startsWith(matrix.os, 'ubuntu')
         run:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
