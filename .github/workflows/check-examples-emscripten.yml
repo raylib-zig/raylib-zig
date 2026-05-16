@@ -11,7 +11,7 @@ defaults:
     shell: bash
 
 jobs:
-  check-examples:
+  check-examples-emscripten:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
