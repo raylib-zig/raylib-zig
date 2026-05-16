@@ -57,8 +57,7 @@ pub fn main() anyerror!void {
     // Setup colors
     const colors = [_]rl.Color{ .black, .maroon, .orange, .blue, .purple, .beige, .lime, .red, .dark_gray, .sky_blue };
 
-    //its possible to perform the initialization of this array at comptime (as of zig 0.14.1). This is left as a exercise for the reader
-    var color_recs = [_]rl.Rectangle{.{ .x = 0, .y = 0, .width = 0, .height = 0 }} ** colors.len;
+    var color_recs: [colors.len]rl.Rectangle = @splat(.{ .x = 0, .y = 0, .width = 0, .height = 0 });
 
     // Calculate rectangle for each color
     var x: f32 = 0;

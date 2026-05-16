@@ -32,7 +32,7 @@ pub fn main() anyerror!void {
     rl.initWindow(screen_width, screen_height, "raylib [text] example - input box");
     defer rl.closeWindow();
 
-    var name = [_:0]u8{0} ** max_input_chars;
+    var name: [max_input_chars:0]u8 = @splat(0);
     var letter_count: usize = 0;
 
     const text_box = rl.Rectangle{
