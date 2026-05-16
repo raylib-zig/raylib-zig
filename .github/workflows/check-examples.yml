@@ -2,6 +2,8 @@ name: Check examples
 
 on:
   push:
+    branches:
+      - devel
   pull_request:
 
 defaults:
