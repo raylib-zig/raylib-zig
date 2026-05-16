@@ -28,6 +28,8 @@ jobs:
       - name: Install Zig
         uses: mlugg/setup-zig@v2
         with:
+          # Needs to be a unstable version past 0.16.0, because of a std lib bug:
+          # https://codeberg.org/ziglang/zig/issues/31872
           version: 0.17.0-dev.305+bdfbf432d
 
       - name: Verify examples can build for emscripten
