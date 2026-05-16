@@ -20,7 +20,7 @@ fn floatingWindow(
     title: []const u8
 ) void {
     var title_buf: [64]u8 = undefined;
-    const title_text = std.fmt.bufPrintZ(&title_buf, "{s}", .{ title }) catch "";
+    const title_text = std.fmt.bufPrintSentinel(&title_buf, "{s}", .{ title }, 0) catch "";
     const mouse_position = rl.getMousePosition();
 
     const is_left_pressed = rl.isMouseButtonPressed(rl.MouseButton.left);
