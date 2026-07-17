@@ -2031,7 +2031,11 @@ pub const ShaderUniformDataType = enum(c_int) {
     ivec2 = 5,
     ivec3 = 6,
     ivec4 = 7,
-    sampler2d = 8,
+    uint = 8,
+    uivec2 = 9,
+    uivec3 = 10,
+    uivec4 = 11,
+    sampler2d = 12,
 };
 
 pub const ShaderAttribute = enum(c_int) {
