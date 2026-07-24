@@ -7,6 +7,11 @@ const builtin = @import("builtin");
 const emscripten = std.os.emscripten;
 
 //----------------------------------------------------------------------------------
+// Callback function return type convention
+//----------------------------------------------------------------------------------
+const loop_callconv: std.builtin.CallingConvention = if (builtin.os.tag == .emscripten) .c else .auto;
+
+//----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
 const screenWidth = 800;
@@ -23,7 +28,7 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     if (builtin.os.tag == .emscripten) {
-        emscripten.emscripten_set_main_loop(@ptrCast(&updateDrawFrame), 0, 1);
+        emscripten.emscripten_set_main_loop(&updateDrawFrame, 0, 1);
     } else {
         rl.setTargetFPS(60); // Set our game to run at 60 frames-per-second
 
@@ -35,7 +40,7 @@ pub fn main() anyerror!void {
 }
 
 // Update and Draw one frame
-fn updateDrawFrame() void {
+fn updateDrawFrame() callconv(loop_callconv) void {
     // Update
     //----------------------------------------------------------------------------------
     // TODO: Update your variables here
