@@ -529,7 +529,7 @@ if __name__ == "__main__":
         "rcamera.h",
         "rcamera.zig",
         "rcamera-ext.zig",
-        "RLAPI",
+        "RLAPI ",
         "preludes/rcamera-prelude.zig",
         "preludes/rcamera-ext-prelude.zig",
     )
