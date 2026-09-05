@@ -41,6 +41,19 @@ const gui = struct {
     }
 };
 
+const camera = struct {
+    fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
+        const raylib = this.getModule(b, target, optimize);
+        return b.addModule("rcamera", .{
+            .root_source_file = b.path("lib/rcamera.zig"),
+            .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+    }
+};
+
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -555,6 +568,7 @@ pub fn build(b: *std.Build) !void {
     usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h").?, "lib/raymath.h");
     usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h").?, "lib/rlgl.h");
     usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h").?, "lib/raygui.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("rcamera.h").?, "lib/raycamera.h");
 
     const bind_step = b.addSystemCommand(&.{"python3"});
     bind_step.addFileArg(b.path("lib/generate_functions.py"));
