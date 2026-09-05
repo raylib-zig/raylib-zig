@@ -90,6 +90,7 @@ pub fn build(b: *std.Build) !void {
 
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
+    const rcamera = this.camera.getModule(b, target, optimize);
 
     raylib.linkLibrary(raylib_artifact);
 
@@ -593,6 +594,7 @@ pub fn build(b: *std.Build) !void {
             });
             wasm.root_module.addImport("raylib", raylib);
             wasm.root_module.addImport("raygui", raygui);
+            wasm.root_module.addImport("rcamera", rcamera);
 
             const install_dir: std.Build.InstallDir = .{ .custom = "web" };
             const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
@@ -630,6 +632,7 @@ pub fn build(b: *std.Build) !void {
             });
             exe.root_module.addImport("raylib", raylib);
             exe.root_module.addImport("raygui", raygui);
+            exe.root_module.addImport("rcamera", rcamera);
 
             const run_cmd = b.addRunArtifact(exe);
             const run_step = b.step(ex.name, ex.desc);
