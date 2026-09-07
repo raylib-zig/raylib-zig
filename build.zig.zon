@@ -33,5 +33,7 @@
         "lib/rlgl-ext.zig",
         "lib/raygui.zig",
         "lib/raygui-ext.zig",
+        "lib/rcamera.zig",
+        "lib/rcamera-ext.zig",
     },
 }

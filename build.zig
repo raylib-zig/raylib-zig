@@ -41,6 +41,19 @@ const gui = struct {
     }
 };
 
+const camera = struct {
+    fn getModule(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.OptimizeMode) *std.Build.Module {
+        const raylib = this.getModule(b, target, optimize);
+        return b.addModule("rcamera", .{
+            .root_source_file = b.path("lib/rcamera.zig"),
+            .imports = &.{.{ .name = "raylib-zig", .module = raylib }},
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+    }
+};
+
 pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
@@ -77,6 +90,7 @@ pub fn build(b: *std.Build) !void {
 
     const raylib = this.getModule(b, target, optimize);
     const raygui = this.gui.getModule(b, target, optimize);
+    const rcamera = this.camera.getModule(b, target, optimize);
 
     raylib.linkLibrary(raylib_artifact);
 
@@ -555,6 +569,7 @@ pub fn build(b: *std.Build) !void {
     usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h").?, "lib/raymath.h");
     usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h").?, "lib/rlgl.h");
     usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h").?, "lib/raygui.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("rcamera.h").?, "lib/raycamera.h");
 
     const bind_step = b.addSystemCommand(&.{"python3"});
     bind_step.addFileArg(b.path("lib/generate_functions.py"));
@@ -579,6 +594,7 @@ pub fn build(b: *std.Build) !void {
             });
             wasm.root_module.addImport("raylib", raylib);
             wasm.root_module.addImport("raygui", raygui);
+            wasm.root_module.addImport("rcamera", rcamera);
 
             const install_dir: std.Build.InstallDir = .{ .custom = "web" };
             const emcc_flags = emsdk.emccDefaultFlags(b.allocator, .{
@@ -616,6 +632,7 @@ pub fn build(b: *std.Build) !void {
             });
             exe.root_module.addImport("raylib", raylib);
             exe.root_module.addImport("raygui", raygui);
+            exe.root_module.addImport("rcamera", rcamera);
 
             const run_cmd = b.addRunArtifact(exe);
             const run_step = b.step(ex.name, ex.desc);

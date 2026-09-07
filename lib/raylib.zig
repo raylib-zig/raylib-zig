@@ -7,6 +7,7 @@ pub const cdef = @import("raylib-ext.zig");
 
 pub const gl = @import("rlgl.zig");
 pub const math = @import("raymath.zig");
+pub const rcamera = @import("rcamera.zig");
 
 const C = std.builtin.CallingConvention.c;
 

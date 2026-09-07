@@ -525,3 +525,11 @@ if __name__ == "__main__":
         "preludes/raygui-ext-prelude.zig",
         "#if defined(RAYGUI_IMPLEMENTATION)\n"
     )
+    parse_header(
+        "rcamera.h",
+        "rcamera.zig",
+        "rcamera-ext.zig",
+        "RLAPI ",
+        "preludes/rcamera-prelude.zig",
+        "preludes/rcamera-ext-prelude.zig",
+    )
