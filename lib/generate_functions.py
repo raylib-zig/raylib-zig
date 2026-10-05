@@ -97,7 +97,6 @@ MANUAL = [
     "DrawTriangleFan",
     "DrawTriangleStrip",
     "DrawTriangleStrip3D",
-    "GuiTabBar",
     "GuiListViewEx",
     "GuiPanel",
     "GuiScrollPanel",
@@ -148,7 +147,7 @@ def ziggify_type(name: str, t: str, func_name: str) -> str:
         "AutomationEventList", "list", "batch", "glInternalFormat", "glFormat",
         "glType", "mipmaps", "active", "scroll", "view", "checked", "mouseCell",
         "scrollIndex", "focus", "secretViewActive", "color", "alpha", "colorHsv",
-        "translation", "rotation", "scale", "mat", "glyphCount"
+        "translation", "rotation", "scale", "mat", "glyphCount", "hscroll", "btnActive"
     ]
     multi = [
         "data", "compData", "points", "fileData", "colors", "pixels",
@@ -294,20 +293,21 @@ def fix_enums(arg_name, arg_type, func_name):
 def convert_name(name):
     if not name:
         return ''
-    if name.startswith("Gui"):
-        name = name[3:]
+    name = name.removeprefix("Gui")
     return name[:1].lower() + name[1:]
 
 
 def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str, prelude_file: str, ext_prelude_file: str, skip_after: str = "#/never\\#"):
-    header = open(header_name, mode="r")
+    with open(header_name, mode="r") as header:
+        header_lines = list(header)
+
     ext_heads = []
     zig_funcs = []
     zig_types = set()
 
     leftover = ""
 
-    for line in header.readlines():
+    for line in header_lines:
         if line == skip_after:
             break
 
@@ -478,16 +478,18 @@ def parse_header(header_name: str, output_file: str, ext_file: str, prefix: str,
                 "\n}"
             )
 
-    prelude = open(prelude_file, mode="r").read()
-    ext_prelude = open(ext_prelude_file, mode="r").read()
+    with open(prelude_file, mode="r") as prelude_source:
+        prelude = prelude_source.read()
+    with open(ext_prelude_file, mode="r") as ext_prelude_source:
+        ext_prelude = ext_prelude_source.read()
 
-    ext_header = open(ext_file, mode="w")
-    print(ext_prelude, file=ext_header)
-    print("\n".join(ext_heads), file=ext_header)
+    with open(ext_file, mode="w") as ext_header:
+        print(ext_prelude, file=ext_header)
+        print("\n".join(ext_heads), file=ext_header)
 
-    zig_header = open(output_file, mode="w")
-    print(prelude, file=zig_header)
-    print("\n\n".join(zig_funcs), file=zig_header)
+    with open(output_file, mode="w") as zig_header:
+        print(prelude, file=zig_header)
+        print("\n\n".join(zig_funcs), file=zig_header)
 
 
 if __name__ == "__main__":

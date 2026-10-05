@@ -43,7 +43,7 @@ pub fn main() anyerror!void {
     defer rl.unloadImage(parrots);
 
     // Draw one image over the other with a scaling of 1.5f
-    rl.imageDraw(&parrots, cat, .{
+    rl.imageDrawImagePro(&parrots, cat, .{
         .x = 0,
         .y = 0,
         .width = @as(f32, @floatFromInt(cat.width)),
@@ -53,7 +53,10 @@ pub fn main() anyerror!void {
         .y = 40,
         .width = @as(f32, @floatFromInt(cat.width)) * 1.5,
         .height = @as(f32, @floatFromInt(cat.height)) * 1.5,
-    }, .white);
+    }, .{
+        .x = 0,
+        .y = 0,
+    }, 0.0, .white);
 
     // Crop resulting image
     rl.imageCrop(&parrots, .{

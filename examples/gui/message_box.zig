@@ -37,6 +37,8 @@ pub fn main() !void {
 
     const color_int = rg.getStyle(.default, .background_color);
 
+    var message_box_button: i32 = 0;
+
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
@@ -47,14 +49,9 @@ pub fn main() !void {
             show_message_box = true;
 
         if (show_message_box) {
-            const result = rg.messageBox(
-                .init(85, 70, 250, 100),
-                "#191#Message Box",
-                "Hi! This is a message",
-                "Nice;Cool",
-            );
+            const result = rg.messageBox(.init(85, 70, 250, 100), "#191#Message Box", "Hi! This is a message", "Nice;Cool", &message_box_button);
 
-            if (result >= 0) show_message_box = false;
+            if (result == 1) show_message_box = false;
         }
     }
 }

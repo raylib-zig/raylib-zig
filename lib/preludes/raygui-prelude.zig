@@ -68,16 +68,16 @@ pub const Control = enum(c_int) {
 };
 
 fn MergedProperty(comptime Other: type) type {
-    const all = @typeInfo(ControlProperty).@"enum".fields ++ @typeInfo(Other).@"enum".fields;
-    comptime var names: [all.len][:0]const u8 = undefined;
-    comptime var values: [all.len]c_int = undefined;
+    const names = @typeInfo(ControlProperty).@"enum".field_names ++ @typeInfo(Other).@"enum".field_names;
+    const raw_values = @typeInfo(ControlProperty).@"enum".field_values ++ @typeInfo(Other).@"enum".field_values;
 
-    inline for (all, 0..) |field, i| {
-        names[i] = field.name;
-        values[i] = field.value;
+    comptime var values: [raw_values.len]c_int = undefined;
+
+    inline for (raw_values, 0..) |value, i| {
+        values[i] = value;
     }
 
-    return @Enum(c_int, .exhaustive, &names, &values);
+    return @Enum(c_int, .exhaustive, names, &values);
 }
 
 fn PropertyType(comptime control: Control) type {
@@ -479,11 +479,6 @@ pub fn getIcons() error{GetIcons}![]u32 {
 /// Load raygui icons file (.rgi) into internal icons data
 pub fn loadIcons(fileName: [*c]const u8, loadIconsName: bool) [*c][*c]u8 {
     return cdef.GuiLoadIcons(fileName, loadIconsName);
-}
-
-/// Tab Bar control, returns TAB to be closed or -1
-pub fn tabBar(bounds: Rectangle, text: [][*:0]u8, active: *i32) i32 {
-    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
 }
 
 /// List View with extended parameters
