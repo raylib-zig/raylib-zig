@@ -64,7 +64,7 @@ pub fn main() anyerror!void {
             var key = rl.getKeyPressed();
             while (key != .null) : (key = rl.getKeyPressed()) {
                 // NOTE: Only allow keys in range [32..125]
-                const keyInt: c_int = @intFromEnum(key);
+                const keyInt: c_int = @backingInt(key);
                 if ((keyInt >= 32) and (keyInt <= 125) and (letter_count < name.len)) {
                     name[letter_count] = @intCast(keyInt);
                     letter_count += 1;

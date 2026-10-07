@@ -15,6 +15,15 @@ test {
     std.testing.refAllDecls(cdef);
     std.testing.refAllDecls(gl);
     std.testing.refAllDecls(math);
+
+    // Also compile the methods of every type, so upstream API changes surface here
+    inline for (comptime std.meta.declarations(@This())) |name| {
+        const decl = @field(@This(), name);
+        if (@TypeOf(decl) == type) switch (@typeInfo(decl)) {
+            .@"struct", .@"enum", .@"union" => std.testing.refAllDecls(decl),
+            else => {},
+        };
+    }
 }
 
 pub const RaylibError = error{
@@ -1153,7 +1162,7 @@ pub const Image = extern struct {
     }
 
     /// Modify image color: contrast (-100 to 100)
-    pub fn contrast(self: *Image, c: f32) void {
+    pub fn contrast(self: *Image, c: i32) void {
         rl.imageColorContrast(self, c);
     }
 
@@ -1239,12 +1248,12 @@ pub const Image = extern struct {
 
     /// Draw rectangle lines within an image
     pub fn drawRectangleLines(self: *Image, rec: Rectangle, thick: i32, color: Color) void {
-        rl.imageDrawRectangleLines(self, rec, thick, color);
+        rl.imageDrawRectangleLinesEx(self, rec, thick, color);
     }
 
     /// Draw a source image within a destination image (tint applied to source)
     pub fn drawImage(self: *Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, t: Color) void {
-        rl.imageDraw(self, src, srcRec, dstRec, t);
+        rl.imageDrawImagePro(self, src, srcRec, dstRec, .zero(), 0, t);
     }
 
     /// Draw text (using default font) within an image (destination)
@@ -1494,7 +1503,7 @@ pub const Mesh = extern struct {
 
     // Skin data for animation
     boneCount: c_int,
-    boneIndices: [*c]u16,
+    boneIndices: [*c]u8,
     boneWeights: [*c]f32,
 
     // Runtime animation vertex data (CPU skinning)
@@ -1503,8 +1512,8 @@ pub const Mesh = extern struct {
     animNormals: [*c]f32,
 
     // OpenGL identifiers
-    vaoId: c_int,
-    vboId: [*c]c_int,
+    vaoId: c_uint,
+    vboId: [*c]c_uint,
 
     /// Draw a 3d mesh with material and transform
     pub fn draw(self: Mesh, material: Material, transform: Matrix) void {
@@ -1573,9 +1582,9 @@ pub const BoneInfo = extern struct {
 };
 
 pub const ModelSkeleton = extern struct {
-    boneCount: c_int,
+    boneCount: c_uint,
     bones: [*c]BoneInfo,
-    bindPose: ModelAnimPose
+    bindPose: ModelAnimPose,
 };
 
 pub const Model = extern struct {
@@ -1630,13 +1639,14 @@ pub const Model = extern struct {
 pub const ModelAnimation = extern struct {
     name: [32]u8,
 
-    boneCount: c_int,
+    boneCount: c_uint,
     keyframeCount: c_int,
     keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
-        rl.unloadModelAnimation(self);
+        var anim = self;
+        rl.unloadModelAnimations((&anim)[0..1]);
     }
 };
 
@@ -1714,7 +1724,6 @@ pub const VrDeviceInfo = extern struct {
     vResolution: c_int,
     hScreenSize: f32,
     vScreenSize: f32,
-    vScreenCenter: f32,
     eyeToScreenDistance: f32,
     lensSeparationDistance: f32,
     interpupillaryDistance: f32,
@@ -1914,7 +1923,7 @@ pub const KeyboardKey = enum(c_int) {
     kp_enter = 335,
     kp_equal = 336,
     back = 4,
-    //menu = 82,
+    menu = 5,
     volume_up = 24,
     volume_down = 25,
     _,
@@ -2159,11 +2168,11 @@ pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(C) bo
 pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(C) void;
 
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 6);
-pub const RAYLIB_VERSION_MINOR = @as(i32, 0);
+pub const RAYLIB_VERSION_MINOR = @as(i32, 1);
 pub const RAYLIB_VERSION_PATCH = @as(i32, 0);
-pub const RAYLIB_VERSION = "6.0";
+pub const RAYLIB_VERSION = "6.1-dev";
 
-pub const MAX_TOUCH_POINTS = 10;
+pub const MAX_TOUCH_POINTS = 8;
 pub const MAX_MATERIAL_MAPS = 12;
 pub const MAX_SHADER_LOCATIONS = 32;
 
@@ -2218,8 +2227,8 @@ pub fn loadRandomSequence(count: u32, min: i32, max: i32) []i32 {
 }
 
 /// Save data to file from byte array (write), returns true on success
-pub fn saveFileData(fileName: [:0]const u8, data: []u8) bool {
-    return cdef.SaveFileData(@as([*c]const u8, @ptrCast(fileName)), @as(*anyopaque, @ptrCast(data.ptr)), @as(c_int, @intCast(data.len)));
+pub fn saveFileData(fileName: [:0]const u8, data: []const u8) bool {
+    return cdef.SaveFileData(@as([*c]const u8, @ptrCast(fileName)), @as(*const anyopaque, @ptrCast(data.ptr)), @as(c_int, @intCast(data.len)));
 }
 
 /// Export data to code (.h), returns true on success
@@ -2227,22 +2236,22 @@ pub fn exportDataAsCode(data: []const u8, fileName: [:0]const u8) bool {
     return cdef.ExportDataAsCode(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)), @as([*c]const u8, @ptrCast(fileName)));
 }
 
-pub fn computeCRC32(data: []u8) u32 {
-    return cdef.ComputeCRC32(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeCRC32(data: []const u8) u32 {
+    return cdef.ComputeCRC32(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
 }
 
-pub fn computeMD5(data: []u8) [4]u32 {
-    const res: [*]c_uint = cdef.ComputeMD5(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeMD5(data: []const u8) [4]u32 {
+    const res: [*]c_uint = cdef.ComputeMD5(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..4].*;
 }
 
-pub fn computeSHA1(data: []u8) [5]u32 {
-    const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeSHA1(data: []const u8) [5]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
 }
 
-pub fn computeSHA256(data: []u8) [8]u32 {
-    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeSHA256(data: []const u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..8].*;
 }
 

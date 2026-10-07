@@ -97,7 +97,7 @@ MANUAL = [
     "DrawTriangleFan",
     "DrawTriangleStrip",
     "DrawTriangleStrip3D",
-    "GuiTabBar",
+    "GuiTabBarEx",
     "GuiListViewEx",
     "GuiPanel",
     "GuiScrollPanel",
@@ -148,7 +148,7 @@ def ziggify_type(name: str, t: str, func_name: str) -> str:
         "AutomationEventList", "list", "batch", "glInternalFormat", "glFormat",
         "glType", "mipmaps", "active", "scroll", "view", "checked", "mouseCell",
         "scrollIndex", "focus", "secretViewActive", "color", "alpha", "colorHsv",
-        "translation", "rotation", "scale", "mat", "glyphCount"
+        "translation", "rotation", "scale", "mat", "glyphCount", "hscroll", "btnActive"
     ]
     multi = [
         "data", "compData", "points", "fileData", "colors", "pixels",

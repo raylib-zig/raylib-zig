@@ -23,6 +23,14 @@ pub const StyleProp = extern struct {
     propertyValue: c_int,
 };
 
+pub const Result = enum(c_int) {
+    none = 0,
+    pressed = 1,
+    changed = 2,
+    tab_close = 4,
+    _,
+};
+
 pub const State = enum(c_int) {
     normal = 0,
     focused,
@@ -60,7 +68,7 @@ pub const Control = enum(c_int) {
     dropdownbox,
     textbox,
     valuebox,
-    control11,
+    tabbar,
     listview,
     colorpicker,
     scrollbar,
@@ -68,16 +76,17 @@ pub const Control = enum(c_int) {
 };
 
 fn MergedProperty(comptime Other: type) type {
-    const all = @typeInfo(ControlProperty).@"enum".fields ++ @typeInfo(Other).@"enum".fields;
-    comptime var names: [all.len][:0]const u8 = undefined;
-    comptime var values: [all.len]c_int = undefined;
+    const control = @typeInfo(ControlProperty).@"enum";
+    const other = @typeInfo(Other).@"enum";
+    const names = control.field_names ++ other.field_names;
+    const all_values = control.field_values ++ other.field_values;
+    comptime var values: [all_values.len]c_int = undefined;
 
-    inline for (all, 0..) |field, i| {
-        names[i] = field.name;
-        values[i] = field.value;
+    inline for (all_values, 0..) |value, i| {
+        values[i] = value;
     }
 
-    return @Enum(c_int, .exhaustive, &names, &values);
+    return @Enum(c_int, .exhaustive, names, &values);
 }
 
 fn PropertyType(comptime control: Control) type {
@@ -92,9 +101,10 @@ fn PropertyType(comptime control: Control) type {
         .dropdownbox => MergedProperty(DropdownBoxProperty),
         .textbox => MergedProperty(TextBoxProperty),
         .valuebox => MergedProperty(ValueBoxProperty),
+        .tabbar => MergedProperty(TabBarProperty),
         .listview => MergedProperty(ListViewProperty),
         .colorpicker => MergedProperty(ColorPickerProperty),
-        .label, .button, .control11, .statusbar => ControlProperty,
+        .label, .button, .statusbar => ControlProperty,
     };
 }
 
@@ -128,6 +138,7 @@ pub const DefaultProperty = enum(c_int) {
 
 pub const ToggleProperty = enum(c_int) {
     group_padding = 16,
+    group_width_full,
 };
 
 pub const SliderProperty = enum(c_int) {
@@ -172,6 +183,12 @@ pub const TextBoxProperty = enum(c_int) {
 pub const ValueBoxProperty = enum(c_int) {
     spin_button_width = 16,
     spin_button_spacing,
+};
+
+pub const TabBarProperty = enum(c_int) {
+    tab_items_width = 16,
+    tab_close_button,
+    tab_line_side,
 };
 
 pub const ListViewProperty = enum(c_int) {
@@ -445,12 +462,13 @@ pub const IconName = enum(c_int) {
     cone = 247,
     ellipsoid = 248,
     capsule = 249,
-    icon_250 = 250,
-    icon_251 = 251,
-    icon_252 = 252,
-    icon_253 = 253,
-    icon_254 = 254,
-    icon_255 = 255,
+    filetype_font = 250,
+    filetype_3d = 251,
+    filetype_code_xml = 252,
+    filetype_code_c = 253,
+    filetype_code_python = 254,
+    filetype_code_js = 255,
+    filetype_icon = 256,
 };
 
 /// Set one style property
@@ -471,7 +489,7 @@ pub fn getIcons() error{GetIcons}![]u32 {
     if (ptr == 0) return error.GetIcons;
 
     res.ptr = @as([*]u32, @ptrCast(ptr));
-    res.len = @as(usize, @intCast(256 * 256)); // RAYGUI_ICON_MAX_ICONS * RAYGUI_ICON_MAX_ICONS
+    res.len = @as(usize, @intCast(512 * (16 * 16 / 32))); // RAYGUI_ICON_MAX_ICONS * RAYGUI_ICON_DATA_ELEMENTS
     return res;
 }
 
@@ -481,9 +499,20 @@ pub fn loadIcons(fileName: [*c]const u8, loadIconsName: bool) [*c][*c]u8 {
     return cdef.GuiLoadIcons(fileName, loadIconsName);
 }
 
-/// Tab Bar control, returns TAB to be closed or -1
-pub fn tabBar(bounds: Rectangle, text: [][*:0]u8, active: *i32) i32 {
-    return @as(i32, cdef.GuiTabBar(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(active))));
+// If you REALLY need the return value of the function, you'll know what to do with it and its size yourself
+/// Load raygui icons file (.rgi) from memory into internal icons data
+pub fn loadIconsFromMemory(fileData: []const u8, loadIconsName: bool) [*c][*c]u8 {
+    return cdef.GuiLoadIconsFromMemory(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)), loadIconsName);
+}
+
+/// Load style from memory (binary only)
+pub fn loadStyleFromMemory(fileData: []const u8) void {
+    cdef.GuiLoadStyleFromMemory(@as([*c]const u8, @ptrCast(fileData)), @as(c_int, @intCast(fileData.len)));
+}
+
+/// Tab Bar control, using text entries list and returning focus entry
+pub fn tabBarEx(bounds: Rectangle, text: [][*:0]u8, hscroll: *i32, active: *i32, focus: *i32) i32 {
+    return @as(i32, cdef.GuiTabBarEx(bounds, @as([*c][*c]u8, @ptrCast(text)), @as(c_int, @intCast(text.len)), @as([*c]c_int, @ptrCast(hscroll)), @as([*c]c_int, @ptrCast(active)), @as([*c]c_int, @ptrCast(focus))));
 }
 
 /// List View with extended parameters
@@ -720,17 +749,22 @@ pub fn listView(bounds: Rectangle, text: [:0]const u8, scrollIndex: *i32, active
     return @as(i32, cdef.GuiListView(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(scrollIndex)), @as([*c]c_int, @ptrCast(active))));
 }
 
+/// Tab Bar control
+pub fn tabBar(bounds: Rectangle, text: [:0]const u8, hscroll: *i32, active: *i32) i32 {
+    return @as(i32, cdef.GuiTabBar(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]c_int, @ptrCast(hscroll)), @as([*c]c_int, @ptrCast(active))));
+}
+
 /// Message Box control, displays a message
-pub fn messageBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8) i32 {
-    return @as(i32, cdef.GuiMessageBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(buttons))));
+pub fn messageBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, btnText: [:0]const u8, btnActive: *i32) i32 {
+    return @as(i32, cdef.GuiMessageBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(btnText)), @as([*c]c_int, @ptrCast(btnActive))));
 }
 
 /// Text Input Box control, ask for text, supports secret
-pub fn textInputBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, buttons: [:0]const u8, text: [:0]u8, textMaxSize: i32, secretViewActive: ?*bool) i32 {
-    return @as(i32, cdef.GuiTextInputBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]const u8, @ptrCast(buttons)), @as([*c]u8, @ptrCast(text)), @as(c_int, textMaxSize), @as([*c]bool, @ptrCast(secretViewActive))));
+pub fn textInputBox(bounds: Rectangle, title: [:0]const u8, message: [:0]const u8, text: [:0]u8, textSize: i32, btnText: [:0]const u8, btnActive: *i32, secretViewActive: ?*bool) i32 {
+    return @as(i32, cdef.GuiTextInputBox(bounds, @as([*c]const u8, @ptrCast(title)), @as([*c]const u8, @ptrCast(message)), @as([*c]u8, @ptrCast(text)), @as(c_int, textSize), @as([*c]const u8, @ptrCast(btnText)), @as([*c]c_int, @ptrCast(btnActive)), @as([*c]bool, @ptrCast(secretViewActive))));
 }
 
-/// Color Picker control (multiple color controls)
+/// Color Picker control, includes Color bar controls
 pub fn colorPicker(bounds: Rectangle, text: [:0]const u8, color: *Color) i32 {
     return @as(i32, cdef.GuiColorPicker(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Color, @ptrCast(color))));
 }
@@ -750,12 +784,12 @@ pub fn colorBarHue(bounds: Rectangle, text: [:0]const u8, value: *f32) i32 {
     return @as(i32, cdef.GuiColorBarHue(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]f32, @ptrCast(value))));
 }
 
-/// Color Picker control that avoids conversion to RGB on each call (multiple color controls)
+/// Color Picker control, using Hue-Saturation-Value color data, includes Color bar controls
 pub fn colorPickerHSV(bounds: Rectangle, text: [:0]const u8, colorHsv: *Vector3) i32 {
     return @as(i32, cdef.GuiColorPickerHSV(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Vector3, @ptrCast(colorHsv))));
 }
 
-/// Color Panel control that updates Hue-Saturation-Value color value, used by GuiColorPickerHSV()
+/// Color Panel control, using Hue-Saturation-Value color data
 pub fn colorPanelHSV(bounds: Rectangle, text: [:0]const u8, colorHsv: *Vector3) i32 {
     return @as(i32, cdef.GuiColorPanelHSV(bounds, @as([*c]const u8, @ptrCast(text)), @as([*c]Vector3, @ptrCast(colorHsv))));
 }

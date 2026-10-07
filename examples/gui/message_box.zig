@@ -34,6 +34,7 @@ pub fn main() !void {
     rl.setTargetFPS(60);
 
     var show_message_box = false;
+    var btn_active: i32 = 0;
 
     const color_int = rg.getStyle(.default, .background_color);
 
@@ -52,9 +53,10 @@ pub fn main() !void {
                 "#191#Message Box",
                 "Hi! This is a message",
                 "Nice;Cool",
+                &btn_active,
             );
 
-            if (result >= 0) show_message_box = false;
+            if (@as(rg.Result, @enumFromInt(result)) == .pressed) show_message_box = false;
         }
     }
 }

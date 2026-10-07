@@ -15,6 +15,15 @@ test {
     std.testing.refAllDecls(cdef);
     std.testing.refAllDecls(gl);
     std.testing.refAllDecls(math);
+
+    // Also compile the methods of every type, so upstream API changes surface here
+    inline for (comptime std.meta.declarations(@This())) |name| {
+        const decl = @field(@This(), name);
+        if (@TypeOf(decl) == type) switch (@typeInfo(decl)) {
+            .@"struct", .@"enum", .@"union" => std.testing.refAllDecls(decl),
+            else => {},
+        };
+    }
 }
 
 pub const RaylibError = error{
@@ -1153,7 +1162,7 @@ pub const Image = extern struct {
     }
 
     /// Modify image color: contrast (-100 to 100)
-    pub fn contrast(self: *Image, c: f32) void {
+    pub fn contrast(self: *Image, c: i32) void {
         rl.imageColorContrast(self, c);
     }
 
@@ -1239,12 +1248,12 @@ pub const Image = extern struct {
 
     /// Draw rectangle lines within an image
     pub fn drawRectangleLines(self: *Image, rec: Rectangle, thick: i32, color: Color) void {
-        rl.imageDrawRectangleLines(self, rec, thick, color);
+        rl.imageDrawRectangleLinesEx(self, rec, thick, color);
     }
 
     /// Draw a source image within a destination image (tint applied to source)
     pub fn drawImage(self: *Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, t: Color) void {
-        rl.imageDraw(self, src, srcRec, dstRec, t);
+        rl.imageDrawImagePro(self, src, srcRec, dstRec, .zero(), 0, t);
     }
 
     /// Draw text (using default font) within an image (destination)
@@ -1494,7 +1503,7 @@ pub const Mesh = extern struct {
 
     // Skin data for animation
     boneCount: c_int,
-    boneIndices: [*c]u16,
+    boneIndices: [*c]u8,
     boneWeights: [*c]f32,
 
     // Runtime animation vertex data (CPU skinning)
@@ -1503,8 +1512,8 @@ pub const Mesh = extern struct {
     animNormals: [*c]f32,
 
     // OpenGL identifiers
-    vaoId: c_int,
-    vboId: [*c]c_int,
+    vaoId: c_uint,
+    vboId: [*c]c_uint,
 
     /// Draw a 3d mesh with material and transform
     pub fn draw(self: Mesh, material: Material, transform: Matrix) void {
@@ -1573,9 +1582,9 @@ pub const BoneInfo = extern struct {
 };
 
 pub const ModelSkeleton = extern struct {
-    boneCount: c_int,
+    boneCount: c_uint,
     bones: [*c]BoneInfo,
-    bindPose: ModelAnimPose
+    bindPose: ModelAnimPose,
 };
 
 pub const Model = extern struct {
@@ -1630,13 +1639,14 @@ pub const Model = extern struct {
 pub const ModelAnimation = extern struct {
     name: [32]u8,
 
-    boneCount: c_int,
+    boneCount: c_uint,
     keyframeCount: c_int,
     keyframePoses: [*c]ModelAnimPose,
 
     /// Unload animation data
     pub fn unload(self: ModelAnimation) void {
-        rl.unloadModelAnimation(self);
+        var anim = self;
+        rl.unloadModelAnimations((&anim)[0..1]);
     }
 };
 
@@ -1714,7 +1724,6 @@ pub const VrDeviceInfo = extern struct {
     vResolution: c_int,
     hScreenSize: f32,
     vScreenSize: f32,
-    vScreenCenter: f32,
     eyeToScreenDistance: f32,
     lensSeparationDistance: f32,
     interpupillaryDistance: f32,
@@ -1914,7 +1923,7 @@ pub const KeyboardKey = enum(c_int) {
     kp_enter = 335,
     kp_equal = 336,
     back = 4,
-    //menu = 82,
+    menu = 5,
     volume_up = 24,
     volume_down = 25,
     _,
@@ -2159,11 +2168,11 @@ pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(C) bo
 pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(C) void;
 
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 6);
-pub const RAYLIB_VERSION_MINOR = @as(i32, 0);
+pub const RAYLIB_VERSION_MINOR = @as(i32, 1);
 pub const RAYLIB_VERSION_PATCH = @as(i32, 0);
-pub const RAYLIB_VERSION = "6.0";
+pub const RAYLIB_VERSION = "6.1-dev";
 
-pub const MAX_TOUCH_POINTS = 10;
+pub const MAX_TOUCH_POINTS = 8;
 pub const MAX_MATERIAL_MAPS = 12;
 pub const MAX_SHADER_LOCATIONS = 32;
 
@@ -2218,8 +2227,8 @@ pub fn loadRandomSequence(count: u32, min: i32, max: i32) []i32 {
 }
 
 /// Save data to file from byte array (write), returns true on success
-pub fn saveFileData(fileName: [:0]const u8, data: []u8) bool {
-    return cdef.SaveFileData(@as([*c]const u8, @ptrCast(fileName)), @as(*anyopaque, @ptrCast(data.ptr)), @as(c_int, @intCast(data.len)));
+pub fn saveFileData(fileName: [:0]const u8, data: []const u8) bool {
+    return cdef.SaveFileData(@as([*c]const u8, @ptrCast(fileName)), @as(*const anyopaque, @ptrCast(data.ptr)), @as(c_int, @intCast(data.len)));
 }
 
 /// Export data to code (.h), returns true on success
@@ -2227,22 +2236,22 @@ pub fn exportDataAsCode(data: []const u8, fileName: [:0]const u8) bool {
     return cdef.ExportDataAsCode(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)), @as([*c]const u8, @ptrCast(fileName)));
 }
 
-pub fn computeCRC32(data: []u8) u32 {
-    return cdef.ComputeCRC32(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeCRC32(data: []const u8) u32 {
+    return cdef.ComputeCRC32(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
 }
 
-pub fn computeMD5(data: []u8) [4]u32 {
-    const res: [*]c_uint = cdef.ComputeMD5(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeMD5(data: []const u8) [4]u32 {
+    const res: [*]c_uint = cdef.ComputeMD5(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..4].*;
 }
 
-pub fn computeSHA1(data: []u8) [5]u32 {
-    const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeSHA1(data: []const u8) [5]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA1(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..5].*;
 }
 
-pub fn computeSHA256(data: []u8) [8]u32 {
-    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
+pub fn computeSHA256(data: []const u8) [8]u32 {
+    const res: [*]c_uint = cdef.ComputeSHA256(@as([*c]const u8, @ptrCast(data)), @as(c_int, @intCast(data.len)));
     return res[0..8].*;
 }
 
@@ -2945,12 +2954,12 @@ pub fn disableEventWaiting() void {
     cdef.DisableEventWaiting();
 }
 
-/// Shows cursor
+/// Show cursor
 pub fn showCursor() void {
     cdef.ShowCursor();
 }
 
-/// Hides cursor
+/// Hide cursor
 pub fn hideCursor() void {
     cdef.HideCursor();
 }
@@ -2960,12 +2969,12 @@ pub fn isCursorHidden() bool {
     return cdef.IsCursorHidden();
 }
 
-/// Enables cursor (unlock cursor)
+/// Enable cursor (unlock cursor)
 pub fn enableCursor() void {
     cdef.EnableCursor();
 }
 
-/// Disables cursor (lock cursor)
+/// Disable cursor (lock cursor)
 pub fn disableCursor() void {
     cdef.DisableCursor();
 }
@@ -2975,17 +2984,17 @@ pub fn isCursorOnScreen() bool {
     return cdef.IsCursorOnScreen();
 }
 
-/// Set background color (framebuffer clear color)
+/// Clear background (framebuffer) to color
 pub fn clearBackground(color: Color) void {
     cdef.ClearBackground(color);
 }
 
-/// Setup canvas (framebuffer) to start drawing
+/// Begin canvas (framebuffer) drawing
 pub fn beginDrawing() void {
     cdef.BeginDrawing();
 }
 
-/// End canvas drawing and swap buffers (double buffering)
+/// End canvas (framebuffer) drawing and swap buffers (double buffering)
 pub fn endDrawing() void {
     cdef.EndDrawing();
 }
@@ -2995,7 +3004,7 @@ pub fn beginMode2D(camera: Camera2D) void {
     cdef.BeginMode2D(camera);
 }
 
-/// Ends 2D mode with custom camera
+/// End 2D mode with custom camera
 pub fn endMode2D() void {
     cdef.EndMode2D();
 }
@@ -3005,7 +3014,7 @@ pub fn beginMode3D(camera: Camera3D) void {
     cdef.BeginMode3D(camera);
 }
 
-/// Ends 3D mode and returns to default 2D orthographic mode
+/// End 3D mode and returns to default 2D orthographic mode
 pub fn endMode3D() void {
     cdef.EndMode3D();
 }
@@ -3015,7 +3024,7 @@ pub fn beginTextureMode(target: RenderTexture2D) void {
     cdef.BeginTextureMode(target);
 }
 
-/// Ends drawing to render texture
+/// End drawing to render texture
 pub fn endTextureMode() void {
     cdef.EndTextureMode();
 }
@@ -3070,7 +3079,7 @@ pub fn unloadVrStereoConfig(config: VrStereoConfig) void {
     cdef.UnloadVrStereoConfig(config);
 }
 
-/// Check if a shader is valid (loaded on GPU)
+/// Check if shader is valid (loaded on GPU)
 pub fn isShaderValid(shader: Shader) bool {
     return cdef.IsShaderValid(shader);
 }
@@ -3120,22 +3129,22 @@ pub fn getScreenToWorldRayEx(position: Vector2, camera: Camera, width: i32, heig
     return cdef.GetScreenToWorldRayEx(position, camera, @as(c_int, width), @as(c_int, height));
 }
 
-/// Get the screen space position for a 3d world space position
+/// Get screen space position for a 3d world space position
 pub fn getWorldToScreen(position: Vector3, camera: Camera) Vector2 {
     return cdef.GetWorldToScreen(position, camera);
 }
 
-/// Get size position for a 3d world space position
+/// Get sized screen space position for a 3d world space position
 pub fn getWorldToScreenEx(position: Vector3, camera: Camera, width: i32, height: i32) Vector2 {
     return cdef.GetWorldToScreenEx(position, camera, @as(c_int, width), @as(c_int, height));
 }
 
-/// Get the screen space position for a 2d camera world space position
+/// Get screen space position for a 2d camera world space position
 pub fn getWorldToScreen2D(position: Vector2, camera: Camera2D) Vector2 {
     return cdef.GetWorldToScreen2D(position, camera);
 }
 
-/// Get the world space position for a 2d camera screen space position
+/// Get world space position for a 2d camera screen space position
 pub fn getScreenToWorld2D(position: Vector2, camera: Camera2D) Vector2 {
     return cdef.GetScreenToWorld2D(position, camera);
 }
@@ -3205,7 +3214,7 @@ pub fn takeScreenshot(fileName: [:0]const u8) void {
     cdef.TakeScreenshot(@as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Setup init configuration flags (view FLAGS)
+/// Set up init configuration flags (view FLAGS)
 pub fn setConfigFlags(flags: ConfigFlags) void {
     cdef.SetConfigFlags(flags);
 }
@@ -3283,32 +3292,32 @@ pub fn setSaveFileTextCallback(callback: SaveFileTextCallback) void {
     cdef.SetSaveFileTextCallback(callback);
 }
 
-/// Rename file (if exists)
+/// Rename file (if exists), returns 0 on success
 pub fn fileRename(fileName: [:0]const u8, fileRename_: [:0]const u8) i32 {
     return @as(i32, cdef.FileRename(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(fileRename_))));
 }
 
-/// Remove file (if exists)
+/// Remove file (if exists), returns 0 on success
 pub fn fileRemove(fileName: [:0]const u8) i32 {
     return @as(i32, cdef.FileRemove(@as([*c]const u8, @ptrCast(fileName))));
 }
 
-/// Copy file from one path to another, dstPath created if it doesn't exist
+/// Copy file from one path to another, dstPath created if it doesn't exist, returns 0 on success
 pub fn fileCopy(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
     return @as(i32, cdef.FileCopy(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
 }
 
-/// Move file from one directory to another, dstPath created if it doesn't exist
+/// Move file from one directory to another, dstPath created if it doesn't exist, returns 0 on success
 pub fn fileMove(srcPath: [:0]const u8, dstPath: [:0]const u8) i32 {
     return @as(i32, cdef.FileMove(@as([*c]const u8, @ptrCast(srcPath)), @as([*c]const u8, @ptrCast(dstPath))));
 }
 
-/// Replace text in an existing file
+/// Replace text in an existing file, returns 0 on success
 pub fn fileTextReplace(fileName: [:0]const u8, search: [:0]const u8, replacement: [:0]const u8) i32 {
     return @as(i32, cdef.FileTextReplace(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search)), @as([*c]const u8, @ptrCast(replacement))));
 }
 
-/// Find text in existing file
+/// Find text in existing file, returns -1 if index not found or index otherwise
 pub fn fileTextFindIndex(fileName: [:0]const u8, search: [:0]const u8) i32 {
     return @as(i32, cdef.FileTextFindIndex(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(search))));
 }
@@ -3318,7 +3327,7 @@ pub fn fileExists(fileName: [:0]const u8) bool {
     return cdef.FileExists(@as([*c]const u8, @ptrCast(fileName)));
 }
 
-/// Check if a directory path exists
+/// Check if directory path exists
 pub fn directoryExists(dirPath: [:0]const u8) bool {
     return cdef.DirectoryExists(@as([*c]const u8, @ptrCast(dirPath)));
 }
@@ -3326,6 +3335,11 @@ pub fn directoryExists(dirPath: [:0]const u8) bool {
 /// Check file extension (recommended include point: .png, .wav)
 pub fn isFileExtension(fileName: [:0]const u8, ext: [:0]const u8) bool {
     return cdef.IsFileExtension(@as([*c]const u8, @ptrCast(fileName)), @as([*c]const u8, @ptrCast(ext)));
+}
+
+/// Check if file path (file or directory) is hidden by OS
+pub fn isFileHidden(filePath: [:0]const u8) bool {
+    return cdef.IsFileHidden(@as([*c]const u8, @ptrCast(filePath)));
 }
 
 /// Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
@@ -3353,12 +3367,12 @@ pub fn getFileNameWithoutExt(filePath: [:0]const u8) [:0]const u8 {
     return std.mem.span(cdef.GetFileNameWithoutExt(@as([*c]const u8, @ptrCast(filePath))));
 }
 
-/// Get full path for a given fileName with path (uses static string)
+/// Get full path for a provided fileName with path (uses static string)
 pub fn getDirectoryPath(filePath: [:0]const u8) [:0]const u8 {
     return std.mem.span(cdef.GetDirectoryPath(@as([*c]const u8, @ptrCast(filePath))));
 }
 
-/// Get previous directory path for a given path (uses static string)
+/// Get previous directory path for a provided path (uses static string)
 pub fn getPrevDirectoryPath(dirPath: [:0]const u8) [:0]const u8 {
     return std.mem.span(cdef.GetPrevDirectoryPath(@as([*c]const u8, @ptrCast(dirPath))));
 }
@@ -3378,14 +3392,24 @@ pub fn makeDirectory(dirPath: [:0]const u8) i32 {
     return @as(i32, cdef.MakeDirectory(@as([*c]const u8, @ptrCast(dirPath))));
 }
 
-/// Change working directory, return true on success
-pub fn changeDirectory(dirPath: [:0]const u8) bool {
-    return cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dirPath)));
+/// Change working directory, returns 0 on success
+pub fn changeDirectory(dirPath: [:0]const u8) i32 {
+    return @as(i32, cdef.ChangeDirectory(@as([*c]const u8, @ptrCast(dirPath))));
 }
 
-/// Check if a given path is a file or a directory
+/// Check if provided path points to a file
 pub fn isPathFile(path: [:0]const u8) bool {
     return cdef.IsPathFile(@as([*c]const u8, @ptrCast(path)));
+}
+
+/// Check if provided path points to a directory
+pub fn isPathDirectory(path: [:0]const u8) bool {
+    return cdef.IsPathDirectory(@as([*c]const u8, @ptrCast(path)));
+}
+
+/// Check if provided path is an absolute path
+pub fn isPathAbsolute(path: [:0]const u8) bool {
+    return cdef.IsPathAbsolute(@as([*c]const u8, @ptrCast(path)));
 }
 
 /// Check if fileName is valid for the platform/OS
@@ -3398,7 +3422,7 @@ pub fn loadDirectoryFiles(dirPath: [:0]const u8) FilePathList {
     return cdef.LoadDirectoryFiles(@as([*c]const u8, @ptrCast(dirPath)));
 }
 
-/// Load directory filepaths with extension filtering and subdir scan; some filters available: "*.*", "FILES*", "DIRS*"
+/// Load directory filepaths with extension filtering and subdir scan; some filters available: '*.*','FILES*','DIRS*'
 pub fn loadDirectoryFilesEx(basePath: [:0]const u8, filter: [:0]const u8, scanSubdirs: bool) FilePathList {
     return cdef.LoadDirectoryFilesEx(@as([*c]const u8, @ptrCast(basePath)), @as([*c]const u8, @ptrCast(filter)), scanSubdirs);
 }
@@ -3408,7 +3432,7 @@ pub fn unloadDirectoryFiles(files: FilePathList) void {
     cdef.UnloadDirectoryFiles(files);
 }
 
-/// Check if a file has been dropped into window
+/// Check if file has been dropped into window
 pub fn isFileDropped() bool {
     return cdef.IsFileDropped();
 }
@@ -3505,27 +3529,27 @@ pub fn playAutomationEvent(event: AutomationEvent) void {
     cdef.PlayAutomationEvent(event);
 }
 
-/// Check if a key has been pressed once
+/// Check if key has been pressed once
 pub fn isKeyPressed(key: KeyboardKey) bool {
     return cdef.IsKeyPressed(key);
 }
 
-/// Check if a key has been pressed again
+/// Check if key has been pressed again
 pub fn isKeyPressedRepeat(key: KeyboardKey) bool {
     return cdef.IsKeyPressedRepeat(key);
 }
 
-/// Check if a key is being pressed
+/// Check if key is being pressed
 pub fn isKeyDown(key: KeyboardKey) bool {
     return cdef.IsKeyDown(key);
 }
 
-/// Check if a key has been released once
+/// Check if key has been released once
 pub fn isKeyReleased(key: KeyboardKey) bool {
     return cdef.IsKeyReleased(key);
 }
 
-/// Check if a key is NOT being pressed
+/// Check if key is NOT being pressed
 pub fn isKeyUp(key: KeyboardKey) bool {
     return cdef.IsKeyUp(key);
 }
@@ -3550,7 +3574,7 @@ pub fn setExitKey(key: KeyboardKey) void {
     cdef.SetExitKey(key);
 }
 
-/// Check if a gamepad is available
+/// Check if gamepad is available
 pub fn isGamepadAvailable(gamepad: i32) bool {
     return cdef.IsGamepadAvailable(@as(c_int, gamepad));
 }
@@ -3560,22 +3584,22 @@ pub fn getGamepadName(gamepad: i32) [:0]const u8 {
     return std.mem.span(cdef.GetGamepadName(@as(c_int, gamepad)));
 }
 
-/// Check if a gamepad button has been pressed once
+/// Check if gamepad button has been pressed once
 pub fn isGamepadButtonPressed(gamepad: i32, button: GamepadButton) bool {
     return cdef.IsGamepadButtonPressed(@as(c_int, gamepad), button);
 }
 
-/// Check if a gamepad button is being pressed
+/// Check if gamepad button is being pressed
 pub fn isGamepadButtonDown(gamepad: i32, button: GamepadButton) bool {
     return cdef.IsGamepadButtonDown(@as(c_int, gamepad), button);
 }
 
-/// Check if a gamepad button has been released once
+/// Check if gamepad button has been released once
 pub fn isGamepadButtonReleased(gamepad: i32, button: GamepadButton) bool {
     return cdef.IsGamepadButtonReleased(@as(c_int, gamepad), button);
 }
 
-/// Check if a gamepad button is NOT being pressed
+/// Check if gamepad button is NOT being pressed
 pub fn isGamepadButtonUp(gamepad: i32, button: GamepadButton) bool {
     return cdef.IsGamepadButtonUp(@as(c_int, gamepad), button);
 }
@@ -3605,22 +3629,22 @@ pub fn setGamepadVibration(gamepad: i32, leftMotor: f32, rightMotor: f32, durati
     cdef.SetGamepadVibration(@as(c_int, gamepad), leftMotor, rightMotor, duration);
 }
 
-/// Check if a mouse button has been pressed once
+/// Check if mouse button has been pressed once
 pub fn isMouseButtonPressed(button: MouseButton) bool {
     return cdef.IsMouseButtonPressed(button);
 }
 
-/// Check if a mouse button is being pressed
+/// Check if mouse button is being pressed
 pub fn isMouseButtonDown(button: MouseButton) bool {
     return cdef.IsMouseButtonDown(button);
 }
 
-/// Check if a mouse button has been released once
+/// Check if mouse button has been released once
 pub fn isMouseButtonReleased(button: MouseButton) bool {
     return cdef.IsMouseButtonReleased(button);
 }
 
-/// Check if a mouse button is NOT being pressed
+/// Check if mouse button is NOT being pressed
 pub fn isMouseButtonUp(button: MouseButton) bool {
     return cdef.IsMouseButtonUp(button);
 }
@@ -3690,7 +3714,7 @@ pub fn getTouchPosition(index: i32) Vector2 {
     return cdef.GetTouchPosition(@as(c_int, index));
 }
 
-/// Get touch point identifier for given index
+/// Get touch point identifier for provided index
 pub fn getTouchPointId(index: i32) i32 {
     return @as(i32, cdef.GetTouchPointId(@as(c_int, index)));
 }
@@ -3705,7 +3729,7 @@ pub fn setGesturesEnabled(flags: Gesture) void {
     cdef.SetGesturesEnabled(flags);
 }
 
-/// Check if a gesture have been detected
+/// Check if gesture has been detected
 pub fn isGestureDetected(gesture: Gesture) bool {
     return cdef.IsGestureDetected(gesture);
 }
@@ -3751,8 +3775,8 @@ pub fn updateCameraPro(camera: *Camera, movement: Vector3, rotation: Vector3, zo
 }
 
 /// Set texture and rectangle to be used on shapes drawing
-pub fn setShapesTexture(texture: Texture2D, source: Rectangle) void {
-    cdef.SetShapesTexture(texture, source);
+pub fn setShapesTexture(texture: Texture2D, rec: Rectangle) void {
+    cdef.SetShapesTexture(texture, rec);
 }
 
 /// Get texture that is used for shapes drawing
@@ -3800,69 +3824,24 @@ pub fn drawLineDashed(startPos: Vector2, endPos: Vector2, dashSize: i32, spaceSi
     cdef.DrawLineDashed(startPos, endPos, @as(c_int, dashSize), @as(c_int, spaceSize), color);
 }
 
-/// Draw a color-filled circle
-pub fn drawCircle(centerX: i32, centerY: i32, radius: f32, color: Color) void {
-    cdef.DrawCircle(@as(c_int, centerX), @as(c_int, centerY), radius, color);
+/// Draw a color-filled triangle, counter-clockwise vertex order
+pub fn drawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    cdef.DrawTriangle(v1, v2, v3, color);
 }
 
-/// Draw a color-filled circle (Vector version)
-pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
-    cdef.DrawCircleV(center, radius, color);
+/// Draw triangle with interpolated colors, counter-clockwise vertex/color order
+pub fn drawTriangleGradient(v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color) void {
+    cdef.DrawTriangleGradient(v1, v2, v3, c1, c2, c3);
 }
 
-/// Draw a gradient-filled circle
-pub fn drawCircleGradient(center: Vector2, radius: f32, inner: Color, outer: Color) void {
-    cdef.DrawCircleGradient(center, radius, inner, outer);
+/// Draw triangle outline, counter-clockwise vertex order
+pub fn drawTriangleLines(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    cdef.DrawTriangleLines(v1, v2, v3, color);
 }
 
-/// Draw a piece of a circle
-pub fn drawCircleSector(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
-    cdef.DrawCircleSector(center, radius, startAngle, endAngle, @as(c_int, segments), color);
-}
-
-/// Draw circle sector outline
-pub fn drawCircleSectorLines(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
-    cdef.DrawCircleSectorLines(center, radius, startAngle, endAngle, @as(c_int, segments), color);
-}
-
-/// Draw circle outline
-pub fn drawCircleLines(centerX: i32, centerY: i32, radius: f32, color: Color) void {
-    cdef.DrawCircleLines(@as(c_int, centerX), @as(c_int, centerY), radius, color);
-}
-
-/// Draw circle outline (Vector version)
-pub fn drawCircleLinesV(center: Vector2, radius: f32, color: Color) void {
-    cdef.DrawCircleLinesV(center, radius, color);
-}
-
-/// Draw ellipse
-pub fn drawEllipse(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: Color) void {
-    cdef.DrawEllipse(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
-}
-
-/// Draw ellipse (Vector version)
-pub fn drawEllipseV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
-    cdef.DrawEllipseV(center, radiusH, radiusV, color);
-}
-
-/// Draw ellipse outline
-pub fn drawEllipseLines(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: Color) void {
-    cdef.DrawEllipseLines(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
-}
-
-/// Draw ellipse outline (Vector version)
-pub fn drawEllipseLinesV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
-    cdef.DrawEllipseLinesV(center, radiusH, radiusV, color);
-}
-
-/// Draw ring
-pub fn drawRing(center: Vector2, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
-    cdef.DrawRing(center, innerRadius, outerRadius, startAngle, endAngle, @as(c_int, segments), color);
-}
-
-/// Draw ring outline
-pub fn drawRingLines(center: Vector2, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
-    cdef.DrawRingLines(center, innerRadius, outerRadius, startAngle, endAngle, @as(c_int, segments), color);
+/// Draw triangle outline with line thickness, counter-clockwise vertex order
+pub fn drawTriangleLinesEx(v1: Vector2, v2: Vector2, v3: Vector2, thick: f32, color: Color) void {
+    cdef.DrawTriangleLinesEx(v1, v2, v3, thick, color);
 }
 
 /// Draw a color-filled rectangle
@@ -3895,9 +3874,9 @@ pub fn drawRectangleGradientH(posX: i32, posY: i32, width: i32, height: i32, lef
     cdef.DrawRectangleGradientH(@as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), left, right);
 }
 
-/// Draw a gradient-filled rectangle with custom vertex colors
-pub fn drawRectangleGradientEx(rec: Rectangle, topLeft: Color, bottomLeft: Color, bottomRight: Color, topRight: Color) void {
-    cdef.DrawRectangleGradientEx(rec, topLeft, bottomLeft, bottomRight, topRight);
+/// Draw a gradient-filled rectangle with custom vertex colors, counter-clockwise color order
+pub fn drawRectangleGradientEx(rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color) void {
+    cdef.DrawRectangleGradientEx(rec, col1, col2, col3, col4);
 }
 
 /// Draw rectangle outline
@@ -3905,9 +3884,9 @@ pub fn drawRectangleLines(posX: i32, posY: i32, width: i32, height: i32, color: 
     cdef.DrawRectangleLines(@as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), color);
 }
 
-/// Draw rectangle outline with extended parameters
-pub fn drawRectangleLinesEx(rec: Rectangle, lineThick: f32, color: Color) void {
-    cdef.DrawRectangleLinesEx(rec, lineThick, color);
+/// Draw rectangle outline with line thickness
+pub fn drawRectangleLinesEx(rec: Rectangle, thick: f32, color: Color) void {
+    cdef.DrawRectangleLinesEx(rec, thick, color);
 }
 
 /// Draw rectangle with rounded edges
@@ -3920,22 +3899,12 @@ pub fn drawRectangleRoundedLines(rec: Rectangle, roundness: f32, segments: i32, 
     cdef.DrawRectangleRoundedLines(rec, roundness, @as(c_int, segments), color);
 }
 
-/// Draw rectangle with rounded edges outline
-pub fn drawRectangleRoundedLinesEx(rec: Rectangle, roundness: f32, segments: i32, lineThick: f32, color: Color) void {
-    cdef.DrawRectangleRoundedLinesEx(rec, roundness, @as(c_int, segments), lineThick, color);
+/// Draw rectangle lines with rounded edges outline and line thickness
+pub fn drawRectangleRoundedLinesEx(rec: Rectangle, roundness: f32, segments: i32, thick: f32, color: Color) void {
+    cdef.DrawRectangleRoundedLinesEx(rec, roundness, @as(c_int, segments), thick, color);
 }
 
-/// Draw a color-filled triangle (vertex in counter-clockwise order!)
-pub fn drawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
-    cdef.DrawTriangle(v1, v2, v3, color);
-}
-
-/// Draw triangle outline (vertex in counter-clockwise order!)
-pub fn drawTriangleLines(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
-    cdef.DrawTriangleLines(v1, v2, v3, color);
-}
-
-/// Draw a regular polygon (Vector version)
+/// Draw a polygon of n sides
 pub fn drawPoly(center: Vector2, sides: i32, radius: f32, rotation: f32, color: Color) void {
     cdef.DrawPoly(center, @as(c_int, sides), radius, rotation, color);
 }
@@ -3945,9 +3914,94 @@ pub fn drawPolyLines(center: Vector2, sides: i32, radius: f32, rotation: f32, co
     cdef.DrawPolyLines(center, @as(c_int, sides), radius, rotation, color);
 }
 
-/// Draw a polygon outline of n sides with extended parameters
-pub fn drawPolyLinesEx(center: Vector2, sides: i32, radius: f32, rotation: f32, lineThick: f32, color: Color) void {
-    cdef.DrawPolyLinesEx(center, @as(c_int, sides), radius, rotation, lineThick, color);
+/// Draw a polygon outline of n sides with line thickness
+pub fn drawPolyLinesEx(center: Vector2, sides: i32, radius: f32, rotation: f32, thick: f32, color: Color) void {
+    cdef.DrawPolyLinesEx(center, @as(c_int, sides), radius, rotation, thick, color);
+}
+
+/// Draw a color-filled circle
+pub fn drawCircle(centerX: i32, centerY: i32, radius: f32, color: Color) void {
+    cdef.DrawCircle(@as(c_int, centerX), @as(c_int, centerY), radius, color);
+}
+
+/// Draw a color-filled circle (Vector version)
+pub fn drawCircleV(center: Vector2, radius: f32, color: Color) void {
+    cdef.DrawCircleV(center, radius, color);
+}
+
+/// Draw a gradient-filled circle
+pub fn drawCircleGradient(center: Vector2, radius: f32, inner: Color, outer: Color) void {
+    cdef.DrawCircleGradient(center, radius, inner, outer);
+}
+
+/// Draw a piece of a circle
+pub fn drawCircleSector(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
+    cdef.DrawCircleSector(center, radius, startAngle, endAngle, @as(c_int, segments), color);
+}
+
+/// Draw circle sector outline
+pub fn drawCircleSectorLines(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
+    cdef.DrawCircleSectorLines(center, radius, startAngle, endAngle, @as(c_int, segments), color);
+}
+
+/// Draw circle sector outline with thickness
+pub fn drawCircleSectorLinesEx(center: Vector2, radius: f32, startAngle: f32, endAngle: f32, segments: i32, thick: f32, color: Color) void {
+    cdef.DrawCircleSectorLinesEx(center, radius, startAngle, endAngle, @as(c_int, segments), thick, color);
+}
+
+/// Draw circle outline
+pub fn drawCircleLines(centerX: i32, centerY: i32, radius: f32, color: Color) void {
+    cdef.DrawCircleLines(@as(c_int, centerX), @as(c_int, centerY), radius, color);
+}
+
+/// Draw circle outline (Vector version)
+pub fn drawCircleLinesV(center: Vector2, radius: f32, color: Color) void {
+    cdef.DrawCircleLinesV(center, radius, color);
+}
+
+/// Draw circle outline with line thickness
+pub fn drawCircleLinesEx(center: Vector2, radius: f32, thick: f32, color: Color) void {
+    cdef.DrawCircleLinesEx(center, radius, thick, color);
+}
+
+/// Draw ellipse
+pub fn drawEllipse(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipse(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
+}
+
+/// Draw ellipse (Vector version)
+pub fn drawEllipseV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipseV(center, radiusH, radiusV, color);
+}
+
+/// Draw ellipse outline
+pub fn drawEllipseLines(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipseLines(@as(c_int, centerX), @as(c_int, centerY), radiusH, radiusV, color);
+}
+
+/// Draw ellipse outline (Vector version)
+pub fn drawEllipseLinesV(center: Vector2, radiusH: f32, radiusV: f32, color: Color) void {
+    cdef.DrawEllipseLinesV(center, radiusH, radiusV, color);
+}
+
+/// Draw ellipse outline with line thickness
+pub fn drawEllipseLinesEx(center: Vector2, radiusH: f32, radiusV: f32, thick: f32, color: Color) void {
+    cdef.DrawEllipseLinesEx(center, radiusH, radiusV, thick, color);
+}
+
+/// Draw ring
+pub fn drawRing(center: Vector2, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
+    cdef.DrawRing(center, innerRadius, outerRadius, startAngle, endAngle, @as(c_int, segments), color);
+}
+
+/// Draw ring outline
+pub fn drawRingLines(center: Vector2, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: Color) void {
+    cdef.DrawRingLines(center, innerRadius, outerRadius, startAngle, endAngle, @as(c_int, segments), color);
+}
+
+/// Draw ring outline with line thickness
+pub fn drawRingLinesEx(center: Vector2, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, thick: f32, color: Color) void {
+    cdef.DrawRingLinesEx(center, innerRadius, outerRadius, startAngle, endAngle, @as(c_int, segments), thick, color);
 }
 
 /// Draw spline segment: Linear, 2 points
@@ -3991,8 +4045,8 @@ pub fn getSplinePointCatmullRom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vecto
 }
 
 /// Get (evaluate) spline point: Quadratic Bezier
-pub fn getSplinePointBezierQuad(p1: Vector2, c2: Vector2, p3: Vector2, t: f32) Vector2 {
-    return cdef.GetSplinePointBezierQuad(p1, c2, p3, t);
+pub fn getSplinePointBezierQuadratic(p1: Vector2, c2: Vector2, p3: Vector2, t: f32) Vector2 {
+    return cdef.GetSplinePointBezierQuadratic(p1, c2, p3, t);
 }
 
 /// Get (evaluate) spline point: Cubic Bezier
@@ -4015,7 +4069,7 @@ pub fn checkCollisionCircleRec(center: Vector2, radius: f32, rec: Rectangle) boo
     return cdef.CheckCollisionCircleRec(center, radius, rec);
 }
 
-/// Check if circle collides with a line created betweeen two points [p1] and [p2]
+/// Check if circle collides with a line created between two points [p1] and [p2]
 pub fn checkCollisionCircleLine(center: Vector2, radius: f32, p1: Vector2, p2: Vector2) bool {
     return cdef.CheckCollisionCircleLine(center, radius, p1, p2);
 }
@@ -4244,8 +4298,8 @@ pub fn imageColorGrayscale(image: *Image) void {
 }
 
 /// Modify image color: contrast (-100 to 100)
-pub fn imageColorContrast(image: *Image, contrast: f32) void {
-    cdef.ImageColorContrast(@as([*c]Image, @ptrCast(image)), contrast);
+pub fn imageColorContrast(image: *Image, contrast: i32) void {
+    cdef.ImageColorContrast(@as([*c]Image, @ptrCast(image)), @as(c_int, contrast));
 }
 
 /// Modify image color: brightness (-255 to 255)
@@ -4286,7 +4340,7 @@ pub fn getImageColor(image: Image, x: i32, y: i32) Color {
     return cdef.GetImageColor(image, @as(c_int, x), @as(c_int, y));
 }
 
-/// Clear image background with given color
+/// Clear image background with provided color
 pub fn imageClearBackground(dst: *Image, color: Color) void {
     cdef.ImageClearBackground(@as([*c]Image, @ptrCast(dst)), color);
 }
@@ -4316,6 +4370,71 @@ pub fn imageDrawLineEx(dst: *Image, start: Vector2, end: Vector2, thick: i32, co
     cdef.ImageDrawLineEx(@as([*c]Image, @ptrCast(dst)), start, end, @as(c_int, thick), color);
 }
 
+/// Draw a lines sequence within an image
+pub fn imageDrawLineStrip(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
+    cdef.ImageDrawLineStrip(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
+}
+
+/// Draw triangle within an image
+pub fn imageDrawTriangle(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    cdef.ImageDrawTriangle(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, color);
+}
+
+/// Draw triangle with interpolated colors within an image
+pub fn imageDrawTriangleGradient(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color) void {
+    cdef.ImageDrawTriangleGradient(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, c1, c2, c3);
+}
+
+/// Draw triangle outline within an image
+pub fn imageDrawTriangleLines(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    cdef.ImageDrawTriangleLines(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, color);
+}
+
+/// Draw a triangle fan defined by points within an image (first vertex is the center)
+pub fn imageDrawTriangleFan(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
+    cdef.ImageDrawTriangleFan(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
+}
+
+/// Draw a triangle strip defined by points within an image
+pub fn imageDrawTriangleStrip(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
+    cdef.ImageDrawTriangleStrip(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
+}
+
+/// Draw rectangle within an image
+pub fn imageDrawRectangle(dst: *Image, posX: i32, posY: i32, width: i32, height: i32, color: Color) void {
+    cdef.ImageDrawRectangle(@as([*c]Image, @ptrCast(dst)), @as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), color);
+}
+
+/// Draw rectangle within an image (Vector version)
+pub fn imageDrawRectangleV(dst: *Image, position: Vector2, size: Vector2, color: Color) void {
+    cdef.ImageDrawRectangleV(@as([*c]Image, @ptrCast(dst)), position, size, color);
+}
+
+/// Draw rectangle within an image
+pub fn imageDrawRectangleRec(dst: *Image, rec: Rectangle, color: Color) void {
+    cdef.ImageDrawRectangleRec(@as([*c]Image, @ptrCast(dst)), rec, color);
+}
+
+/// Draw a color-filled rectangle with pro parameters within and image
+pub fn imageDrawRectanglePro(dst: *Image, rec: Rectangle, origin: Vector2, rotation: f32, color: Color) void {
+    cdef.ImageDrawRectanglePro(@as([*c]Image, @ptrCast(dst)), rec, origin, rotation, color);
+}
+
+/// Draw rectangle lines within an image
+pub fn imageDrawRectangleLines(dst: *Image, posX: i32, posY: i32, width: i32, height: i32, color: Color) void {
+    cdef.ImageDrawRectangleLines(@as([*c]Image, @ptrCast(dst)), @as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), color);
+}
+
+/// Draw rectangle lines within an image with line thickness
+pub fn imageDrawRectangleLinesEx(dst: *Image, rec: Rectangle, thick: i32, color: Color) void {
+    cdef.ImageDrawRectangleLinesEx(@as([*c]Image, @ptrCast(dst)), rec, @as(c_int, thick), color);
+}
+
+/// Draw rectangle with gradient colors within an image, counter-clockwise color order
+pub fn imageDrawRectangleGradientEx(dst: *Image, rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color) void {
+    cdef.ImageDrawRectangleGradientEx(@as([*c]Image, @ptrCast(dst)), rec, col1, col2, col3, col4);
+}
+
 /// Draw a filled circle within an image
 pub fn imageDrawCircle(dst: *Image, centerX: i32, centerY: i32, radius: i32, color: Color) void {
     cdef.ImageDrawCircle(@as([*c]Image, @ptrCast(dst)), @as(c_int, centerX), @as(c_int, centerY), @as(c_int, radius), color);
@@ -4336,54 +4455,29 @@ pub fn imageDrawCircleLinesV(dst: *Image, center: Vector2, radius: i32, color: C
     cdef.ImageDrawCircleLinesV(@as([*c]Image, @ptrCast(dst)), center, @as(c_int, radius), color);
 }
 
-/// Draw rectangle within an image
-pub fn imageDrawRectangle(dst: *Image, posX: i32, posY: i32, width: i32, height: i32, color: Color) void {
-    cdef.ImageDrawRectangle(@as([*c]Image, @ptrCast(dst)), @as(c_int, posX), @as(c_int, posY), @as(c_int, width), @as(c_int, height), color);
+/// Draw a gradient-filled circle within an image
+pub fn imageDrawCircleGradient(dst: *Image, center: Vector2, radius: f32, inner: Color, outer: Color) void {
+    cdef.ImageDrawCircleGradient(@as([*c]Image, @ptrCast(dst)), center, radius, inner, outer);
 }
 
-/// Draw rectangle within an image (Vector version)
-pub fn imageDrawRectangleV(dst: *Image, position: Vector2, size: Vector2, color: Color) void {
-    cdef.ImageDrawRectangleV(@as([*c]Image, @ptrCast(dst)), position, size, color);
+/// Draw an image within an image
+pub fn imageDrawImage(dst: *Image, src: Image, posX: i32, posY: i32, tint: Color) void {
+    cdef.ImageDrawImage(@as([*c]Image, @ptrCast(dst)), src, @as(c_int, posX), @as(c_int, posY), tint);
 }
 
-/// Draw rectangle within an image
-pub fn imageDrawRectangleRec(dst: *Image, rec: Rectangle, color: Color) void {
-    cdef.ImageDrawRectangleRec(@as([*c]Image, @ptrCast(dst)), rec, color);
+/// Draw an image with scaling and rotation within an image
+pub fn imageDrawImageEx(dst: *Image, src: Image, position: Vector2, rotation: f32, scale: f32, tint: Color) void {
+    cdef.ImageDrawImageEx(@as([*c]Image, @ptrCast(dst)), src, position, rotation, scale, tint);
 }
 
-/// Draw rectangle lines within an image
-pub fn imageDrawRectangleLines(dst: *Image, rec: Rectangle, thick: i32, color: Color) void {
-    cdef.ImageDrawRectangleLines(@as([*c]Image, @ptrCast(dst)), rec, @as(c_int, thick), color);
+/// Draw a part of an image defined by a rectangle within an image
+pub fn imageDrawImageRec(dst: *Image, src: Image, srcRec: Rectangle, position: Vector2, tint: Color) void {
+    cdef.ImageDrawImageRec(@as([*c]Image, @ptrCast(dst)), src, srcRec, position, tint);
 }
 
-/// Draw triangle within an image
-pub fn imageDrawTriangle(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
-    cdef.ImageDrawTriangle(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, color);
-}
-
-/// Draw triangle with interpolated colors within an image
-pub fn imageDrawTriangleEx(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color) void {
-    cdef.ImageDrawTriangleEx(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, c1, c2, c3);
-}
-
-/// Draw triangle outline within an image
-pub fn imageDrawTriangleLines(dst: *Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
-    cdef.ImageDrawTriangleLines(@as([*c]Image, @ptrCast(dst)), v1, v2, v3, color);
-}
-
-/// Draw a triangle fan defined by points within an image (first vertex is the center)
-pub fn imageDrawTriangleFan(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
-    cdef.ImageDrawTriangleFan(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
-}
-
-/// Draw a triangle strip defined by points within an image
-pub fn imageDrawTriangleStrip(dst: *Image, points: []const Vector2, pointCount: i32, color: Color) void {
-    cdef.ImageDrawTriangleStrip(@as([*c]Image, @ptrCast(dst)), @as([*c]const Vector2, @ptrCast(points)), @as(c_int, pointCount), color);
-}
-
-/// Draw a source image within a destination image (tint applied to source)
-pub fn imageDraw(dst: *Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color) void {
-    cdef.ImageDraw(@as([*c]Image, @ptrCast(dst)), src, srcRec, dstRec, tint);
+/// Draw a part of an image defined by a rectangle into destination rectangle, with scaling and rotation, within an image
+pub fn imageDrawImagePro(dst: *Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
+    cdef.ImageDrawImagePro(@as([*c]Image, @ptrCast(dst)), src, srcRec, dstRec, origin, rotation, tint);
 }
 
 /// Draw text (using default font) within an image (destination)
@@ -4396,7 +4490,17 @@ pub fn imageDrawTextEx(dst: *Image, font: Font, text: [:0]const u8, position: Ve
     cdef.ImageDrawTextEx(@as([*c]Image, @ptrCast(dst)), font, @as([*c]const u8, @ptrCast(text)), position, fontSize, spacing, tint);
 }
 
-/// Check if a texture is valid (loaded in GPU)
+/// Draw text using Font and pro parameters (rotation)
+pub fn imageDrawTextPro(dst: *Image, font: Font, text: [:0]const u8, position: Vector2, origin: Vector2, rotation: f32, fontSize: f32, spacing: f32, tint: Color) void {
+    cdef.ImageDrawTextPro(@as([*c]Image, @ptrCast(dst)), font, @as([*c]const u8, @ptrCast(text)), position, origin, rotation, fontSize, spacing, tint);
+}
+
+/// Load texture for rendering (framebuffer), with specific format
+pub fn loadRenderTextureEx(width: i32, height: i32, format: PixelFormat) RenderTexture2D {
+    return cdef.LoadRenderTextureEx(@as(c_int, width), @as(c_int, height), format);
+}
+
+/// Check if texture is valid (loaded in GPU)
 pub fn isTextureValid(texture: Texture2D) bool {
     return cdef.IsTextureValid(texture);
 }
@@ -4406,7 +4510,7 @@ pub fn unloadTexture(texture: Texture2D) void {
     cdef.UnloadTexture(texture);
 }
 
-/// Check if a render texture is valid (loaded in GPU)
+/// Check if render texture is valid (loaded in GPU)
 pub fn isRenderTextureValid(target: RenderTexture2D) bool {
     return cdef.IsRenderTextureValid(target);
 }
@@ -4451,24 +4555,24 @@ pub fn drawTextureV(texture: Texture2D, position: Vector2, tint: Color) void {
     cdef.DrawTextureV(texture, position, tint);
 }
 
-/// Draw a Texture2D with extended parameters
+/// Draw a Texture2D with rotation and scale
 pub fn drawTextureEx(texture: Texture2D, position: Vector2, rotation: f32, scale: f32, tint: Color) void {
     cdef.DrawTextureEx(texture, position, rotation, scale, tint);
 }
 
 /// Draw a part of a texture defined by a rectangle
-pub fn drawTextureRec(texture: Texture2D, source: Rectangle, position: Vector2, tint: Color) void {
-    cdef.DrawTextureRec(texture, source, position, tint);
+pub fn drawTextureRec(texture: Texture2D, rec: Rectangle, position: Vector2, tint: Color) void {
+    cdef.DrawTextureRec(texture, rec, position, tint);
 }
 
-/// Draw a part of a texture defined by a rectangle with 'pro' parameters
-pub fn drawTexturePro(texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
-    cdef.DrawTexturePro(texture, source, dest, origin, rotation, tint);
+/// Draw a part of a texture defined by a source rectangle to destination rectangle, with scaling and rotation
+pub fn drawTexturePro(texture: Texture2D, srcrec: Rectangle, dstrec: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
+    cdef.DrawTexturePro(texture, srcrec, dstrec, origin, rotation, tint);
 }
 
-/// Draws a texture (or part of it) that stretches or shrinks nicely
-pub fn drawTextureNPatch(texture: Texture2D, nPatchInfo: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
-    cdef.DrawTextureNPatch(texture, nPatchInfo, dest, origin, rotation, tint);
+/// Draw a texture (or part of it) that stretches or shrinks nicely
+pub fn drawTextureNPatch(texture: Texture2D, nPatchInfo: NPatchInfo, dstrec: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
+    cdef.DrawTextureNPatch(texture, nPatchInfo, dstrec, origin, rotation, tint);
 }
 
 /// Check if two colors are equal
@@ -4537,7 +4641,7 @@ pub fn getColor(hexValue: u32) Color {
 }
 
 /// Get Color from a source pixel pointer of certain format
-pub fn getPixelColor(srcPtr: *anyopaque, format: PixelFormat) Color {
+pub fn getPixelColor(srcPtr: *const anyopaque, format: PixelFormat) Color {
     return cdef.GetPixelColor(srcPtr, format);
 }
 
@@ -4551,7 +4655,7 @@ pub fn getPixelDataSize(width: i32, height: i32, format: PixelFormat) i32 {
     return @as(i32, cdef.GetPixelDataSize(@as(c_int, width), @as(c_int, height), format));
 }
 
-/// Check if a font is valid (font data loaded, WARNING: GPU texture not checked)
+/// Check if font is valid (font data loaded, WARNING: GPU texture not checked)
 pub fn isFontValid(font: Font) bool {
     return cdef.IsFontValid(font);
 }
@@ -4674,7 +4778,7 @@ pub fn textCopy(dst: *u8, src: [:0]const u8) i32 {
     return @as(i32, cdef.TextCopy(@as([*c]u8, @ptrCast(dst)), @as([*c]const u8, @ptrCast(src))));
 }
 
-/// Check if two text string are equal
+/// Check if two text strings are equal
 pub fn textIsEqual(text1: [:0]const u8, text2: [:0]const u8) bool {
     return cdef.TextIsEqual(@as([*c]const u8, @ptrCast(text1)), @as([*c]const u8, @ptrCast(text2)));
 }
@@ -4797,7 +4901,7 @@ pub fn drawCircle3D(center: Vector3, radius: f32, rotationAxis: Vector3, rotatio
     cdef.DrawCircle3D(center, radius, rotationAxis, rotationAngle, color);
 }
 
-/// Draw a color-filled triangle (vertex in counter-clockwise order!)
+/// Draw a color-filled triangle, counter-clockwise vertex order
 pub fn drawTriangle3D(v1: Vector3, v2: Vector3, v3: Vector3, color: Color) void {
     cdef.DrawTriangle3D(v1, v2, v3, color);
 }
@@ -4827,7 +4931,7 @@ pub fn drawSphere(centerPos: Vector3, radius: f32, color: Color) void {
     cdef.DrawSphere(centerPos, radius, color);
 }
 
-/// Draw sphere with extended parameters
+/// Draw sphere with defined rings and slices
 pub fn drawSphereEx(centerPos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) void {
     cdef.DrawSphereEx(centerPos, radius, @as(c_int, rings), @as(c_int, slices), color);
 }
@@ -4838,8 +4942,8 @@ pub fn drawSphereWires(centerPos: Vector3, radius: f32, rings: i32, slices: i32,
 }
 
 /// Draw a cylinder/cone
-pub fn drawCylinder(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, slices: i32, color: Color) void {
-    cdef.DrawCylinder(position, radiusTop, radiusBottom, height, @as(c_int, slices), color);
+pub fn drawCylinder(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, sides: i32, color: Color) void {
+    cdef.DrawCylinder(position, radiusTop, radiusBottom, height, @as(c_int, sides), color);
 }
 
 /// Draw a cylinder with base at startPos and top at endPos
@@ -4848,8 +4952,8 @@ pub fn drawCylinderEx(startPos: Vector3, endPos: Vector3, startRadius: f32, endR
 }
 
 /// Draw a cylinder/cone wires
-pub fn drawCylinderWires(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, slices: i32, color: Color) void {
-    cdef.DrawCylinderWires(position, radiusTop, radiusBottom, height, @as(c_int, slices), color);
+pub fn drawCylinderWires(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, sides: i32, color: Color) void {
+    cdef.DrawCylinderWires(position, radiusTop, radiusBottom, height, @as(c_int, sides), color);
 }
 
 /// Draw a cylinder wires with base at startPos and top at endPos
@@ -4858,13 +4962,13 @@ pub fn drawCylinderWiresEx(startPos: Vector3, endPos: Vector3, startRadius: f32,
 }
 
 /// Draw a capsule with the center of its sphere caps at startPos and endPos
-pub fn drawCapsule(startPos: Vector3, endPos: Vector3, radius: f32, slices: i32, rings: i32, color: Color) void {
-    cdef.DrawCapsule(startPos, endPos, radius, @as(c_int, slices), @as(c_int, rings), color);
+pub fn drawCapsule(startPos: Vector3, endPos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) void {
+    cdef.DrawCapsule(startPos, endPos, radius, @as(c_int, rings), @as(c_int, slices), color);
 }
 
 /// Draw capsule wireframe with the center of its sphere caps at startPos and endPos
-pub fn drawCapsuleWires(startPos: Vector3, endPos: Vector3, radius: f32, slices: i32, rings: i32, color: Color) void {
-    cdef.DrawCapsuleWires(startPos, endPos, radius, @as(c_int, slices), @as(c_int, rings), color);
+pub fn drawCapsuleWires(startPos: Vector3, endPos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) void {
+    cdef.DrawCapsuleWires(startPos, endPos, radius, @as(c_int, rings), @as(c_int, slices), color);
 }
 
 /// Draw a plane XZ
@@ -4882,7 +4986,7 @@ pub fn drawGrid(slices: i32, spacing: f32) void {
     cdef.DrawGrid(@as(c_int, slices), spacing);
 }
 
-/// Check if a model is valid (loaded in GPU, VAO/VBOs)
+/// Check if model is valid (loaded in GPU, VAO/VBOs)
 pub fn isModelValid(model: Model) bool {
     return cdef.IsModelValid(model);
 }
@@ -4902,7 +5006,7 @@ pub fn drawModel(model: Model, position: Vector3, scale: f32, tint: Color) void 
     cdef.DrawModel(model, position, scale, tint);
 }
 
-/// Draw a model with extended parameters
+/// Draw a model with custom transform
 pub fn drawModelEx(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f32, scale: Vector3, tint: Color) void {
     cdef.DrawModelEx(model, position, rotationAxis, rotationAngle, scale, tint);
 }
@@ -4912,7 +5016,7 @@ pub fn drawModelWires(model: Model, position: Vector3, scale: f32, tint: Color) 
     cdef.DrawModelWires(model, position, scale, tint);
 }
 
-/// Draw a model wires (with texture if set) with extended parameters
+/// Draw a model wires with custom transform
 pub fn drawModelWiresEx(model: Model, position: Vector3, rotationAxis: Vector3, rotationAngle: f32, scale: Vector3, tint: Color) void {
     cdef.DrawModelWiresEx(model, position, rotationAxis, rotationAngle, scale, tint);
 }
@@ -4927,14 +5031,14 @@ pub fn drawBillboard(camera: Camera, texture: Texture2D, position: Vector3, scal
     cdef.DrawBillboard(camera, texture, position, scale, tint);
 }
 
-/// Draw a billboard texture defined by source
-pub fn drawBillboardRec(camera: Camera, texture: Texture2D, source: Rectangle, position: Vector3, size: Vector2, tint: Color) void {
-    cdef.DrawBillboardRec(camera, texture, source, position, size, tint);
+/// Draw a billboard texture defined by rectangle
+pub fn drawBillboardRec(camera: Camera, texture: Texture2D, rec: Rectangle, position: Vector3, size: Vector2, tint: Color) void {
+    cdef.DrawBillboardRec(camera, texture, rec, position, size, tint);
 }
 
-/// Draw a billboard texture defined by source and rotation
-pub fn drawBillboardPro(camera: Camera, texture: Texture2D, source: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) void {
-    cdef.DrawBillboardPro(camera, texture, source, position, up, size, origin, rotation, tint);
+/// Draw a billboard texture defined by source rectangle with scaling and rotation
+pub fn drawBillboardPro(camera: Camera, texture: Texture2D, rec: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) void {
+    cdef.DrawBillboardPro(camera, texture, rec, position, up, size, origin, rotation, tint);
 }
 
 /// Upload mesh vertex data in GPU and provide VAO/VBO ids
@@ -5032,7 +5136,7 @@ pub fn genMeshCubicmap(cubicmap: Image, cubeSize: Vector3) Mesh {
     return cdef.GenMeshCubicmap(cubicmap, cubeSize);
 }
 
-/// Check if a material is valid (shader assigned, map textures loaded in GPU)
+/// Check if material is valid (shader assigned, map textures loaded in GPU)
 pub fn isMaterialValid(material: Material) bool {
     return cdef.IsMaterialValid(material);
 }
@@ -5140,7 +5244,7 @@ pub fn getMasterVolume() f32 {
     return cdef.GetMasterVolume();
 }
 
-/// Checks if wave data is valid (data loaded and parameters)
+/// Check if wave data is valid (data loaded and parameters)
 pub fn isWaveValid(wave: Wave) bool {
     return cdef.IsWaveValid(wave);
 }
@@ -5150,19 +5254,19 @@ pub fn loadSoundFromWave(wave: Wave) Sound {
     return cdef.LoadSoundFromWave(wave);
 }
 
-/// Create a new sound that shares the same sample data as the source sound, does not own the sound data
+/// Load sound alias, new sound that shares the same sample data as the source sound, does not own the sound data
 pub fn loadSoundAlias(source: Sound) Sound {
     return cdef.LoadSoundAlias(source);
 }
 
-/// Checks if a sound is valid (data loaded and buffers initialized)
+/// Check if sound is valid (data loaded and buffers initialized)
 pub fn isSoundValid(sound: Sound) bool {
     return cdef.IsSoundValid(sound);
 }
 
 /// Update sound buffer with new data (default data format: 32 bit float, stereo)
-pub fn updateSound(sound: Sound, data: *const anyopaque, sampleCount: i32) void {
-    cdef.UpdateSound(sound, data, @as(c_int, sampleCount));
+pub fn updateSound(sound: Sound, data: *const anyopaque, frameCount: i32) void {
+    cdef.UpdateSound(sound, data, @as(c_int, frameCount));
 }
 
 /// Unload wave data
@@ -5175,7 +5279,7 @@ pub fn unloadSound(sound: Sound) void {
     cdef.UnloadSound(sound);
 }
 
-/// Unload a sound alias (does not deallocate sample data)
+/// Unload sound alias (does not deallocate sample data)
 pub fn unloadSoundAlias(alias: Sound) void {
     cdef.UnloadSoundAlias(alias);
 }
@@ -5210,7 +5314,7 @@ pub fn resumeSound(sound: Sound) void {
     cdef.ResumeSound(sound);
 }
 
-/// Check if a sound is currently playing
+/// Check if sound is currently playing
 pub fn isSoundPlaying(sound: Sound) bool {
     return cdef.IsSoundPlaying(sound);
 }
@@ -5250,7 +5354,7 @@ pub fn unloadWaveSamples(samples: []f32) void {
     cdef.UnloadWaveSamples(@as([*c]f32, @ptrCast(samples)));
 }
 
-/// Checks if a music stream is valid (context and buffers initialized)
+/// Check if music stream is valid (context and buffers initialized)
 pub fn isMusicValid(music: Music) bool {
     return cdef.IsMusicValid(music);
 }
@@ -5270,7 +5374,7 @@ pub fn isMusicStreamPlaying(music: Music) bool {
     return cdef.IsMusicStreamPlaying(music);
 }
 
-/// Updates buffers for music streaming
+/// Update buffers for music streaming
 pub fn updateMusicStream(music: Music) void {
     cdef.UpdateMusicStream(music);
 }
@@ -5300,12 +5404,12 @@ pub fn setMusicVolume(music: Music, volume: f32) void {
     cdef.SetMusicVolume(music, volume);
 }
 
-/// Set pitch for a music (1.0 is base level)
+/// Set pitch for music (1.0 is base level)
 pub fn setMusicPitch(music: Music, pitch: f32) void {
     cdef.SetMusicPitch(music, pitch);
 }
 
-/// Set pan for a music (-1.0 left, 0.0 center, 1.0 right)
+/// Set pan for music (-1.0 left, 0.0 center, 1.0 right)
 pub fn setMusicPan(music: Music, pan: f32) void {
     cdef.SetMusicPan(music, pan);
 }
@@ -5320,7 +5424,7 @@ pub fn getMusicTimePlayed(music: Music) f32 {
     return cdef.GetMusicTimePlayed(music);
 }
 
-/// Checks if an audio stream is valid (buffers initialized)
+/// Check if an audio stream is valid (buffers initialized)
 pub fn isAudioStreamValid(stream: AudioStream) bool {
     return cdef.IsAudioStreamValid(stream);
 }
@@ -5375,7 +5479,7 @@ pub fn setAudioStreamPitch(stream: AudioStream, pitch: f32) void {
     cdef.SetAudioStreamPitch(stream, pitch);
 }
 
-/// Set pan for audio stream (-1.0 to 1.0 range, 0.0 is centered)
+/// Set pan for audio stream (-1.0 left, 0.0 center, 1.0 right)
 pub fn setAudioStreamPan(stream: AudioStream, pan: f32) void {
     cdef.SetAudioStreamPan(stream, pan);
 }

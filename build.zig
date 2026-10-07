@@ -10,6 +10,18 @@ pub const OpenglVersion = rl.OpenglVersion;
 pub const LinuxDisplayBackend = rl.LinuxDisplayBackend;
 pub const PlatformBackend = rl.PlatformBackend;
 
+/// raylib's `emsdk.emccStep` always invokes `emcc.py`, which can't be spawned
+/// directly on Windows. Point the underlying run step at `emcc.bat` instead.
+fn fixEmccOnWindows(b: *std.Build, emcc_step: *std.Build.Step) !void {
+    if (@import("builtin").os.tag != .windows) return;
+    for (emcc_step.dependencies.items) |dep| {
+        const run = dep.cast(std.Build.Step.Run) orelse continue;
+        run.argv.items[0].lazy_path.lazy_path = try emsdk.path(b, "upstream/emscripten/emcc.bat");
+        return;
+    }
+    return error.EmccRunStepNotFound;
+}
+
 const Program = struct {
     name: []const u8,
     path: []const u8,
@@ -63,6 +75,11 @@ pub fn build(b: *std.Build) !void {
         .config = options.config,
         .raygui = true,
     });
+
+    // raylib's build script bails out before creating its artifact when one of
+    // its lazy dependencies hasn't been fetched yet. Propagate so the build
+    // runner fetches them and reruns us.
+    if (b.graph.needed_lazy_dependencies.count() != 0) return error.LazyDependencyNeeded;
 
     const raylib_artifact = raylib_dep.artifact("raylib");
 
@@ -551,10 +568,10 @@ pub fn build(b: *std.Build) !void {
     const generate_binding_step = b.step("binding", "Generate the binding");
 
     const usf_dependency = b.addUpdateSourceFiles();
-    usf_dependency.addCopyFileToSource(raylib_headers.get("raylib.h").?, "lib/raylib.h");
-    usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h").?, "lib/raymath.h");
-    usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h").?, "lib/rlgl.h");
-    usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h").?, "lib/raygui.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raylib.h") orelse return error.LazyDependencyNeeded, "lib/raylib.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raymath.h") orelse return error.LazyDependencyNeeded, "lib/raymath.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("rlgl.h") orelse return error.LazyDependencyNeeded, "lib/rlgl.h");
+    usf_dependency.addCopyFileToSource(raylib_headers.get("raygui.h") orelse return error.LazyDependencyNeeded, "lib/raygui.h");
 
     const bind_step = b.addSystemCommand(&.{"python3"});
     bind_step.addFileArg(b.path("lib/generate_functions.py"));
@@ -588,20 +605,20 @@ pub fn build(b: *std.Build) !void {
             const emcc_settings = emsdk.emccDefaultSettings(b.allocator, .{
                 .optimize = optimize,
             });
-
-            const emcc_step = emsdk.emccStep(b, raylib_artifact, wasm, .{
+            const emcc_step = try emsdk.emccStep(b, &.{}, &.{ raylib_artifact, wasm }, .{
                 .optimize = optimize,
                 .flags = emcc_flags,
                 .settings = emcc_settings,
-                .shell_file_path = emsdk.shell(raylib_dep),
+                .shell_file_path = raylib_dep.path("src/shell.html"),
                 .install_dir = install_dir,
-                .embed_paths = &.{.{ .src_path = "resources/" }},
+                .preload_paths = &.{.{ .src_path = b.path("resources"), .virtual_path = "resources" }},
+                .out_file_name = wasm.name,
             });
+            try fixEmccOnWindows(b, emcc_step);
 
-            const html_filename = try std.fmt.allocPrint(b.allocator, "{s}.html", .{wasm.name});
-            const emrun_step = emsdk.emrunStep(
+            const emrun_step = try emsdk.emrunStep(
                 b,
-                b.getInstallPath(install_dir, html_filename),
+                b.graph.path(.install_prefix, b.fmt("{s}.html", .{wasm.name})),
                 &.{},
             );
             emrun_step.dependOn(emcc_step);

@@ -55,6 +55,10 @@ const WaveTextConfig = struct {
     waveOffset: rl.Vector3,
 };
 
+fn bufPrintZ(buf: []u8, comptime fmt: []const u8, args: anytype) ![:0]u8 {
+    return try std.mem.printSentinel(buf, fmt, args, 0);
+}
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -306,45 +310,41 @@ pub fn main() anyerror!void {
 
                 var text_buf: [64:0]u8 = @splat(0);
 
-                var opt = try std.fmt.bufPrintSentinel(&text_buf, "< SIZE: {d} >", .{font_size}, 0);
+                var opt = try bufPrintZ(&text_buf, "< SIZE: {d} >", .{font_size});
                 var m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 var pos = rl.Vector3{ .x = -m.x / 2.0, .y = 0.01, .z = 2.0 };
                 drawText3D(default_font, opt, pos, 0.8, 0.1, 0.0, false, .blue);
                 pos.z += 0.5 + m.y;
 
-                opt = try std.fmt.bufPrintSentinel(&text_buf, "< SPACING: {d} >", .{fontSpacing}, 0);
+                opt = try bufPrintZ(&text_buf, "< SPACING: {d} >", .{fontSpacing});
                 quads += std.mem.len(opt.ptr);
                 m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 pos.x = -m.x / 2.0;
                 drawText3D(default_font, opt, pos, 0.8, 0.1, 0.0, false, .blue);
                 pos.z += 0.5 + m.y;
 
-                opt = try std.fmt.bufPrintSentinel(&text_buf, "< LINE: {d} >", .{lineSpacing}, 0);
+                opt = try bufPrintZ(&text_buf, "< LINE: {d} >", .{lineSpacing});
                 quads += std.mem.len(opt.ptr);
                 m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 pos.x = -m.x / 2.0;
                 drawText3D(default_font, opt, pos, 0.8, 0.1, 0.0, false, .blue);
                 pos.z += 0.5 + m.y;
 
-                opt = try std.fmt.bufPrintSentinel(&text_buf, "< LBOX: {s} >", .{if (slb) "ON" else "OFF"}, 0);
+                opt = try bufPrintZ(&text_buf, "< LBOX: {s} >", .{if (slb) "ON" else "OFF"});
                 quads += std.mem.len(opt.ptr);
                 m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 pos.x = -m.x / 2.0;
                 drawText3D(default_font, opt, pos, 0.8, 0.1, 0.0, false, .red);
                 pos.z += 0.5 + m.y;
 
-                opt = try std.fmt.bufPrintSentinel(
-                    &text_buf,
-                    "< TBOX: {s} >",
-                    .{if (show_text_boundry) "ON" else "OFF"},
-                    0);
+                opt = try bufPrintZ(&text_buf, "< TBOX: {s} >", .{if (show_text_boundry) "ON" else "OFF"});
                 quads += std.mem.len(opt.ptr);
                 m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 pos.x = -m.x / 2.0;
                 drawText3D(default_font, opt, pos, 0.8, 0.1, 0.0, false, .red);
                 pos.z += 0.5 + m.y;
 
-                opt = try std.fmt.bufPrintSentinel(&text_buf, "< LAYER DISTANCE: {d} >", .{layerDistance}, 0);
+                opt = try bufPrintZ(&text_buf, "< LAYER DISTANCE: {d} >", .{layerDistance});
                 quads += std.mem.len(opt.ptr);
                 m = rl.measureTextEx(default_font, opt, 0.8, 0.1);
                 pos.x = -m.x / 2.0;
@@ -404,12 +404,12 @@ pub fn main() anyerror!void {
 
         quads += rl.textLength(&text) * 2 * layers;
         var buf: [70:0]u8 = @splat(0);
-        const tmp = std.fmt.bufPrintSentinel(&buf, "{} layer(s) | {s} camera | {} quads ({} verts)", .{
+        const tmp = bufPrintZ(&buf, "{} layer(s) | {s} camera | {} quads ({} verts)", .{
             layers,
             if (spin) "ORBITAL" else "FREE",
             quads,
             quads * 4,
-        }, 0) catch unreachable;
+        }) catch unreachable;
         var width = rl.measureText(tmp, 10);
         rl.drawText(tmp, screen_width - 20 - width, 10, 10, .dark_green);
 
