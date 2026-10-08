@@ -16,7 +16,12 @@ pub fn main() anyerror!void {
     defer rl.closeWindow(); // Close window and OpenGL context
 
     var filePathCounter: usize = 0;
-    var filePaths: [MAX_FILEPATH_RECORDED][MAX_FILEPATH_SIZE]u8 = std.mem.zeroes([MAX_FILEPATH_RECORDED][MAX_FILEPATH_SIZE]u8);
+    const allocator = std.heap.page_allocator;
+    var filePaths = try allocator.alloc([MAX_FILEPATH_SIZE]u8, MAX_FILEPATH_RECORDED);
+    defer allocator.free(filePaths);
+    for (filePaths) |*entry| {
+        entry.* = @splat(0);
+    }
 
     rl.setTargetFPS(60);
 
