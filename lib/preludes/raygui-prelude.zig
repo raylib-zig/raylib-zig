@@ -174,7 +174,6 @@ pub const DropdownBoxProperty = enum(c_int) {
     dropdown_items_spacing,
     dropdown_arrow_hidden,
     dropdown_roll_up,
-    dropdown_max_height,
 };
 
 pub const TextBoxProperty = enum(c_int) {
