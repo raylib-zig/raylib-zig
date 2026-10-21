@@ -1,6 +1,6 @@
 .{
     .name = .raylib_zig,
-    .version = "6.0.0",
+    .version = "6.2.0",
     .fingerprint = 0xc4cfa8c610114f28,
     .dependencies = .{
         .raygui = .{
