@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   raylib v6.1-dev - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
+*   raylib v6.2 - A simple and easy-to-use library to enjoy videogames programming (www.raylib.com)
 *
 *   FEATURES:
 *       - NO external dependencies, all required libraries included with raylib
@@ -87,9 +87,9 @@
 #include <stdarg.h>     // Required for: va_list - Only used by TraceLogCallback
 
 #define RAYLIB_VERSION_MAJOR 6
-#define RAYLIB_VERSION_MINOR 1
+#define RAYLIB_VERSION_MINOR 2
 #define RAYLIB_VERSION_PATCH 0
-#define RAYLIB_VERSION  "6.1-dev"
+#define RAYLIB_VERSION  "6.2"
 
 // Function specifiers in case library is build/used as a shared library
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
@@ -1111,7 +1111,7 @@ RLAPI void UnloadRandomSequence(int *sequence);         // Unload random values 
 
 // Misc. functions
 RLAPI void TakeScreenshot(const char *fileName);                // Takes a screenshot of current screen (filename extension defines format)
-RLAPI void SetConfigFlags(unsigned int flags);                  // Set up init configuration flags (view FLAGS)
+RLAPI void SetConfigFlags(unsigned int flags);                  // Set init configuration flags (view FLAGS)
 RLAPI void OpenURL(const char *url);                            // Open URL with default system browser (if available)
 
 // Logging system

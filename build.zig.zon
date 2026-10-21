@@ -4,16 +4,16 @@
     .fingerprint = 0xc4cfa8c610114f28,
     .dependencies = .{
         .raygui = .{
-            .url = "git+https://github.com/raysan5/raygui#9cb5cfa73290ba920d071f57c1d06a4daee22f52",
-            .hash = "N-V-__8AAEXAmAArH0MVL51g7bvErPrgngfsOY9pTJEZCb8O",
+            .url = "git+https://github.com/raysan5/raygui#1abccb3a5303d041dc14404b7dd874fa665dd4af",
+            .hash = "N-V-__8AAHfAmAAiGh5pd2tF_LRtm1Wc_NbGUXbkBZ1riYkj",
         },
         .emsdk = .{
             .url = "git+https://github.com/emscripten-core/emsdk#4.0.9",
             .hash = "N-V-__8AAJl1DwBezhYo_VE6f53mPVm00R-Fk28NPW7P14EQ",
         },
         .raylib = .{
-            .url = "git+https://github.com/raysan5/raylib#2dee47282ae75d241759cc35f22e4768dcd092be",
-            .hash = "raylib-6.0.0-whq8uM2eNwXVGGNZwCSIfww2flgpamJLoaJ9Tau5lbJa",
+            .url = "git+https://github.com/raysan5/raylib#6.2",
+            .hash = "raylib-6.0.0-whq8uDpYOAVcH_KyOZ0--nYF1dEsjdQ5r4e9R24UkQOi",
         },
     },
     .minimum_zig_version = "0.17.0",

@@ -2168,9 +2168,9 @@ pub const SaveFileTextCallback = *const fn ([*c]const u8, [*c]u8) callconv(C) bo
 pub const AudioCallback = ?*const fn (?*anyopaque, c_uint) callconv(C) void;
 
 pub const RAYLIB_VERSION_MAJOR = @as(i32, 6);
-pub const RAYLIB_VERSION_MINOR = @as(i32, 1);
+pub const RAYLIB_VERSION_MINOR = @as(i32, 2);
 pub const RAYLIB_VERSION_PATCH = @as(i32, 0);
-pub const RAYLIB_VERSION = "6.1-dev";
+pub const RAYLIB_VERSION = "6.2";
 
 pub const MAX_TOUCH_POINTS = 8;
 pub const MAX_MATERIAL_MAPS = 12;
